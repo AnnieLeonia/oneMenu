@@ -1,0 +1,67 @@
+{
+  "name": "onemenu",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "PORT=8080 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom --coverage",
+    "test:watch": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "env:pull": "scp git@192.168.0.100:www/onemenu/.env .env",
+    "db:pull": "pg_dump --format=c -h 192.168.0.100 -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnnieLeonia/onemenu.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnnieLeonia/onemenu/issues"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/registerServiceWorker.js"
+    ]
+  },
+  "dependencies": {
+    "http-proxy-middleware": "2.0.1",
+    "lodash": "4.17.21",
+    "prop-types": "15.7.2",
+    "react": "16.14.0",
+    "react-autosuggest": "10.1.0",
+    "react-beautiful-dnd": "11.0.5",
+    "react-dom": "16.14.0",
+    "react-localize-redux": "2.17.5",
+    "react-redux": "7.2.4",
+    "react-router-dom": "5.2.0",
+    "redux": "4.1.1",
+    "redux-devtools-extension": "2.13.9",
+    "redux-thunk": "2.3.0"
+  },
+  "devDependencies": {
+    "enzyme": "3.11.0",
+    "enzyme-adapter-react-16": "1.15.6",
+    "eslint": "6.8.0",
+    "eslint-config-airbnb": "18.2.1",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.24.0",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-react": "7.24.0",
+    "jest-fetch-mock": "3.0.3",
+    "prettier-eslint": "13.0.0",
+    "react-scripts": "3.4.4",
+    "react-test-renderer": "16.14.0",
+    "redux-mock-store": "1.5.4"
+  },
+  "engines": {
+    "node": "12.x"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

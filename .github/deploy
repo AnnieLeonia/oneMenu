@@ -1,0 +1,14 @@
+#!/bin/bash
+set -eu # exit script on errors
+
+echo "copy onemenu env"
+rsync /home/git/www/onemenu/.env .
+
+echo "> npm install server..."
+npm run install-server
+
+# build is done with github actions
+# echo "> npm run build..."
+# npm run build
+
+export MAIN="server"
