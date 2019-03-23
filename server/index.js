@@ -25,8 +25,7 @@ const sequelize = new Sequelize(
   process.env.SEQUELIZE_PASSWORD,
   {
     host: process.env.SEQUELIZE_HOST,
-    dialect: "postgres",
-    operatorsAliases: false
+    dialect: "postgres"
   }
 );
 
@@ -59,7 +58,7 @@ passport.use(
       if (chef) {
         return done(null, chef);
       }
-      return done({ success: false, message: "401 Unauthorized" });
+      return done(null, false, { message: "401 Unauthorized" });
     }
   )
 );
