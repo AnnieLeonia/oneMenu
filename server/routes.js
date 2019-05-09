@@ -1,4 +1,6 @@
-module.exports = (app, passport, { Chef }) => {
+module.exports = (app, passport, models) => {
+  const { sequelize, Chef, Day, Dish, Sidetype, Side } = models;
+
   const isLoggedIn = (req, res, next) => {
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated()) return next();
@@ -36,5 +38,42 @@ module.exports = (app, passport, { Chef }) => {
   app.get("/api/chefs", isLoggedIn, async (req, res) => {
     const chefs = await Chef.findAll();
     res.send(chefs);
+  });
+
+  app.get("/api/days", isLoggedIn, async (req, res) => {
+    const days = await Day.findAll();
+    res.send(days);
+  });
+
+  app.get("/api/sidetypes", isLoggedIn, async (req, res) => {
+    const sidetypes = await Sidetype.findAll();
+    res.send(sidetypes);
+  });
+
+  app.post("/api/dishes", isLoggedIn, async (req, res) => {
+    const { name, date, dayId, sides } = req.body;
+    let transaction, dish;
+
+    try {
+      // Get the transaction
+      transaction = await sequelize.transaction();
+
+      // Create the dish
+      dish = await Dish.create({ name, date, dayId }, { transaction });
+
+      // Create the sides
+      for (const side of sides) {
+        await Side.create(side, { transaction });
+      }
+
+      // Commit transaction
+      await transaction.commit();
+    } catch (err) {
+      // Rollback transaction if any errors were encountered
+      await transaction.rollback();
+      return res.status(400).send(err);
+    }
+
+    return res.send(dish);
   });
 };

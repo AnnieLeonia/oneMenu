@@ -10,18 +10,14 @@ const Chef = sequelize.define("chef", {
 });
 
 const Day = sequelize.define("day", {
-  name: Sequelize.INTEGER,
+  name: Sequelize.STRING,
   weekday: Sequelize.INTEGER
 });
-
-Day.belongsTo(Chef);
 
 const Dish = sequelize.define("dish", {
   name: Sequelize.STRING,
   date: Sequelize.STRING
 });
-
-Dish.belongsTo(Day);
 
 const Sidetype = sequelize.define("sidetype", {
   name: Sequelize.STRING
@@ -31,7 +27,9 @@ const Side = sequelize.define("side", {
   name: Sequelize.STRING
 });
 
+Day.belongsTo(Chef);
+Dish.belongsTo(Day);
 Side.belongsTo(Sidetype);
 Side.belongsTo(Dish);
 
-module.exports = { Chef, Day, Dish, Sidetype, Side };
+module.exports = { sequelize, Chef, Day, Dish, Sidetype, Side };
