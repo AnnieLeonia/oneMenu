@@ -41,39 +41,48 @@ module.exports = (app, passport, models) => {
   });
 
   app.get("/api/days", isLoggedIn, async (req, res) => {
-    const days = await Day.findAll();
+    const days = await Day.findAll({ attributes: ["id", "name", "weekday"] });
     res.send(days);
   });
 
   app.get("/api/sidetypes", isLoggedIn, async (req, res) => {
-    const sidetypes = await Sidetype.findAll();
+    const sidetypes = await Sidetype.findAll({ attributes: ["id", "name"] });
     res.send(sidetypes);
   });
 
   app.post("/api/dishes", isLoggedIn, async (req, res) => {
     const { name, date, dayId, sides } = req.body;
-    let transaction, dish;
+    const dish = await Dish.create(
+      { name, date, dayId, sides },
+      { include: [Side] }
+    );
+    res.send(dish);
+  });
 
-    try {
-      // Get the transaction
-      transaction = await sequelize.transaction();
+  app.get("/api/menus", isLoggedIn, async (req, res) => {
+    const rawDishes = await Dish.findAll({
+      attributes: ["id", "name", "date"],
+      order: ["date"],
+      include: [
+        { model: Day, attributes: ["name"] },
+        {
+          model: Side,
+          attributes: ["name"],
+          include: [{ model: Sidetype, attributes: ["name"] }]
+        }
+      ]
+    });
 
-      // Create the dish
-      dish = await Dish.create({ name, date, dayId }, { transaction });
+    const dishes = rawDishes.map(({ name, date, day, sides }) => ({
+      dish: name,
+      date,
+      day: day.name,
+      sides: sides.map(({ name, sidetype }) => ({
+        side: name,
+        sidetype: sidetype.name
+      }))
+    }));
 
-      // Create the sides
-      for (const side of sides) {
-        await Side.create(side, { transaction });
-      }
-
-      // Commit transaction
-      await transaction.commit();
-    } catch (err) {
-      // Rollback transaction if any errors were encountered
-      await transaction.rollback();
-      return res.status(400).send(err);
-    }
-
-    return res.send(dish);
+    res.send(dishes);
   });
 };
