@@ -1,6 +1,18 @@
 const Sequelize = require("sequelize");
+const { Op } = Sequelize;
+const operatorsAliases = {
+  $gte: Op.gte,
+  $gt: Op.gt,
+  $lte: Op.lte,
+  $lt: Op.lt,
+  $not: Op.not,
+  $between: Op.between,
+  $notBetween: Op.notBetween,
+  $and: Op.and,
+  $or: Op.or
+};
 
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+const sequelize = new Sequelize(process.env.DATABASE_URL, { operatorsAliases });
 
 const Chef = sequelize.define("chef", {
   name: Sequelize.STRING,
@@ -15,7 +27,7 @@ const Day = sequelize.define("day", {
 
 const Dish = sequelize.define("dish", {
   name: Sequelize.STRING,
-  date: Sequelize.STRING
+  date: Sequelize.DATE
 });
 
 const Sidetype = sequelize.define("sidetype", {

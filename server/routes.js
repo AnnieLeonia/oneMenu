@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = (app, passport, models) => {
   const { sequelize, Chef, Day, Dish, Sidetype, Side } = models;
 
@@ -41,12 +43,18 @@ module.exports = (app, passport, models) => {
   });
 
   app.get("/api/days", isLoggedIn, async (req, res) => {
-    const days = await Day.findAll({ attributes: ["id", "name", "weekday"] });
+    const days = await Day.findAll({
+      order: ["weekday"],
+      attributes: ["id", "name", "weekday"]
+    });
     res.send(days);
   });
 
   app.get("/api/sidetypes", isLoggedIn, async (req, res) => {
-    const sidetypes = await Sidetype.findAll({ attributes: ["id", "name"] });
+    const sidetypes = await Sidetype.findAll({
+      order: ["name"],
+      attributes: ["id", "name"]
+    });
     res.send(sidetypes);
   });
 
@@ -59,10 +67,17 @@ module.exports = (app, passport, models) => {
     res.send(dish);
   });
 
-  app.get("/api/menus", isLoggedIn, async (req, res) => {
+  app.get("/api/menus/:date", isLoggedIn, async (req, res) => {
+    const { date } = req.params;
+
     const rawDishes = await Dish.findAll({
       attributes: ["id", "name", "date"],
       order: ["date"],
+      where: {
+        date: {
+          $between: [moment(date), moment(date).add(5, "days")]
+        }
+      },
       include: [
         { model: Day, attributes: ["name"] },
         {
@@ -75,11 +90,11 @@ module.exports = (app, passport, models) => {
 
     const dishes = rawDishes.map(({ name, date, day, sides }) => ({
       dish: name,
-      date,
+      date: moment(date).format("YYYY-MM-DD"),
       day: day.name,
       sides: sides.map(({ name, sidetype }) => ({
         side: name,
-        sidetype: sidetype.name
+        sidetype: sidetype && sidetype.name
       }))
     }));
 
