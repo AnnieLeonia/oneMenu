@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { Op } = require("sequelize");
 
 module.exports = (app, passport, models) => {
   const { sequelize, Chef, Day, Dish, Sidetype, Side } = models;
@@ -75,7 +76,7 @@ module.exports = (app, passport, models) => {
       order: ["date"],
       where: {
         date: {
-          $between: [moment(date), moment(date).add(5, "days")]
+          [Op.between]: [moment(date), moment(date).add(5, "days")]
         }
       },
       include: [
