@@ -1,18 +1,5 @@
 const Sequelize = require("sequelize");
-const { Op } = Sequelize;
-const operatorsAliases = {
-  $gte: Op.gte,
-  $gt: Op.gt,
-  $lte: Op.lte,
-  $lt: Op.lt,
-  $not: Op.not,
-  $between: Op.between,
-  $notBetween: Op.notBetween,
-  $and: Op.and,
-  $or: Op.or
-};
-
-const sequelize = new Sequelize(process.env.DATABASE_URL, { operatorsAliases });
+const sequelize = new Sequelize(process.env.DATABASE_URL);
 
 const Chef = sequelize.define("chef", {
   name: Sequelize.STRING,
