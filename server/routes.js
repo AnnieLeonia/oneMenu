@@ -88,7 +88,8 @@ module.exports = (app, passport, models) => {
       ]
     });
 
-    const dishes = rawDishes.map(({ name, date, day, sides }) => ({
+    const dishes = rawDishes.map(({ id, name, date, day, sides }) => ({
+      id,
       dish: name,
       date: moment(date).format("YYYY-MM-DD"),
       day: day.name,

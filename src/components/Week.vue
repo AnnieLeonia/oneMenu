@@ -8,11 +8,20 @@
     </span>
     <p class="year">{{ date | moment("YYYY") }}</p>
     <h1>{{ date | moment("W") }}</h1>
-    <ul :v-model="week">
+    <ul class="week" :v-model="week">
       <li v-for="day in week" v-bind:key="day.id">
-        <p v-bind:class="isToday(day.date) ? 'today' : ''">
-          {{ day.date | moment("dddd D/M") }}
+        <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
+          {{ day.day }} {{ day.date | moment("D/M") }}
+          <span class="edit" v-on:click="editDish(day.date)">
+            <v-icon name="pen" scale="1.5" />
+          </span>
         </p>
+        <p class="dish">{{ day.dish }}</p>
+        <ul class="sides">
+          <li v-for="side in day.sides" v-bind:key="side.sideType">
+            <p class="side">{{ side.sidetype }}: {{ side.side }}</p>
+          </li>
+        </ul>
       </li>
     </ul>
   </main>
@@ -25,19 +34,50 @@ export default {
       date: this.$moment()
     };
   },
-  computed: {
-    week: function() {
+  asyncComputed: {
+    week: async function() {
       const weekdays = [];
+      const current = this.$moment(this.date);
+      const monday = current.day(1).format("YYYY-MM-DD");
+      const dishes = await this.getDishes(monday);
       for (var i = 1; i < 6; i += 1) {
-        weekdays.push({ id: i, date: this.$moment(this.date).day(i) });
+        var date = this.$moment(current).day(i);
+        var day = date.format("dddd");
+        var dish = "";
+        var sides = [];
+        for (var j = 0; j < dishes.length; j++) {
+          if (current.day(i).format("YYYY-MM-DD") == dishes[j].date) {
+            dish = dishes[j].dish;
+            sides = dishes[j].sides;
+            day = dishes[j].day;
+          }
+        }
+        weekdays.push({
+          id: i,
+          date: date,
+          day: day,
+          dish: dish,
+          sides: sides
+        });
       }
       return weekdays;
     }
   },
   methods: {
+    getDishes: async function(monday) {
+      const res = await fetch("/api/menus/" + monday);
+      const dishes = await res.json();
+      return dishes;
+    },
     isToday(day) {
       const f = "dddd, MMMM Do YYYY";
       return day.format(f) == this.$moment().format(f);
+    },
+    editDish(moment) {
+      const date = moment.format("YYYY-MM-DD");
+      console.log(this.week);
+
+      this.$router.push("/edit/" + date);
     },
     next: function() {
       this.date = this.$moment(this.date).add(7, "days");
@@ -56,13 +96,23 @@ h1 {
 }
 
 p {
+  margin: 0;
+
   &.year {
-    margin: 0;
     font-size: 80%;
   }
 
   &.today {
     font-weight: bold;
+  }
+
+  &.day {
+    margin: 1em 0 0 0;
+  }
+
+  &.dish,
+  &.side {
+    color: #888;
   }
 }
 
@@ -74,20 +124,31 @@ p {
   &.left {
     left: 0;
   }
+
   &.right {
     right: 0;
   }
+}
+
+.edit {
+  float: right;
 }
 
 ul {
   list-style-type: none;
   margin: 0 auto;
   padding: 0;
-  width: 75%;
+
+  &.week {
+    width: 75%;
+  }
+
+  &.sides {
+    margin: 0;
+  }
 }
 
 li {
-  text-align: left;
+  text-align: center;
 }
 </style>
-

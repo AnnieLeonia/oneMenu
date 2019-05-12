@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Week />
+    <router-view />
   </div>
 </template>
 
