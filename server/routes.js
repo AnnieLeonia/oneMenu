@@ -36,8 +36,6 @@ module.exports = (app, passport, models) => {
 
   app.get("/auth/me", (req, res) => res.send(req.user));
 
-  app.get("/api", (req, res) => res.send("Hello Server!"));
-
   app.get("/api/chefs", isLoggedIn, async (req, res) => {
     const chefs = await Chef.findAll();
     res.send(chefs);
