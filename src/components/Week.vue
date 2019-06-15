@@ -6,9 +6,9 @@
     <span class="icon right" v-on:click="next()">
       <v-icon name="chevron-right" scale="2" />
     </span>
-    <a class="logout" href="/auth/logout">
+    <button class="logout" v-on:click="logout()">
       <v-icon name="sign-out-alt" />
-    </a>
+    </button>
     <p class="year">{{ date | moment("YYYY") }}</p>
     <h1>{{ date | moment("W") }}</h1>
     <ul class="week" :v-model="week">
@@ -100,6 +100,9 @@ export default {
     },
     back() {
       this.date = this.$moment(this.date).subtract(7, "days");
+    },
+    logout() {
+      location.href = "/auth/logout";
     }
   },
   created: function() {}
@@ -158,10 +161,12 @@ p {
   font-size: 80%;
 }
 
-a.logout {
-  float: right;
-  color: inherit;
-  text-decoration: none;
+.logout {
+  position: absolute;
+  right: 0;
+  margin: 1em;
+  padding: 0.5em 1em;
+  border-radius: 10px;
 }
 
 ul {
