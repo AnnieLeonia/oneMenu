@@ -4,7 +4,11 @@
     <form v-on:submit="checkForm()">
       <section>
         <label>Day:</label>
-        <input class="full" type="text" v-model="day" required="O" />
+        <select class="full" v-model="day">
+          <option v-for="day in days" :key="day.id">
+            {{ day.name }}
+          </option>
+        </select>
       </section>
       <section>
         <label>Dish:</label>
@@ -13,7 +17,11 @@
       <div v-for="(side, index) in sides" :key="index">
         <section>
           <label>Side:</label>
-          <input class="half" type="text" v-model="side.sideType" />
+          <select class="half" v-model="sides[index].sideType">
+            <option v-for="side in sidetypes" :key="side.id">
+              {{ side.name }}
+            </option>
+          </select>
           <input class="half" type="text" v-model="side.side" />
           <span class="cross" v-on:click="deleteSide(index)">
             <v-icon name="times" scale="1.2" />
@@ -44,6 +52,19 @@ export default {
       return this.$route.params.date;
     }
   },
+  asyncComputed: {
+    days: async function() {
+      const dayId = this.$moment(this.date).format("e");
+      const res = await fetch("/api/days/" + dayId);
+      const days = await res.json();
+      return days;
+    },
+    sidetypes: async function() {
+      const res = await fetch("/api/sidetypes");
+      const sidetypes = await res.json();
+      return sidetypes;
+    }
+  },
   methods: {
     addSide() {
       this.sides.push({ sideType: null, side: null });
@@ -62,8 +83,8 @@ export default {
         console.log("no sides");
       }
     },
-
     save() {
+      this.checkForm();
       console.log("done");
     },
     goBack() {
@@ -99,7 +120,8 @@ label {
   width: 20%;
 }
 
-input[type="text"] {
+input[type="text"],
+select {
   border: 1px solid black;
 
   &.full {
