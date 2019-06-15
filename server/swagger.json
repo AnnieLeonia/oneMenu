@@ -57,10 +57,18 @@
         }
       }
     },
-    "/api/days": {
+    "/api/days/{weekday}": {
       "get": {
         "tags": ["Management"],
-        "summary": "Get all days",
+        "summary": "Return days based on weekday",
+        "parameters": [
+          {
+            "name": "weekday",
+            "in": "path",
+            "description": "Weekday of days to fetch",
+            "type": "integer"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",

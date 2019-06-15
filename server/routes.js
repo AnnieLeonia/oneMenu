@@ -48,10 +48,13 @@ module.exports = (app, passport, models) => {
     res.send(chefs);
   });
 
-  app.get("/api/days", isLoggedIn, async (req, res) => {
+  app.get("/api/days/:weekday", isLoggedIn, async (req, res) => {
+    const { weekday } = req.params;
+
     const days = await Day.findAll({
-      order: ["weekday"],
-      attributes: ["id", "name", "weekday"]
+      order: ["name"],
+      attributes: ["id", "name"],
+      where: { weekday }
     });
     res.send(days);
   });
