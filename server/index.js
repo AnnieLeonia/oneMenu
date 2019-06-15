@@ -4,6 +4,8 @@ const path = require("path");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const session = require("cookie-session");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDoc = require("./swagger.json");
 require("dotenv").config();
 
 const app = express();
@@ -20,6 +22,8 @@ const models = require("./models");
 
 require("./passport")(passport, models);
 require("./routes")(app, passport, models);
+
+app.use("/api", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "..", "dist", "index.html"));

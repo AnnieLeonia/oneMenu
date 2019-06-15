@@ -18,25 +18,30 @@ module.exports = (app, passport, models) => {
     })
   );
 
-  app.get(
-    "/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/login" }),
-    function(req, res) {
-      res.cookie("name", req.user.name);
-      res.redirect("/");
-    }
-  );
+  app.get("/auth/google/callback", (req, res, next) => {
+    passport.authenticate("google", (err, user, info) => {
+      if (err) return next(err);
+      if (!user) {
+        return res.redirect(`/login?info=${info}`);
+      }
+      req.logIn(user, function(err) {
+        if (err) {
+          return next(err);
+        }
+        res.cookie("name", user.name);
+        return res.redirect("/");
+      });
+    })(req, res, next);
+  });
 
   app.get("/auth/logout", (req, res) => {
     req.logout();
     req.session = null;
-    res.clearCookie("connect.sid");
+    res.clearCookie("name");
     res.redirect("/");
   });
 
   app.get("/auth/me", (req, res) => res.send(req.user));
-
-  app.get("/api", (req, res) => res.send("Hello Server!"));
 
   app.get("/api/chefs", isLoggedIn, async (req, res) => {
     const chefs = await Chef.findAll();
@@ -71,7 +76,7 @@ module.exports = (app, passport, models) => {
   app.get("/api/menus/:date", isLoggedIn, async (req, res) => {
     const { date } = req.params;
 
-    const rawDishes = await Dish.findAll({
+    const dishes = await Dish.findAll({
       attributes: ["id", "name", "date"],
       order: ["date"],
       where: {
@@ -89,7 +94,7 @@ module.exports = (app, passport, models) => {
       ]
     });
 
-    const dishes = rawDishes.map(({ id, name, date, day, sides }) => ({
+    const menu = dishes.map(({ id, name, date, day, sides }) => ({
       id,
       dish: name,
       date: moment(date).format("YYYY-MM-DD"),
@@ -100,6 +105,6 @@ module.exports = (app, passport, models) => {
       }))
     }));
 
-    res.send(dishes);
+    res.send(menu);
   });
 };

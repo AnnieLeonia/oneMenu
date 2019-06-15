@@ -1,0 +1,279 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "OneMenu API"
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "API for authentication"
+    },
+    {
+      "name": "Management",
+      "description": "API for management"
+    }
+  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current chef",
+        "responses": {
+          "200": {
+            "description": "Chef is found",
+            "schema": {
+              "$ref": "#/definitions/Chef"
+            }
+          }
+        }
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Authenticate with google"
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Logout from google"
+      }
+    },
+    "/api/chefs": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Get all chefs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Chefs"
+            }
+          }
+        }
+      }
+    },
+    "/api/days": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Get all days",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Days"
+            }
+          }
+        }
+      }
+    },
+    "/api/sidetypes": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Get all sidetypes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Sidetypes"
+            }
+          }
+        }
+      }
+    },
+    "/api/dishes": {
+      "post": {
+        "tags": ["Management"],
+        "summary": "Create new dish",
+        "parameters": [
+          {
+            "name": "dish",
+            "in": "body",
+            "description": "Dish that we want to create",
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New dish is created",
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          }
+        }
+      }
+    },
+    "/api/menus/{date}": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Returns a menu based on date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Date of menu to fetch",
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Menus"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Chef": {
+      "required": ["id", "email"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "uniqueItems": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "photo": {
+          "type": "string"
+        }
+      }
+    },
+    "Chefs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Chef"
+      }
+    },
+    "Day": {
+      "required": ["id", "name", "weekday"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "name": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "weekday": {
+          "type": "integer"
+        }
+      }
+    },
+    "Days": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Day"
+      }
+    },
+    "Sidetype": {
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "name": {
+          "type": "string",
+          "uniqueItems": true
+        }
+      }
+    },
+    "Sidetypes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Sidetype"
+      }
+    },
+    "Dish": {
+      "required": ["name", "date", "dayId", "sides"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "dayId": {
+          "type": "integer"
+        },
+        "sides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "sidetypeId": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Dishes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Dish"
+      }
+    },
+    "Menu": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "dish": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "day": {
+          "type": "string"
+        },
+        "sides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "side": {
+                "type": "string"
+              },
+              "sidetype": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Menus": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Menu"
+      }
+    }
+  }
+}
