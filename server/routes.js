@@ -77,7 +77,7 @@ module.exports = (app, passport, models) => {
   app.get("/api/menus/:date", isLoggedIn, async (req, res) => {
     const { date } = req.params;
 
-    const rawDishes = await Dish.findAll({
+    const dishes = await Dish.findAll({
       attributes: ["id", "name", "date"],
       order: ["date"],
       where: {
@@ -95,7 +95,7 @@ module.exports = (app, passport, models) => {
       ]
     });
 
-    const dishes = rawDishes.map(({ id, name, date, day, sides }) => ({
+    const menu = dishes.map(({ id, name, date, day, sides }) => ({
       id,
       dish: name,
       date: moment(date).format("YYYY-MM-DD"),
@@ -106,6 +106,6 @@ module.exports = (app, passport, models) => {
       }))
     }));
 
-    res.send(dishes);
+    res.send(menu);
   });
 };

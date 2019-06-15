@@ -14,7 +14,6 @@
       "description": "API for management"
     }
   ],
-  "schemes": ["http", "https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "paths": {
@@ -109,6 +108,29 @@
           }
         }
       }
+    },
+    "/api/menus/{date}": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Returns a menu based on date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Date of menu to fetch",
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Menus"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -179,17 +201,6 @@
         "$ref": "#/definitions/Sidetype"
       }
     },
-    "Side": {
-      "required": ["name", "sidetypeId"],
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "sidetypeId": {
-          "type": "integer"
-        }
-      }
-    },
     "Dish": {
       "required": ["name", "date", "dayId", "sides"],
       "properties": {
@@ -207,7 +218,15 @@
         "sides": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Side"
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "sidetypeId": {
+                "type": "integer"
+              }
+            }
           }
         }
       }
@@ -216,6 +235,44 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/Dish"
+      }
+    },
+    "Menu": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "dish": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "day": {
+          "type": "string"
+        },
+        "sides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "side": {
+                "type": "string"
+              },
+              "sidetype": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Menus": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Menu"
       }
     }
   }
