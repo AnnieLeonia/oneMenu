@@ -4,7 +4,6 @@
     "version": "1.0.0",
     "title": "OneMenu API"
   },
-  "host": "localhost:8080",
   "tags": [
     {
       "name": "Auth",
