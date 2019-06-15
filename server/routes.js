@@ -19,11 +19,10 @@ module.exports = (app, passport, models) => {
   );
 
   app.get("/auth/google/callback", (req, res, next) => {
-    passport.authenticate("google", (err, user, { message }) => {
+    passport.authenticate("google", (err, user, info) => {
       if (err) return next(err);
       if (!user) {
-        res.cookie("message", message);
-        return res.redirect(`/login?message=${message}`);
+        return res.redirect(`/login?info=${info}`);
       }
       req.logIn(user, function(err) {
         if (err) {

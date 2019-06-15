@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="info" v-if="message">
+    <div class="info" v-if="info">
       <b>Varning!</b>
-      {{message}}
+      {{info}}
     </div>
     <p>Var vänlig logga in för att använda OneMenu</p>
     <a href="/auth/google">Logga in</a>
@@ -15,8 +15,8 @@ export default {
     isLoggedIn: function() {
       return !!this.$cookie.get("name");
     },
-    message: function() {
-      return this.$route.query.message;
+    info: function() {
+      return this.$route.query.info;
     }
   }
 };

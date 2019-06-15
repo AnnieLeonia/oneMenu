@@ -25,7 +25,7 @@ module.exports = (passport, { Chef }) => {
           }
         });
         if (chef) return done(null, chef);
-        return done(null, false, { message: "Åtkomst nekad." });
+        return done(null, false, "Åtkomst nekad.");
       }
     )
   );
