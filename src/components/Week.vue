@@ -6,6 +6,9 @@
     <span class="icon right" v-on:click="next()">
       <v-icon name="chevron-right" scale="2" />
     </span>
+    <a class="logout" href="/auth/logout">
+      <v-icon name="sign-out-alt" />
+    </a>
     <p class="year">{{ date | moment("YYYY") }}</p>
     <h1>{{ date | moment("W") }}</h1>
     <ul class="week" :v-model="week">
@@ -132,6 +135,12 @@ p {
 
 .edit {
   float: right;
+}
+
+a.logout {
+  float: right;
+  color: inherit;
+  text-decoration: none;
 }
 
 ul {

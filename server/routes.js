@@ -30,7 +30,7 @@ module.exports = (app, passport, models) => {
   app.get("/auth/logout", (req, res) => {
     req.logout();
     req.session = null;
-    res.clearCookie("connect.sid");
+    res.clearCookie("name");
     res.redirect("/");
   });
 
