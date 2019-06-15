@@ -12,8 +12,8 @@
       <li v-for="day in week" v-bind:key="day.id">
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
           {{ day.day }} {{ day.date | moment("D/M") }}
-          <span class="edit" v-on:click="editDish(day.date)">
-            <v-icon name="pen" scale="1.5" />
+          <span v-if="editable" class="edit" v-on:click="editDish(day.date)">
+            <v-icon name="pen" scale="1" />
           </span>
         </p>
         <p class="dish">{{ day.dish }}</p>
@@ -24,6 +24,9 @@
         </ul>
       </li>
     </ul>
+    <button class="editBtn" v-on:click="toggleEdit()">
+      {{ editText }}
+    </button>
   </main>
 </template>
 
@@ -31,7 +34,8 @@
 export default {
   data() {
     return {
-      date: this.$moment()
+      date: this.$moment(),
+      editable: false
     };
   },
   asyncComputed: {
@@ -61,6 +65,12 @@ export default {
         });
       }
       return weekdays;
+    },
+    editText() {
+      if (!this.editable) {
+        return "Edit menu";
+      }
+      return "Done editing";
     }
   },
   methods: {
@@ -73,16 +83,19 @@ export default {
       const f = "dddd, MMMM Do YYYY";
       return day.format(f) == this.$moment().format(f);
     },
+    toggleEdit() {
+      this.editable = !this.editable;
+    },
     editDish(moment) {
       const date = moment.format("YYYY-MM-DD");
       console.log(this.week);
 
       this.$router.push("/edit/" + date);
     },
-    next: function() {
+    next() {
       this.date = this.$moment(this.date).add(7, "days");
     },
-    back: function() {
+    back() {
       this.date = this.$moment(this.date).subtract(7, "days");
     }
   },
@@ -131,7 +144,15 @@ p {
 }
 
 .edit {
-  float: right;
+  position: absolute;
+  right: 2em;
+}
+
+.editBtn {
+  margin: 2em 0 1em 0;
+  padding: 0.5em 1em;
+  border-radius: 10px;
+  font-size: 80%;
 }
 
 ul {
