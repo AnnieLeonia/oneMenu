@@ -2,14 +2,17 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from "vue";
 import VueCookie from "vue-cookie";
+import ElementUI from "element-ui";
 import VueAsyncComputed from "vue-async-computed";
 import Icon from "vue-awesome/components/Icon";
+import "element-ui/lib/theme-chalk/index.css";
 import "vue-awesome/icons";
 
 import App from "./App";
 import Routes from "./routes";
 
 Vue.use(VueCookie);
+Vue.use(ElementUI);
 Vue.use(VueAsyncComputed);
 Vue.use(require("vue-moment"));
 Vue.component("v-icon", Icon);

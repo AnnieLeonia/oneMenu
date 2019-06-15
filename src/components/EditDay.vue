@@ -3,31 +3,37 @@
     <h1>{{ date | moment("dddd D/M") }}</h1>
     <form v-on:submit="checkForm()">
       <section>
-        <label>Day:</label>
-        <select class="full" v-model="day">
-          <option v-for="day in days" :key="day.id">
-            {{ day.name }}
-          </option>
-        </select>
+        <span>Day:</span>
+        <el-select v-model="day" placeholder="Select">
+          <el-option v-for="day in days" :key="day.id" :value="day.name" />
+        </el-select>
       </section>
       <section>
-        <label>Dish:</label>
-        <input class="full" type="text" v-model="dish" required="" />
+        <span>Dish:</span>
+        <el-input placeholder="Please input" v-model="dish"></el-input>
       </section>
-      <div v-for="(side, index) in sides" :key="index">
-        <section>
-          <label>Side:</label>
-          <select class="half" v-model="sides[index].sideType">
-            <option v-for="side in sidetypes" :key="side.id">
-              {{ side.name }}
-            </option>
-          </select>
-          <input class="half" type="text" v-model="side.side" />
-          <span class="cross" v-on:click="deleteSide(index)">
-            <v-icon name="times" scale="1.2" />
-          </span>
-        </section>
-      </div>
+      <section v-for="(side, index) in sides" :key="index">
+        <span>Side:</span>
+        <el-select
+          class="shorter"
+          v-model="sides[index].sideType"
+          placeholder="Select"
+        >
+          <el-option
+            v-for="side in sidetypes"
+            :key="side.id"
+            :value="side.name"
+          />
+        </el-select>
+        <el-input
+          class="short"
+          placeholder="Please input"
+          v-model="side.side"
+        />
+        <span class="delete" v-on:click="deleteSide(index)">
+          <v-icon class="cross" name="times" scale="2" />
+        </span>
+      </section>
       <button type="button" class="addSideBtn" v-on:click="addSide()">
         Add side
       </button>
@@ -101,41 +107,46 @@ h1 {
 }
 
 form {
-  margin: 0 auto;
-  padding: 0 1em;
-}
-
-input:required:focus {
-  border: 1px solid red;
-  outline: none;
+  padding: 0;
+  margin: 0;
 }
 
 section {
-  text-align: left;
+  display: flex;
+  margin: 0.5em;
 }
 
-label {
+span {
   text-align: right;
   display: inline-block;
-  width: 20%;
+  flex: 2;
 }
 
-input[type="text"],
-select {
-  border: 1px solid black;
+.el-select,
+.el-input {
+  flex: 8;
+  margin: 0.25em 0.5em;
 
-  &.full {
-    width: 60%;
+  &.short {
+    flex: 4;
+    margin: 0.25em 0.25em 0.25em 0.5em;
   }
 
-  &.half {
-    width: calc(30% - 5px);
+  &.shorter {
+    flex: 3;
+    margin: 0.25em 0.5em 0.25em 0.25em;
   }
+}
+
+.delete {
+  flex: 1;
 }
 
 .cross {
   position: relative;
-  top: 6px;
+  margin: 0 auto;
+  display: block;
+  top: 5px;
 }
 
 button {
