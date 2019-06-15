@@ -1,23 +1,26 @@
 <template>
-  <main>
-    <h1>{{ date | moment("dddd D/M") }}</h1>
-    <form v-on:submit="checkForm()">
+  <div>
+    <header>
+      <h1>OneMenu</h1>
+    </header>
+    <h2>{{ date | moment("dddd D/M") }}</h2>
+    <form>
       <section>
         <span>Day:</span>
-        <el-select v-model="day" placeholder="Select">
+        <el-select v-model="day" placeholder="Select day">
           <el-option v-for="day in days" :key="day.id" :value="day.name" />
         </el-select>
       </section>
       <section>
         <span>Dish:</span>
-        <el-input placeholder="Please input" v-model="dish"></el-input>
+        <el-input placeholder="Write dish..." v-model="dish"></el-input>
       </section>
       <section v-for="(side, index) in sides" :key="index">
         <span>Side:</span>
         <el-select
           class="shorter"
           v-model="sides[index].sideType"
-          placeholder="Select"
+          placeholder="Select sidetype"
         >
           <el-option
             v-for="side in sidetypes"
@@ -27,7 +30,7 @@
         </el-select>
         <el-input
           class="short"
-          placeholder="Please input"
+          placeholder="Write dessert..."
           v-model="side.side"
         />
         <span class="delete" v-on:click="deleteSide(index)">
@@ -38,10 +41,10 @@
         Add side
       </button>
       <br />
-      <button class="backBtn" v-on:click="goBack()">CANCEL</button>
-      <button class="saveBtn" type="submit" v-on:click="save()">SAVE</button>
     </form>
-  </main>
+    <button class="backBtn" v-on:click="goBack()">CANCEL</button>
+    <button class="saveBtn" v-on:click="save()">SAVE</button>
+  </div>
 </template>
 
 <script>
@@ -90,7 +93,6 @@ export default {
       }
     },
     save() {
-      this.checkForm();
       console.log("done");
     },
     goBack() {
@@ -101,7 +103,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-h1 {
+h2 {
   font-size: 120%;
   margin: 0.5em;
 }
@@ -117,6 +119,7 @@ section {
 }
 
 span {
+  margin: 0.5em 0;
   text-align: right;
   display: inline-block;
   flex: 2;
@@ -146,7 +149,7 @@ span {
   position: relative;
   margin: 0 auto;
   display: block;
-  top: 5px;
+  fill: #666;
 }
 
 button {
@@ -155,10 +158,14 @@ button {
   font-size: 80%;
 
   &.addSideBtn {
-    color: #333;
+    color: white;
+    float: right;
+    margin-right: 1em;
+    background-color: #ff851b;
   }
 
-  &.backBtn {
+  &.backBtn,
+  &.saveBtn {
     margin: 2em 0 1em 0;
   }
 }

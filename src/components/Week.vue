@@ -1,16 +1,23 @@
 <template>
-  <main>
+  <div>
+    <header>
+      <h1>OneMenu</h1>
+      <button class="logout" v-on:click="logout()">
+        <v-icon name="sign-out-alt" />
+      </button>
+    </header>
     <span class="icon left" v-on:click="back()">
-      <v-icon name="chevron-left" scale="2" />
+      <v-icon class="arrow" name="chevron-left" scale="2" />
     </span>
     <span class="icon right" v-on:click="next()">
-      <v-icon name="chevron-right" scale="2" />
+      <v-icon class="arrow" name="chevron-right" scale="2" />
     </span>
-    <button class="logout" v-on:click="logout()">
-      <v-icon name="sign-out-alt" />
-    </button>
+    <div class="top">
+      <p class="top right">Weekly</p>
+      <h2>{{ date | moment("W") }}</h2>
+      <p class="top left">Menu</p>
+    </div>
     <p class="year">{{ date | moment("YYYY") }}</p>
-    <h1>{{ date | moment("W") }}</h1>
     <ul class="week" :v-model="week">
       <li v-for="day in week" v-bind:key="day.id">
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
@@ -30,7 +37,7 @@
     <button class="editBtn" v-on:click="toggleEdit()">
       {{ editText }}
     </button>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -91,8 +98,6 @@ export default {
     },
     editDish(moment) {
       const date = moment.format("YYYY-MM-DD");
-      console.log(this.week);
-
       this.$router.push("/edit/" + date);
     },
     next() {
@@ -110,8 +115,21 @@ export default {
 </script>
 
 <style lang="less">
-h1 {
+header {
+  background-color: #ff851b;
+  text-align: left;
+  color: #662f00;
+  height: 3em;
+}
+
+h2 {
   margin: 0.2em;
+  font-family: fantasy;
+  flex: 1;
+}
+
+.top {
+  display: flex;
 }
 
 p {
@@ -119,6 +137,8 @@ p {
 
   &.year {
     font-size: 80%;
+    margin: -25px 0 0 0;
+    font-family: cursive;
   }
 
   &.today {
@@ -127,6 +147,23 @@ p {
 
   &.day {
     margin: 1em 0 0 0;
+  }
+
+  &.top {
+    flex: 3;
+    display: inline;
+    font-family: fantasy;
+    font-size: 200%;
+    color: #eee;
+    font-style: italic;
+
+    &.left {
+      text-align: left;
+    }
+
+    &.right {
+      text-align: right;
+    }
   }
 
   &.dish,
@@ -149,6 +186,10 @@ p {
   }
 }
 
+&.arrow {
+  fill: #ff851b;
+}
+
 .edit {
   position: absolute;
   right: 2em;
@@ -163,6 +204,8 @@ p {
 
 .logout {
   position: absolute;
+  background-color: #fff8;
+  border: solid #666 2px;
   right: 0;
   margin: 1em;
   padding: 0.5em 1em;
