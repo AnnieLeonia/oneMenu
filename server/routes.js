@@ -18,14 +18,22 @@ module.exports = (app, passport, models) => {
     })
   );
 
-  app.get(
-    "/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/login" }),
-    function(req, res) {
-      res.cookie("name", req.user.name);
-      res.redirect("/");
-    }
-  );
+  app.get("/auth/google/callback", (req, res, next) => {
+    passport.authenticate("google", (err, user, { message }) => {
+      if (err) return next(err);
+      if (!user) {
+        res.cookie("message", message);
+        return res.redirect(`/login?message=${message}`);
+      }
+      req.logIn(user, function(err) {
+        if (err) {
+          return next(err);
+        }
+        res.cookie("name", user.name);
+        return res.redirect("/");
+      });
+    })(req, res, next);
+  });
 
   app.get("/auth/logout", (req, res) => {
     req.logout();

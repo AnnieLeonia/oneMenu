@@ -25,7 +25,7 @@ module.exports = (passport, { Chef }) => {
           }
         });
         if (chef) return done(null, chef);
-        return done(null, false, { message: "401 Unauthorized" });
+        return done(null, false, { message: "Åtkomst nekad." });
       }
     )
   );
