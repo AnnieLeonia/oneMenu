@@ -63,7 +63,7 @@ export default {
   },
   asyncComputed: {
     days: async function() {
-      const dayId = this.$moment(this.date).format("e");
+      const dayId = this.$moment(this.date).isoWeekday();
       const res = await fetch("/api/days/" + dayId);
       const days = await res.json();
       return days;

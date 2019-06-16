@@ -52,7 +52,7 @@ export default {
     week: async function() {
       const weekdays = [];
       const current = this.$moment(this.date);
-      const monday = current.day(1).format("YYYY-MM-DD");
+      const monday = current.isoWeekday(1).format("YYYY-MM-DD");
       const dishes = await this.getDishes(monday);
       for (var i = 1; i < 6; i += 1) {
         var date = this.$moment(current).day(i);
