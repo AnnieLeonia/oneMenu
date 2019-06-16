@@ -38,7 +38,9 @@
         </span>
       </section>
       <div class="buttons addSide">
-        <el-button round v-on:click="addSide()">Add side</el-button>
+        <el-button class="addSideBtn " round v-on:click="addSide()">
+          Add side
+        </el-button>
       </div>
     </form>
     <div class="buttons">
@@ -84,12 +86,12 @@ export default {
   },
   methods: {
     addSide() {
-      this.sides.push({ sidetype: null, name: null });
+      this.sides.push({ sidetype: null, side: null });
     },
     deleteSide(index) {
       this.sides.splice(index, 1);
     },
-    save() {
+    async save() {
       if (this.dish) {
         if (this.day) {
           const dayId = this.days.find(day => day.name == this.day).id;
@@ -97,10 +99,10 @@ export default {
           if (this.sides.length > 0) {
             for (var i = 0; i < this.sides.length; i++) {
               const side = this.sides[i];
-              if (side.name && side.sidetype) {
+              if (side.side && side.sidetype) {
                 const sideId = this.sidetypes.find(s => s.name == side.sidetype)
                   .id;
-                sides.push({ name: side.name, sidetypeId: sideId });
+                sides.push({ name: side.side, sidetypeId: sideId });
               }
             }
           }
@@ -111,11 +113,26 @@ export default {
             sides: sides
           };
           console.log("add", dinner);
+          const res = await fetch("/api/dishes", {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify(dinner)
+          });
+          const response = await res.json();
+          console.log("response", response);
+          this.goBack();
         }
       }
     },
-    remove() {
-      console.log("remove", this.date);
+    async remove() {
+      const res = await fetch("/api/dishes/" + this.date, { method: "DELETE" });
+      //const response = await res.json();
+      //console.log("response", response);
+      this.goBack();
     },
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
@@ -187,21 +204,10 @@ span {
 
 .el-button {
   flex: 1;
-}
-
-button {
-  padding: 0.5em 1em;
-  border-radius: 30px;
-  font-size: 80%;
 
   &.addSideBtn {
-    color: white;
+    color: #666;
     background-color: #ff851b;
-  }
-
-  &.backBtn,
-  &.saveBtn {
-    margin: 2em 0 1em 0;
   }
 }
 </style>
