@@ -37,13 +37,21 @@
           <v-icon class="cross" name="times" scale="2" />
         </span>
       </section>
-      <button type="button" class="addSideBtn" v-on:click="addSide()">
-        Add side
-      </button>
-      <br />
+      <div class="buttons addSide">
+        <el-button round v-on:click="addSide()">Add side</el-button>
+      </div>
     </form>
-    <button class="backBtn" v-on:click="goBack()">CANCEL</button>
-    <button class="saveBtn" v-on:click="save()">SAVE</button>
+    <div class="buttons">
+      <el-button type="danger" plain round v-on:click="remove()">
+        Delete
+      </el-button>
+      <el-button type="warning" plain round v-on:click="goBack()">
+        Cancel
+      </el-button>
+      <el-button type="success" plain round v-on:click="save()">
+        Save
+      </el-button>
+    </div>
   </div>
 </template>
 
@@ -102,9 +110,12 @@ export default {
             dayId: dayId,
             sides: sides
           };
-          console.log(dinner);
+          console.log("add", dinner);
         }
       }
+    },
+    remove() {
+      console.log("remove", this.date);
     },
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
@@ -169,15 +180,22 @@ span {
   fill: #666;
 }
 
+.buttons {
+  display: flex;
+  margin: 1em;
+}
+
+.el-button {
+  flex: 1;
+}
+
 button {
   padding: 0.5em 1em;
-  border-radius: 10px;
+  border-radius: 30px;
   font-size: 80%;
 
   &.addSideBtn {
     color: white;
-    float: right;
-    margin-right: 1em;
     background-color: #ff851b;
   }
 
