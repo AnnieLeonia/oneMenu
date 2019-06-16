@@ -118,6 +118,27 @@
       }
     },
     "/api/dishes/{date}": {
+      "get": {
+        "tags": ["Management"],
+        "summary": "Return dish based on date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Date of dash to fetch",
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Dish"
+            }
+          }
+        }
+      },
       "delete": {
         "tags": ["Management"],
         "summary": "Remove dish based on date",

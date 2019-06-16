@@ -69,10 +69,41 @@ module.exports = (app, passport, models) => {
 
   app.post("/api/dishes", isLoggedIn, async (req, res) => {
     const { name, date, dayId, sides } = req.body;
+
+    await Dish.destroy({
+      where: sequelize.where(
+        sequelize.fn("date", sequelize.col("date")),
+        "=",
+        date
+      )
+    });
+
     const dish = await Dish.create(
       { name, date, dayId, sides },
       { include: [Side] }
     );
+
+    res.send(dish);
+  });
+
+  app.get("/api/dishes/:date", isLoggedIn, async (req, res) => {
+    const { date } = req.params;
+
+    const dish = await Dish.findOne({
+      where: sequelize.where(
+        sequelize.fn("date", sequelize.col("date")),
+        "=",
+        date
+      ),
+      include: [
+        {
+          model: Side,
+          attributes: ["name"],
+          include: [{ model: Sidetype, attributes: ["name"] }]
+        }
+      ]
+    });
+
     res.send(dish);
   });
 
@@ -87,7 +118,7 @@ module.exports = (app, passport, models) => {
       )
     });
 
-    res.send("");
+    res.send({});
   });
 
   app.get("/api/menus/:date", isLoggedIn, async (req, res) => {
