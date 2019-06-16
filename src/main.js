@@ -10,6 +10,7 @@ import "vue-awesome/icons";
 
 import App from "./App";
 import Routes from "./routes";
+import Store from "./store";
 
 Vue.use(VueCookie);
 Vue.use(ElementUI);
@@ -23,6 +24,7 @@ Vue.config.productionTip = false;
 new Vue({
   el: "#app",
   router: Routes,
+  store: Store,
   components: { App, "v-icon": Icon },
   template: "<App/>"
 });

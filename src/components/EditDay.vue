@@ -19,7 +19,7 @@
         <span>Side:</span>
         <el-select
           class="shorter"
-          v-model="sides[index].sideType"
+          v-model="sides[index].sidetype"
           placeholder="Select sidetype"
         >
           <el-option
@@ -76,28 +76,45 @@ export default {
   },
   methods: {
     addSide() {
-      this.sides.push({ sideType: null, side: null });
+      this.sides.push({ sidetype: null, name: null });
     },
     deleteSide(index) {
       this.sides.splice(index, 1);
     },
-    checkForm() {
-      if (this.day == "") {
-        console.log("missing day");
-      }
-      if (this.dish == "") {
-        console.log("missing dish");
-      }
-      if (this.sides.length == 0) {
-        console.log("no sides");
-      }
-    },
     save() {
-      console.log("done");
+      if (this.dish) {
+        if (this.day) {
+          const dayId = this.days.find(day => day.name == this.day).id;
+          const sides = [];
+          if (this.sides.length > 0) {
+            for (var i = 0; i < this.sides.length; i++) {
+              const side = this.sides[i];
+              if (side.name && side.sidetype) {
+                const sideId = this.sidetypes.find(s => s.name == side.sidetype)
+                  .id;
+                sides.push({ name: side.name, sidetypeId: sideId });
+              }
+            }
+          }
+          const dinner = {
+            name: this.dish,
+            date: this.date,
+            dayId: dayId,
+            sides: sides
+          };
+          console.log(dinner);
+        }
+      }
     },
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     }
+  },
+  created: function() {
+    const currentDinner = this.$store.state.currentDinner;
+    this.dish = currentDinner.dish;
+    this.day = currentDinner.dish ? currentDinner.day : "";
+    this.sides = currentDinner.sides || [];
   }
 };
 </script>

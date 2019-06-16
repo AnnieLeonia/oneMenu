@@ -22,7 +22,7 @@
       <li v-for="day in week" v-bind:key="day.id">
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
           {{ day.day }} {{ day.date | moment("D/M") }}
-          <span v-if="editable" class="edit" v-on:click="editDish(day.date)">
+          <span v-if="editable" class="edit" v-on:click="editDish(day)">
             <v-icon name="pen" scale="1" />
           </span>
         </p>
@@ -96,8 +96,10 @@ export default {
     toggleEdit() {
       this.editable = !this.editable;
     },
-    editDish(moment) {
-      const date = moment.format("YYYY-MM-DD");
+    editDish(day) {
+      const dinner = this.week[day.id - 1];
+      this.$store.commit("setCurrentDinner", dinner);
+      const date = day.date.format("YYYY-MM-DD");
       this.$router.push("/edit/" + date);
     },
     next() {
