@@ -117,6 +117,26 @@
         }
       }
     },
+    "/api/dishes/{date}": {
+      "delete": {
+        "tags": ["Management"],
+        "summary": "Remove dish based on date",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Date of dash to remove",
+            "type": "string",
+            "format": "date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dish is removed"
+          }
+        }
+      }
+    },
     "/api/menus/{date}": {
       "get": {
         "tags": ["Management"],
