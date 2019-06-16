@@ -30,7 +30,7 @@ CREATE TABLE dishes
 (
     id           SERIAL          NOT NULL,
     name         VARCHAR(255)    NOT NULL,
-    date         TIMESTAMP       NOT NULL,
+    date         TIMESTAMP       NOT NULL UNIQUE,
     "dayId"      INT,
     "createdAt"  TIMESTAMP       NOT NULL,
     "updatedAt"  TIMESTAMP       NOT NULL,
