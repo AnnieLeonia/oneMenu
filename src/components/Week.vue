@@ -1,21 +1,28 @@
 <template>
-  <main>
+  <div>
+    <header>
+      <h1>OneMenu</h1>
+      <button class="logout" v-on:click="logout()">
+        <v-icon name="sign-out-alt" />
+      </button>
+    </header>
     <span class="icon left" v-on:click="back()">
-      <v-icon name="chevron-left" scale="2" />
+      <v-icon class="arrow" name="chevron-left" scale="2" />
     </span>
     <span class="icon right" v-on:click="next()">
-      <v-icon name="chevron-right" scale="2" />
+      <v-icon class="arrow" name="chevron-right" scale="2" />
     </span>
-    <button class="logout" v-on:click="logout()">
-      <v-icon name="sign-out-alt" />
-    </button>
+    <div class="top">
+      <p class="top right">Weekly</p>
+      <h2>{{ date | moment("W") }}</h2>
+      <p class="top left">Menu</p>
+    </div>
     <p class="year">{{ date | moment("YYYY") }}</p>
-    <h1>{{ date | moment("W") }}</h1>
     <ul class="week" :v-model="week">
       <li v-for="day in week" v-bind:key="day.id">
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
           {{ day.day }} {{ day.date | moment("D/M") }}
-          <span v-if="editable" class="edit" v-on:click="editDish(day.date)">
+          <span v-if="editable" class="edit" v-on:click="editDish(day)">
             <v-icon name="pen" scale="1" />
           </span>
         </p>
@@ -30,7 +37,7 @@
     <button class="editBtn" v-on:click="toggleEdit()">
       {{ editText }}
     </button>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -45,7 +52,7 @@ export default {
     week: async function() {
       const weekdays = [];
       const current = this.$moment(this.date);
-      const monday = current.day(1).format("YYYY-MM-DD");
+      const monday = current.isoWeekday(1).format("YYYY-MM-DD");
       const dishes = await this.getDishes(monday);
       for (var i = 1; i < 6; i += 1) {
         var date = this.$moment(current).day(i);
@@ -89,10 +96,10 @@ export default {
     toggleEdit() {
       this.editable = !this.editable;
     },
-    editDish(moment) {
-      const date = moment.format("YYYY-MM-DD");
-      console.log(this.week);
-
+    editDish(day) {
+      const dinner = this.week[day.id - 1];
+      this.$store.commit("setCurrentDinner", dinner);
+      const date = day.date.format("YYYY-MM-DD");
       this.$router.push("/edit/" + date);
     },
     next() {
@@ -110,8 +117,21 @@ export default {
 </script>
 
 <style lang="less">
-h1 {
+header {
+  background-color: #ff851b;
+  text-align: left;
+  color: #662f00;
+  height: 3em;
+}
+
+h2 {
   margin: 0.2em;
+  font-family: fantasy;
+  flex: 1;
+}
+
+.top {
+  display: flex;
 }
 
 p {
@@ -119,6 +139,8 @@ p {
 
   &.year {
     font-size: 80%;
+    margin: -25px 0 0 0;
+    font-family: cursive;
   }
 
   &.today {
@@ -127,6 +149,23 @@ p {
 
   &.day {
     margin: 1em 0 0 0;
+  }
+
+  &.top {
+    flex: 3;
+    display: inline;
+    font-family: fantasy;
+    font-size: 200%;
+    color: #eee;
+    font-style: italic;
+
+    &.left {
+      text-align: left;
+    }
+
+    &.right {
+      text-align: right;
+    }
   }
 
   &.dish,
@@ -149,6 +188,10 @@ p {
   }
 }
 
+&.arrow {
+  fill: #ff851b;
+}
+
 .edit {
   position: absolute;
   right: 2em;
@@ -163,6 +206,8 @@ p {
 
 .logout {
   position: absolute;
+  background-color: #fff8;
+  border: solid #666 2px;
   right: 0;
   margin: 1em;
   padding: 0.5em 1em;

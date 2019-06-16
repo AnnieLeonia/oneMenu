@@ -1,41 +1,50 @@
 <template>
-  <main>
-    <h1>{{ date | moment("dddd D/M") }}</h1>
-    <form v-on:submit="checkForm()">
+  <div>
+    <header>
+      <h1>OneMenu</h1>
+    </header>
+    <h2>{{ date | moment("dddd D/M") }}</h2>
+    <form>
       <section>
-        <label>Day:</label>
-        <select class="full" v-model="day">
-          <option v-for="day in days" :key="day.id">
-            {{ day.name }}
-          </option>
-        </select>
+        <span>Day:</span>
+        <el-select v-model="day" placeholder="Select day">
+          <el-option v-for="day in days" :key="day.id" :value="day.name" />
+        </el-select>
       </section>
       <section>
-        <label>Dish:</label>
-        <input class="full" type="text" v-model="dish" required="" />
+        <span>Dish:</span>
+        <el-input placeholder="Write dish..." v-model="dish"></el-input>
       </section>
-      <div v-for="(side, index) in sides" :key="index">
-        <section>
-          <label>Side:</label>
-          <select class="half" v-model="sides[index].sideType">
-            <option v-for="side in sidetypes" :key="side.id">
-              {{ side.name }}
-            </option>
-          </select>
-          <input class="half" type="text" v-model="side.side" />
-          <span class="cross" v-on:click="deleteSide(index)">
-            <v-icon name="times" scale="1.2" />
-          </span>
-        </section>
-      </div>
+      <section v-for="(side, index) in sides" :key="index">
+        <span>Side:</span>
+        <el-select
+          class="shorter"
+          v-model="sides[index].sidetype"
+          placeholder="Select sidetype"
+        >
+          <el-option
+            v-for="side in sidetypes"
+            :key="side.id"
+            :value="side.name"
+          />
+        </el-select>
+        <el-input
+          class="short"
+          placeholder="Write dessert..."
+          v-model="side.side"
+        />
+        <span class="delete" v-on:click="deleteSide(index)">
+          <v-icon class="cross" name="times" scale="2" />
+        </span>
+      </section>
       <button type="button" class="addSideBtn" v-on:click="addSide()">
         Add side
       </button>
       <br />
-      <button class="backBtn" v-on:click="goBack()">CANCEL</button>
-      <button class="saveBtn" type="submit" v-on:click="save()">SAVE</button>
     </form>
-  </main>
+    <button class="backBtn" v-on:click="goBack()">CANCEL</button>
+    <button class="saveBtn" v-on:click="save()">SAVE</button>
+  </div>
 </template>
 
 <script>
@@ -54,7 +63,7 @@ export default {
   },
   asyncComputed: {
     days: async function() {
-      const dayId = this.$moment(this.date).format("e");
+      const dayId = this.$moment(this.date).isoWeekday();
       const res = await fetch("/api/days/" + dayId);
       const days = await res.json();
       return days;
@@ -67,75 +76,97 @@ export default {
   },
   methods: {
     addSide() {
-      this.sides.push({ sideType: null, side: null });
+      this.sides.push({ sidetype: null, name: null });
     },
     deleteSide(index) {
       this.sides.splice(index, 1);
     },
-    checkForm() {
-      if (this.day == "") {
-        console.log("missing day");
-      }
-      if (this.dish == "") {
-        console.log("missing dish");
-      }
-      if (this.sides.length == 0) {
-        console.log("no sides");
-      }
-    },
     save() {
-      this.checkForm();
-      console.log("done");
+      if (this.dish) {
+        if (this.day) {
+          const dayId = this.days.find(day => day.name == this.day).id;
+          const sides = [];
+          if (this.sides.length > 0) {
+            for (var i = 0; i < this.sides.length; i++) {
+              const side = this.sides[i];
+              if (side.name && side.sidetype) {
+                const sideId = this.sidetypes.find(s => s.name == side.sidetype)
+                  .id;
+                sides.push({ name: side.name, sidetypeId: sideId });
+              }
+            }
+          }
+          const dinner = {
+            name: this.dish,
+            date: this.date,
+            dayId: dayId,
+            sides: sides
+          };
+          console.log(dinner);
+        }
+      }
     },
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     }
+  },
+  created: function() {
+    const currentDinner = this.$store.state.currentDinner;
+    this.dish = currentDinner.dish;
+    this.day = currentDinner.dish ? currentDinner.day : "";
+    this.sides = currentDinner.sides || [];
   }
 };
 </script>
 
 <style lang="less" scoped>
-h1 {
+h2 {
   font-size: 120%;
   margin: 0.5em;
 }
 
 form {
-  margin: 0 auto;
-  padding: 0 1em;
-}
-
-input:required:focus {
-  border: 1px solid red;
-  outline: none;
+  padding: 0;
+  margin: 0;
 }
 
 section {
-  text-align: left;
+  display: flex;
+  margin: 0.5em;
 }
 
-label {
+span {
+  margin: 0.5em 0;
   text-align: right;
   display: inline-block;
-  width: 20%;
+  flex: 2;
 }
 
-input[type="text"],
-select {
-  border: 1px solid black;
+.el-select,
+.el-input {
+  flex: 8;
+  margin: 0.25em 0.5em;
 
-  &.full {
-    width: 60%;
+  &.short {
+    flex: 4;
+    margin: 0.25em 0.25em 0.25em 0.5em;
   }
 
-  &.half {
-    width: calc(30% - 5px);
+  &.shorter {
+    flex: 3;
+    margin: 0.25em 0.5em 0.25em 0.25em;
   }
+}
+
+.delete {
+  flex: 1;
 }
 
 .cross {
   position: relative;
-  top: 6px;
+  margin: 0 auto;
+  display: block;
+  fill: #666;
 }
 
 button {
@@ -144,10 +175,14 @@ button {
   font-size: 80%;
 
   &.addSideBtn {
-    color: #333;
+    color: white;
+    float: right;
+    margin-right: 1em;
+    background-color: #ff851b;
   }
 
-  &.backBtn {
+  &.backBtn,
+  &.saveBtn {
     margin: 2em 0 1em 0;
   }
 }
