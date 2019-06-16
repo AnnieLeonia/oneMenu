@@ -76,6 +76,20 @@ module.exports = (app, passport, models) => {
     res.send(dish);
   });
 
+  app.delete("/api/dishes/:date", isLoggedIn, async (req, res) => {
+    const { date } = req.params;
+
+    const dish = await Dish.destroy({
+      where: sequelize.where(
+        sequelize.fn("date", sequelize.col("date")),
+        "=",
+        date
+      )
+    });
+
+    res.send("");
+  });
+
   app.get("/api/menus/:date", isLoggedIn, async (req, res) => {
     const { date } = req.params;
 
