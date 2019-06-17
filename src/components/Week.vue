@@ -139,7 +139,7 @@ p {
 
   &.year {
     font-size: 80%;
-    margin: -25px 0 0 0;
+    margin: -2em 0 0 0;
     font-family: cursive;
   }
 
