@@ -7,8 +7,13 @@
     <form>
       <section>
         <span>Day:</span>
-        <el-select v-model="day" placeholder="Select day">
-          <el-option v-for="day in days" :key="day.id" :value="day.name" />
+        <el-select v-model="dayId" placeholder="Select day">
+          <el-option
+            v-for="day in days"
+            :key="day.id"
+            :label="day.name"
+            :value="day.id"
+          />
         </el-select>
       </section>
       <section>
@@ -19,19 +24,20 @@
         <span>Side:</span>
         <el-select
           class="shorter"
-          v-model="sides[index].sidetype"
+          v-model="side.sidetypeId"
           placeholder="Select sidetype"
         >
           <el-option
             v-for="side in sidetypes"
             :key="side.id"
-            :value="side.name"
+            :label="side.name"
+            :value="side.id"
           />
         </el-select>
         <el-input
           class="short"
           placeholder="Write dessert..."
-          v-model="side.side"
+          v-model="side.name"
         />
         <span class="delete" v-on:click="deleteSide(index)">
           <v-icon class="cross" name="times" scale="2" />
@@ -61,7 +67,7 @@
 export default {
   data() {
     return {
-      day: "",
+      dayId: "",
       dish: "",
       sides: []
     };
@@ -86,33 +92,33 @@ export default {
   },
   methods: {
     addSide() {
-      this.sides.push({ sidetype: null, side: null });
+      this.sides.push({ name: null, sidetypeId: null });
     },
     deleteSide(index) {
       this.sides.splice(index, 1);
     },
     async save() {
       if (this.dish) {
-        if (this.day) {
-          const dayId = this.days.find(day => day.name == this.day).id;
+        if (this.dayId) {
           const sides = [];
           if (this.sides.length > 0) {
             for (var i = 0; i < this.sides.length; i++) {
-              const side = this.sides[i];
-              if (side.side && side.sidetype) {
-                const sideId = this.sidetypes.find(s => s.name == side.sidetype)
-                  .id;
-                sides.push({ name: side.side, sidetypeId: sideId });
+              if (this.sides[i].name && this.sides[i].sidetypeId) {
+                sides.push({
+                  name: this.sides[i].name,
+                  sidetypeId: this.sides[i].sidetypeId
+                });
               }
             }
           }
           const dinner = {
             name: this.dish,
             date: this.date,
-            dayId: dayId,
+            dayId: this.dayId,
             sides: sides
           };
-          console.log("add", dinner);
+          console.log("Dinner: ", dinner);
+
           const res = await fetch("/api/dishes", {
             method: "POST",
             headers: {
@@ -123,7 +129,8 @@ export default {
             body: JSON.stringify(dinner)
           });
           const response = await res.json();
-          console.log("response", response);
+          console.log("Save: ", response);
+
           this.goBack();
         }
       }
@@ -138,11 +145,14 @@ export default {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     }
   },
-  created: function() {
-    const currentDinner = this.$store.state.currentDinner;
-    this.dish = currentDinner.dish;
-    this.day = currentDinner.dish ? currentDinner.day : "";
-    this.sides = currentDinner.sides || [];
+  created: async function() {
+    const res = await fetch("/api/dishes/" + this.date);
+    const response = await res.json();
+    console.log("RES", response);
+
+    this.dish = response.name || "";
+    this.dayId = response.dayId || "";
+    this.sides = response.sides || [];
   }
 };
 </script>

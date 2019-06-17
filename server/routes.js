@@ -99,12 +99,14 @@ module.exports = (app, passport, models) => {
         {
           model: Side,
           attributes: ["name"],
-          include: [{ model: Sidetype, attributes: ["name"] }]
+          include: [{ model: Sidetype, attributes: ["id"] }]
         }
       ]
     });
 
-    res.send(dish);
+    if (dish) dish.sides.forEach(side => (side.sidetypeId = side.sidetype.id));
+
+    res.send(dish || {});
   });
 
   app.delete("/api/dishes/:date", isLoggedIn, async (req, res) => {
@@ -146,7 +148,7 @@ module.exports = (app, passport, models) => {
       id,
       dish: name,
       date: moment(date).format("YYYY-MM-DD"),
-      day: day.name,
+      day: day && day.name,
       sides: sides.map(({ name, sidetype }) => ({
         side: name,
         sidetype: sidetype && sidetype.name
