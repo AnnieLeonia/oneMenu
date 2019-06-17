@@ -9,6 +9,11 @@
         <span>Day:</span>
         <el-select v-model="dayId" placeholder="Select day">
           <el-option
+            :key="0"
+            :label="date | moment('dddd')"
+            :value="null"
+          />
+          <el-option
             v-for="day in days"
             :key="day.id"
             :label="day.name"
@@ -67,7 +72,7 @@
 export default {
   data() {
     return {
-      dayId: "",
+      dayId: null,
       dish: "",
       sides: []
     };
@@ -99,40 +104,27 @@ export default {
     },
     async save() {
       if (this.dish) {
-        if (this.dayId) {
-          const sides = [];
-          if (this.sides.length > 0) {
-            for (var i = 0; i < this.sides.length; i++) {
-              if (this.sides[i].name && this.sides[i].sidetypeId) {
-                sides.push({
-                  name: this.sides[i].name,
-                  sidetypeId: this.sides[i].sidetypeId
-                });
-              }
-            }
-          }
-          const dinner = {
-            name: this.dish,
-            date: this.date,
-            dayId: this.dayId,
-            sides: sides
-          };
-          console.log("Dinner: ", dinner);
+        const dinner = {
+          name: this.dish,
+          date: this.date,
+          dayId: this.dayId,
+          sides: this.sides.filter(({ name, sidetypeId }) => name && sidetypeId)
+        };
+        console.log("Dinner: ", dinner);
 
-          const res = await fetch("/api/dishes", {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify(dinner)
-          });
-          const response = await res.json();
-          console.log("Save: ", response);
+        const res = await fetch("/api/dishes", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(dinner)
+        });
+        const response = await res.json();
+        console.log("Save: ", response);
 
-          this.goBack();
-        }
+        this.goBack();
       }
     },
     async remove() {
@@ -151,7 +143,7 @@ export default {
     console.log("RES", response);
 
     this.dish = response.name || "";
-    this.dayId = response.dayId || "";
+    this.dayId = response.dayId || null;
     this.sides = response.sides || [];
   }
 };

@@ -63,7 +63,7 @@ export default {
           if (current.day(i).format("YYYY-MM-DD") == dishes[j].date) {
             dish = dishes[j].dish;
             sides = dishes[j].sides;
-            day = dishes[j].day;
+            day = dishes[j].day || day;
           }
         }
         weekdays.push({
