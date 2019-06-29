@@ -13,11 +13,17 @@
       <v-icon class="arrow" name="chevron-right" scale="2" />
     </span>
     <div class="top">
-      <p class="top right">Weekly</p>
-      <h2>{{ date | moment("W") }}</h2>
-      <p class="top left">Menu</p>
+      <p class="p">Weekly</p>
     </div>
-    <p class="year">{{ date | moment("YYYY") }}</p>
+    <div class="top">
+      <div class="p">
+        <p class="weeknbr">{{ date | moment("W") }}</p>
+        <p class="year">{{ date | moment("YYYY") }}</p>
+      </div>
+    </div>
+    <div class="top">
+      <p class="p">Menu</p>
+    </div>
     <ul class="week" :v-model="week">
       <li v-for="day in week" v-bind:key="day.id">
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
@@ -118,29 +124,43 @@ export default {
 
 <style lang="less">
 header {
-  background-color: #ff851b;
+  background-color: #cd5c5c;
   text-align: left;
-  color: #662f00;
+  color: white;
   height: 3em;
 }
 
-h2 {
-  margin: 0.2em;
-  font-family: fantasy;
-  flex: 1;
+.top {
+  display: inline-table;
+  margin: 0 auto;
 }
 
-.top {
-  display: flex;
+.top > p,
+.top > div {
+  display: table-cell;
+  vertical-align: middle;
+  margin: 0;
 }
 
 p {
   margin: 0;
 
+  &.weeknbr {
+    font-family: fantasy;
+    font-size: 175%;
+  }
+
   &.year {
     font-size: 80%;
     margin: 0;
     font-family: cursive;
+  }
+
+  &.p {
+    font-family: fantasy;
+    font-size: 200%;
+    color: #eee;
+    font-style: italic;
   }
 
   &.today {
@@ -160,10 +180,14 @@ p {
     font-style: italic;
 
     &.left {
+      display: table-cell;
+      vertical-align: middle;
       text-align: left;
     }
 
     &.right {
+      display: table-cell;
+      vertical-align: middle;
       text-align: right;
     }
   }
@@ -189,7 +213,7 @@ p {
 }
 
 &.arrow {
-  fill: #ff851b;
+  fill: #cd5c5c;
 }
 
 .edit {

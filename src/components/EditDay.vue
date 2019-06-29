@@ -8,11 +8,7 @@
       <section>
         <span>Day:</span>
         <el-select v-model="dayId" placeholder="Select day">
-          <el-option
-            :key="0"
-            :label="date | moment('dddd')"
-            :value="null"
-          />
+          <el-option :key="0" :label="date | moment('dddd')" :value="null" />
           <el-option
             v-for="day in days"
             :key="day.id"
@@ -208,8 +204,8 @@ span {
   flex: 1;
 
   &.addSideBtn {
-    color: #666;
-    background-color: #ff851b;
+    color: white;
+    background-color: #cd5c5c;
   }
 }
 </style>
