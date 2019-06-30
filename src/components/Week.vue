@@ -53,10 +53,15 @@
 <script>
 export default {
   data() {
-    return {
-      date: this.$moment(),
-      editable: false
-    };
+    return {};
+  },
+  computed: {
+    editable: function() {
+      return this.$store.state.editable;
+    },
+    date: function() {
+      return this.$store.state.currentWeek;
+    }
   },
   asyncComputed: {
     week: async function() {
@@ -104,25 +109,24 @@ export default {
       return day.format(f) == this.$moment().format(f);
     },
     toggleEdit() {
-      this.editable = !this.editable;
+      this.$store.commit("setEditable", !this.editable);
     },
     editDish(day) {
-      const dinner = this.week[day.id - 1];
-      this.$store.commit("setCurrentDinner", dinner);
-      const date = day.date.format("YYYY-MM-DD");
-      this.$router.push("/edit/" + date);
+      this.$router.push("/edit/" + day.date.format("YYYY-MM-DD"));
     },
     next() {
-      this.date = this.$moment(this.date).add(7, "days");
+      this.$store.commit("nextWeek", this.$moment(this.date));
     },
     back() {
-      this.date = this.$moment(this.date).subtract(7, "days");
+      this.$store.commit("backWeek", this.$moment(this.date));
     },
     logout() {
       location.href = "/auth/logout";
     }
   },
-  created: function() {}
+  created: function() {
+    this.$store.commit("setWeek", this.$moment());
+  }
 };
 </script>
 
