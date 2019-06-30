@@ -40,9 +40,13 @@
         </ul>
       </li>
     </ul>
-    <button class="editBtn" v-on:click="toggleEdit()">
+    <el-button
+      :class="editable ? 'editBtn on' : 'editBtn off'"
+      round
+      v-on:click="toggleEdit()"
+    >
       {{ editText }}
-    </button>
+    </el-button>
   </div>
 </template>
 
@@ -225,10 +229,18 @@ p {
 }
 
 .editBtn {
-  margin: 2em 0 1em 0;
-  padding: 0.5em 1em;
-  border-radius: 10px;
+  margin: 1em;
   font-size: 80%;
+
+  &.on {
+    color: #cd5c5c;
+    border: solid #cd5c5c 2px;
+  }
+
+  &.off {
+    background-color: #cd5c5c;
+    color: white;
+  }
 }
 
 .logout {
