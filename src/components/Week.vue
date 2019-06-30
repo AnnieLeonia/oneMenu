@@ -12,17 +12,17 @@
     <span class="icon right" v-on:click="next()">
       <v-icon class="arrow" name="chevron-right" scale="2" />
     </span>
-    <div class="top">
-      <p class="p">Weekly</p>
+    <div class="top right">
+      <p class="right">Weekly</p>
     </div>
-    <div class="top">
-      <div class="p">
+    <div class="top center">
+      <div>
         <p class="weeknbr">{{ date | moment("W") }}</p>
         <p class="year">{{ date | moment("YYYY") }}</p>
       </div>
     </div>
-    <div class="top">
-      <p class="p">Menu</p>
+    <div class="top left">
+      <p class="left">Menu</p>
     </div>
     <ul class="week" :v-model="week">
       <li v-for="day in week" v-bind:key="day.id">
@@ -132,7 +132,13 @@ header {
 
 .top {
   display: inline-table;
+  table-layout: fixed;
   margin: 0 auto;
+  width: 40%;
+
+  &.center {
+    width: 20%;
+  }
 }
 
 .top > p,
@@ -156,11 +162,20 @@ p {
     font-family: cursive;
   }
 
-  &.p {
+  &.left,
+  &.right {
     font-family: fantasy;
     font-size: 200%;
     color: #eee;
     font-style: italic;
+  }
+
+  &.left {
+    text-align: left;
+  }
+
+  &.right {
+    text-align: right;
   }
 
   &.today {
@@ -178,18 +193,6 @@ p {
     font-size: 200%;
     color: #eee;
     font-style: italic;
-
-    &.left {
-      display: table-cell;
-      vertical-align: middle;
-      text-align: left;
-    }
-
-    &.right {
-      display: table-cell;
-      vertical-align: middle;
-      text-align: right;
-    }
   }
 
   &.dish,
