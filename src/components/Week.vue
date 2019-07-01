@@ -1,9 +1,9 @@
 <template>
   <div>
     <header>
-      <h1>OneMenu</h1>
+      <h1 style="flex: 1">OneMenu</h1>
       <button class="logout" v-on:click="logout()">
-        <v-icon name="sign-out-alt" />
+        <v-icon style="margin-left: 3px" name="sign-out-alt" />
       </button>
     </header>
     <span class="icon left" v-on:click="back()">
@@ -132,6 +132,7 @@ export default {
 
 <style lang="less">
 header {
+  display: flex;
   background-color: #cd5c5c;
   text-align: left;
   color: white;
@@ -248,12 +249,12 @@ p {
 }
 
 .logout {
-  position: absolute;
+  width: 2.5em;
+  height: 2.5em;
+  font-size: inherit;
   background-color: #fff8;
   border: solid #666 2px;
-  right: 0;
-  margin: 1em;
-  padding: 0.5em 1em;
+  margin: 0.25em;
   border-radius: 10px;
 }
 
