@@ -1,7 +1,16 @@
 // vue.config.js
 module.exports = {
   devServer: {
-    proxy: 'http://localhost:3010',
+    proxy: {
+      "/api": {
+        target: "http://localhost:3010",
+        ws: true
+      },
+      "/auth": {
+        target: "http://localhost:3010",
+        ws: true
+      }
+    }
   },
-  runtimeCompiler: true,
+  runtimeCompiler: true
 };
