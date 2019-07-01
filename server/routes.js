@@ -131,7 +131,7 @@ module.exports = (app, passport, models) => {
       order: ["date"],
       where: {
         date: {
-          [Op.between]: [moment(date), moment(date).add(5, "days")]
+          [Op.between]: [moment.utc(date), moment.utc(date).add(5, "days")]
         }
       },
       include: [
@@ -147,7 +147,7 @@ module.exports = (app, passport, models) => {
     const menu = dishes.map(({ id, name, date, day, sides }) => ({
       id,
       dish: name,
-      date: moment(date).format("YYYY-MM-DD"),
+      date: moment.utc(date).format("YYYY-MM-DD"),
       day: day && day.name,
       sides: sides.map(({ name, sidetype }) => ({
         side: name,
