@@ -25,7 +25,11 @@
       <p class="left">Menu</p>
     </div>
     <ul class="week" :v-model="week">
-      <li v-for="day in week" v-bind:key="day.id">
+      <li
+        :class="editable ? 'day editable' : 'day'"
+        v-for="day in week"
+        v-bind:key="day.id"
+      >
         <p v-bind:class="isToday(day.date) ? 'day today' : 'day'">
           {{ day.day }} {{ day.date | moment("D/M") }}
           <span v-if="editable" class="edit" v-on:click="editDish(day)">
@@ -187,12 +191,12 @@ p {
     text-align: right;
   }
 
-  &.today {
-    font-weight: bold;
+  &.day {
+    font-size: 120%;
   }
 
-  &.day {
-    margin: 1em 0 0 0;
+  &.today {
+    font-weight: bold;
   }
 
   &.top {
@@ -230,12 +234,15 @@ p {
 
 .edit {
   position: absolute;
-  right: 2em;
+  cursor: pointer;
+  right: 15%;
 }
 
 .editBtn {
   margin: 1em;
   font-size: 80%;
+  width: 50%;
+  max-width: 300px;
 
   &.on {
     color: #cd5c5c;
@@ -274,5 +281,24 @@ ul {
 
 li {
   text-align: center;
+
+  &.day {
+    padding: 0.5em;
+    border: solid transparent;
+    border-width: 2px 2px 0px 2px;
+  }
+
+  &.day:last-child {
+    border-width: 2px;
+  }
+
+  &.editable {
+    border: dashed black;
+    border-width: 2px 2px 0px 2px;
+  }
+
+  &.editable:last-child {
+    border-width: 2px;
+  }
 }
 </style>
