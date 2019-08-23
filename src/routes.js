@@ -1,11 +1,11 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-Vue.use(VueRouter);
-
 import Week from "./components/Week";
 import Login from "./components/Login";
 import EditDay from "./components/EditDay";
+
+Vue.use(VueRouter);
 
 const router = new VueRouter({
   mode: "history",
