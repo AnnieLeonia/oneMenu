@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import VueCookie from 'vue-cookie';
 import ElementUI from 'element-ui';
 import VueAsyncComputed from 'vue-async-computed';
 import Icon from 'vue-awesome/components/Icon';
@@ -11,7 +10,6 @@ import Routes from './routes';
 import Store from './store';
 import './registerServiceWorker';
 
-Vue.use(VueCookie);
 Vue.use(ElementUI);
 Vue.use(VueAsyncComputed);
 Vue.use(require('vue-moment'));

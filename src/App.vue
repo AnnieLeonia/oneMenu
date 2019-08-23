@@ -1,15 +1,18 @@
 <template>
   <div id="app">
+    <Login />
     <router-view />
   </div>
 </template>
 
 <script>
+import Login from "./components/Login";
 import Week from "./components/Week";
 
 export default {
   name: "App",
   components: {
+    Login,
     Week
   }
 };

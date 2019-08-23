@@ -28,7 +28,6 @@ module.exports = (app, passport, models) => {
         if (err) {
           return next(err);
         }
-        res.cookie("name", user.name);
         return res.redirect("/");
       });
     })(req, res, next);
@@ -37,11 +36,11 @@ module.exports = (app, passport, models) => {
   app.get("/auth/logout", (req, res) => {
     req.logout();
     req.session = null;
-    res.clearCookie("name");
+    res.clearCookie("session");
     res.redirect("/");
   });
 
-  app.get("/auth/me", (req, res) => res.send(req.user));
+  app.get("/auth/me", (req, res) => res.send(req.user || {}));
 
   app.get("/api/chefs", isLoggedIn, async (req, res) => {
     const chefs = await Chef.findAll();

@@ -12,9 +12,19 @@ const app = express();
 
 app.use(express.static(path.resolve(__dirname, "..", "dist")));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(cookieParser());
-app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(session({
+  name: 'session',
+  secret: process.env.SESSION_SECRET,
+  httpOnly: true,
+  resave: false,
+  rolling: true,
+  saveUninitialized: false,
+  maxAge: 30 * 24 * 60 * 60 * 1000, // one month
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
