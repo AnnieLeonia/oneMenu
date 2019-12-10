@@ -67,7 +67,7 @@ module.exports = (app, passport, models) => {
   });
 
   app.post("/api/dishes", isLoggedIn, async (req, res) => {
-    const { name, date, dayId, sides } = req.body;
+    const { name, date, isSkipped, dayId, sides } = req.body;
 
     await Dish.destroy({
       where: sequelize.where(
@@ -78,7 +78,7 @@ module.exports = (app, passport, models) => {
     });
 
     const dish = await Dish.create(
-      { name, date, dayId, sides },
+      { name, date, isSkipped, dayId, sides },
       { include: [Side] }
     );
 
@@ -126,7 +126,7 @@ module.exports = (app, passport, models) => {
     const { date } = req.params;
 
     const dishes = await Dish.findAll({
-      attributes: ["id", "name", "date"],
+      attributes: ["id", "name", "date", "isSkipped"],
       order: ["date"],
       where: {
         date: {
@@ -143,11 +143,12 @@ module.exports = (app, passport, models) => {
       ]
     });
 
-    const menu = dishes.map(({ id, name, date, day, sides }) => ({
+    const menu = dishes.map(({ id, name, date, isSkipped, day, sides }) => ({
       id,
       dish: name,
       date: moment(date).format("YYYY-MM-DD"),
       day: day && day.name,
+      isSkipped,
       sides: sides.map(({ name, sidetype }) => ({
         side: name,
         sidetype: sidetype && sidetype.name

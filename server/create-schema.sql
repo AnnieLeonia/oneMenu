@@ -31,6 +31,7 @@ CREATE TABLE dishes
     id           SERIAL          NOT NULL,
     name         VARCHAR(255)    NOT NULL,
     date         DATE            NOT NULL UNIQUE,
+    "isSkipped"  BOOLEAN         NOT NULL,
     "dayId"      INT,
     "createdAt"  TIMESTAMP       NOT NULL,
     "updatedAt"  TIMESTAMP       NOT NULL,

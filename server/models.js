@@ -14,7 +14,8 @@ const Day = sequelize.define("day", {
 
 const Dish = sequelize.define("dish", {
   name: Sequelize.STRING,
-  date: Sequelize.DATEONLY
+  date: Sequelize.DATEONLY,
+  isSkipped: Sequelize.BOOLEAN
 });
 
 const Sidetype = sequelize.define("sidetype", {
