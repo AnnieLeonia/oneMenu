@@ -1,6 +1,6 @@
 // vue.config.js
 module.exports = {
-  devServer: {
+  devServer: process.env.NODE_ENV === 'production' ? {} : {
     proxy: {
       "/api": {
         target: "http://localhost:3010",
