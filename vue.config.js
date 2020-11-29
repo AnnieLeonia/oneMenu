@@ -4,11 +4,10 @@ module.exports = {
     proxy: {
       "/api": {
         target: "http://localhost:3010",
-        ws: true
       },
       "/auth": {
         target: "http://localhost:3010",
-        ws: true
+        changeOrigin: false
       }
     }
   },
