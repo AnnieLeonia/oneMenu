@@ -61,9 +61,10 @@ const props = {
 // routes
 require("./src/auth/auth")(props);
 require("./src/user/user-route")(props);
+require("./src/category/category-route")(props);
 
 app.get("/__/*", async (_, res) => {
-  return res.sendStatus(501)
+  return res.sendStatus(501);
 });
 
 app.get("*", (_, res) => {
