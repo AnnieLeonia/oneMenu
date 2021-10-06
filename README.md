@@ -9,11 +9,9 @@
 
 ## Environment variables
 
-There are two env-files that you need to create locally:
+Create the env-file in root dir (path: `.env`) locally
 
-- one in root dir (path: `.env`) for backend
-- one in client dir (path: `client/.env`) for frontend
-  > You can copy the `.env.example` to `.env` and modify the variables as needed
+> You can copy the `.env.example` to `.env` and modify the variables as needed
 
 ## Database Setup
 
