@@ -16,7 +16,7 @@ CREATE TABLE dishes (
   id           SERIAL        NOT NULL,
   name         VARCHAR(255)  NOT NULL UNIQUE,
   description  VARCHAR(255),
-  active       BOOLEAN       DEFAULT FALSE,
+  active       BOOLEAN       DEFAULT TRUE,
 
   PRIMARY KEY (id)
 );
