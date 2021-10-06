@@ -84,5 +84,5 @@ app.use((err, req, res, _next) => {
 });
 
 app.listen(PORT || 3000, () =>
-  console.log(`Server running on port ${PORT || 3000}!`)
+  console.log(`OneMenu running on port ${PORT || 3000}!`)
 );
