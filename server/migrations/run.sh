@@ -16,7 +16,7 @@ cd $(dirname "${BASH_SOURCE[0]}")
 
 VERSION_FILE='.version'
 CURRENT_VERSION="`cat $VERSION_FILE 2>/dev/null || echo 0`"
-USAGE="Usage: $0 DATABASE [--check] [--fix]"
+USAGE="Usage: $0 DATABASE [--check] [--fix] [-U <user>]"
 LOG_FILE_PATH=".migrations.log"
 TMP_ERR_FILE_PATH=".tmp.err"
 
@@ -46,6 +46,10 @@ case "$1" in
     --fix)
     FIX=YES
     shift
+    ;;
+    -U)
+    USER=$2
+    shift; shift
     ;;
 	*)
 	echo $USAGE
@@ -81,7 +85,11 @@ for FNAME in `ls *.sql | sort -n`; do
 
 		# Load the .sql file
 		echo -n "$SCRIPT_PATH ... "
-		PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a -d $DATABASE -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
+    if [[ -n $USER ]]; then
+		  PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a -U $USER -d $DATABASE -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
+    else
+      PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a -d $DATABASE -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
+    fi
 		RET_CODE=$?
 		echo -e "$SCRIPT_PATH\n$PSQL" >> $LOG_FILE_PATH
 
