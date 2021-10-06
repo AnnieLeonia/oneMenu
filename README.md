@@ -19,7 +19,6 @@ There are two env-files that you need to create locally:
 
 ```
 createdb onemenu
-psql onemenu < server/schema.sql
 ```
 
 ### Database migrations

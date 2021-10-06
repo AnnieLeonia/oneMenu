@@ -3,7 +3,7 @@ import { FETCH_PRODUCTS } from "../constants/products";
 export const addProduct = ({ name, uid }) => async (dispatch) => {
   if (name) {
     try {
-      await fetch("/__/products", {
+      await fetch("/__/dishes", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -23,7 +23,7 @@ export const editProduct = ({ id, name, amount, unit, category }) => async (
   dispatch
 ) => {
   try {
-    await fetch(`/__/products/${id}`, {
+    await fetch(`/__/dishes/${id}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -40,7 +40,7 @@ export const editProduct = ({ id, name, amount, unit, category }) => async (
 
 export const toggleProductChecked = ({ id, uid }) => async (dispatch) => {
   try {
-    await fetch(`/__/products/${id}/${uid}`, {
+    await fetch(`/__/dishes/${id}/${uid}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -55,15 +55,14 @@ export const toggleProductChecked = ({ id, uid }) => async (dispatch) => {
   }
 };
 
-export const toggleProductInactive = (item, getData) => async (dispatch) => {
+export const toggleProductInactive = (id) => async (dispatch) => {
   try {
-    const { userId } = getData(item);
-    await fetch(`/__/products/${item.id}/${userId}`, {
+    await fetch(`/__/dishes/${id}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Type: "toggle-inactive",
+        Type: "toggle-active",
       },
       credentials: "include",
     });
@@ -75,7 +74,7 @@ export const toggleProductInactive = (item, getData) => async (dispatch) => {
 
 export const removeProduct = (id) => async (dispatch) => {
   try {
-    await fetch(`/__/products/${id}`, {
+    await fetch(`/__/dishes/${id}`, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
@@ -108,7 +107,7 @@ export const inactivateProducts = (_, getData) => async (dispatch) => {
 
 export const fetchProducts = () => async (dispatch) => {
   try {
-    const res = await fetch("/__/products", { credentials: "include" });
+    const res = await fetch("/__/dishes", { credentials: "include" });
     const products = await res.json();
     return dispatch({ type: FETCH_PRODUCTS, products });
   } catch (err) {

@@ -11,7 +11,6 @@ import {
   mergeWith,
   sortBy,
   toInteger,
-  uniqBy,
   zipObject,
 } from 'lodash/fp';
 
@@ -23,18 +22,18 @@ import ProductList from '../../components/ProductList';
 const active = (state) => {
   const userId = state.user.isCollaboration ? 0 : state.user.id || 0;
   const uncategorized = getTranslate(state.locale)('categories.uncategorized');
-  const getCategory = ({ category }) =>
-    get('name', find({ id: toInteger(category) }, state.categories));
+  const getCategory = ({ categoryId }) => {
+    return get('name', find({ id: toInteger(categoryId) }, state.categories))
+  };
 
   return flow(
     map(product => ({
       ...product,
-      key: `${product.id}-${product.uid}`,
-      checked: product.uid !== null && product.uid === userId,
+      key: `${product.id}-${product.categoryId}`,
+      checked: product.active,
       categoryName: getCategory(product),
     })),
     sortBy(({ name, uid }) => [name.toLowerCase(), uid !== userId]),
-    uniqBy('id'),
     groupBy('categoryName'),
     mergeWith((category, products) => ({
       ...category,
