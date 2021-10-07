@@ -14,17 +14,17 @@ html,
 
 /* main div comes after header */
 #root > div > :nth-child(2),
-.products {
+.dishes {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.products > :nth-child(1) {
+.dishes > :nth-child(1) {
   flex: 1;
 }
 
-.products > :nth-child(2) {
+.dishes > :nth-child(2) {
   overflow: visible;
 }
 
@@ -134,14 +134,14 @@ nav a.active {
   margin: 0.25em 0.5em;
 }
 
-.product .title,
+.dish .title,
 .category .title {
   font-family: "Quicksand", sans-serif;
   padding: 0.5em 0.5em;
   font-size: 20px;
 }
 
-.product .title,
+.dish .title,
 .category .title,
 .search-form,
 .header {
@@ -150,8 +150,8 @@ nav a.active {
 }
 
 .search-form input,
-.product input,
-.product select,
+.dish input,
+.dish select,
 .category input,
 .settings input,
 .settings select,
@@ -195,7 +195,7 @@ nav a.active {
   float: right;
 }
 
-.product .wrapper,
+.dish .wrapper,
 .category .wrapper {
   padding-top: 1em;
   clear: both;
@@ -203,7 +203,7 @@ nav a.active {
   background-color: white;
 }
 
-.product label span,
+.dish label span,
 .category label span,
 .settings label span {
   font-family: "Quicksand", sans-serif;
@@ -215,8 +215,8 @@ nav a.active {
   padding: 0.6em 0.5em;
 }
 
-.product input,
-.product select,
+.dish input,
+.dish select,
 .category input,
 .settings input,
 .settings select,
@@ -228,20 +228,20 @@ nav a.active {
   float: left;
 }
 
-.product .productAmountText{
+.dish .dishAmountText{
   width: calc((100% - 120px - 2em) * 0.6);
   text-indent: 0.3em;
   border-radius: 4px 0px 0px 4px;
 }
   
-.product .productAmountUnit {
+.dish .dishAmountUnit {
   width: calc((100% - 120px - 2em) * 0.4);
   text-indent: 0.3em;
   border-radius: 0px 4px 4px 0px;
 }
 
 
-.product input,
+.dish input,
 .category input,
 .settings input,
 #color-btn {
@@ -249,7 +249,7 @@ nav a.active {
   text-indent: 0.3em;
 }
 
-.product select,
+.dish select,
 .settings select,
 #color-btn {
   width: calc(100% - 120px - 1.89em);
@@ -347,7 +347,7 @@ nav a.active {
   user-select: none;
 }
 
-.listitem .productText{
+.listitem .dishText{
   font-family: "Quicksand", sans-serif;
   padding-left: 35px;
   font-size: 22px;
@@ -374,17 +374,17 @@ nav a.active {
 }
 
 /* When the checkbox is checked, add a blue background */
-.products input:checked ~ .checkmark {
+.dishes input:checked ~ .checkmark {
   background-color: #ff3334;
 }
 
 /* Show the checkmark when checked */
-.products input:checked ~ .checkmark:after {
+.dishes input:checked ~ .checkmark:after {
   display: block;
 }
 
 /* Style the checkmark/indicator */
-.products .checkmark:after {
+.dishes .checkmark:after {
   left: 6px;
   top: -2px;
   width: 10px;
@@ -395,12 +395,12 @@ nav a.active {
 }
 
 /* Create a custom checkbox */
-.products .checkmark {
+.dishes .checkmark {
   background-color: #eee;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
-.products .checkmark:after {
+.dishes .checkmark:after {
   content: "";
   position: absolute;
   display: none;
@@ -414,7 +414,7 @@ nav a.active {
   font-weight: bold;
 }
 
-.products .done {
+.dishes .done {
   background-color: rgb(80, 80, 80);
   border-radius: 5px 5px 0 0;
   margin: 0.5em 0 0 0;
@@ -422,7 +422,7 @@ nav a.active {
   color: white;
 }
 
-.products .done h2 {
+.dishes .done h2 {
   color: white;
   font-family: "Quicksand", sans-serif;
   font-weight: normal;
@@ -430,11 +430,11 @@ nav a.active {
   display: inline;
 }
 
-.products .done li {
+.dishes .done li {
   text-decoration: line-through;
 }
 
-.products .done button {
+.dishes .done button {
   position: absolute;
   right: 0;
   font-family: "Quicksand", sans-serif;
@@ -457,13 +457,13 @@ nav a.active {
 }
 
 .hidden,
-.products .done img,
-.products .done .amountText {
+.dishes .done img,
+.dishes .done .amountText {
   display: none;
 }
 
 .categories .checkmark,
-.products .checkmark {
+.dishes .checkmark {
   position: absolute;
   top: 0;
   left: 0;

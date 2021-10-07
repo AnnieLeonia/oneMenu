@@ -77,7 +77,7 @@ CategorySelect.propTypes = {
 };
 
 const mapStateToProps = (state, { id }) => ({
-  category: get('category', find({ id }, state.products)),
+  category: get('category', find({ id }, state.dishes)),
   categories: sortBy('name', state.categories),
   translate: getTranslate(state.locale),
 });

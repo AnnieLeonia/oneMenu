@@ -2,7 +2,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { fetchProducts } from '../../actions/products';
+import { fetchDishes } from '../../actions/dishes';
 import { fetchCategories } from '../../actions/categories';
 
 class FetchDB extends Component {
@@ -12,10 +12,10 @@ class FetchDB extends Component {
     this.update = () => {};
   }
 
-  componentWillReceiveProps({ user, updateProducts, updateCategories }) {
+  componentWillReceiveProps({ user, updateDishes, updateCategories }) {
     const { username } = user;
     this.update = () => {
-      updateProducts();
+      updateDishes();
       updateCategories();
     };
 
@@ -40,7 +40,7 @@ FetchDB.propTypes = {
   user: PropTypes.shape({
     username: PropTypes.string,
   }).isRequired,
-  updateProducts: PropTypes.func.isRequired,
+  updateDishes: PropTypes.func.isRequired,
   updateCategories: PropTypes.func.isRequired,
 };
 
@@ -49,7 +49,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = {
-  updateProducts: fetchProducts,
+  updateDishes: fetchDishes,
   updateCategories: fetchCategories,
 };
 

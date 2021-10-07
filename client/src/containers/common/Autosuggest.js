@@ -27,19 +27,19 @@ const getSuggestions = (value, state) => {
 
   return flow(
     filter(search),
-    map(product => ({
-      ...product,
-      categoryName: getCategory(product),
+    map(dish => ({
+      ...dish,
+      categoryName: getCategory(dish),
     })),
     sortBy(({ name, uid }) => [name.toLowerCase(), uid]),
     groupBy('categoryName'),
-    mergeWith((category, products) => ({
+    mergeWith((category, dishes) => ({
       title: getOr(uncategorized, 'name', category),
-      suggestions: products,
+      suggestions: dishes,
     }))(zipObject(map('name', state.categories), state.categories)),
     filter('suggestions.length'),
     sortBy('orderidx')
-  )(state.products);
+  )(state.dishes);
 };
 
 const mapStateToProps = state => ({

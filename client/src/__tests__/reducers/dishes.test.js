@@ -1,16 +1,16 @@
 import makeStore, { store } from '../store';
-import products from '../../reducers/products';
+import dishes from '../../reducers/dishes';
 import {
-  addProduct,
-  editProduct,
-  toggleProductChecked,
-  toggleProductInactive,
-  removeProduct,
-  inactivateProducts,
-  fetchProducts,
-} from '../../actions/products';
+  addDish,
+  editDish,
+  toggleDishChecked,
+  toggleDishInactive,
+  removeDish,
+  inactivateDishes,
+  fetchDishes,
+} from '../../actions/dishes';
 
-const testProduct = [
+const testDish = [
   {
     id: 1,
     name: 'Milk',
@@ -19,10 +19,10 @@ const testProduct = [
 
 const id = () => ({})
 
-describe('products reducer', () => {
+describe('dishes reducer', () => {
   const { dispatch } = store;
   it('has a default state', () => {
-    expect(products(undefined, { type: 'unexpected' })).toEqual([]);
+    expect(dishes(undefined, { type: 'unexpected' })).toEqual([]);
   });
 
   it('can handle ADD_PRODUCT', async () => {
@@ -32,12 +32,12 @@ describe('products reducer', () => {
         name: 'Milk',
       }])
     );
-    const state = await dispatch(addProduct({ name: 'Milk' }));
-    expect(products(undefined, state)).toEqual(testProduct);
+    const state = await dispatch(addDish({ name: 'Milk' }));
+    expect(dishes(undefined, state)).toEqual(testDish);
   });
 
   it('can handle ADD_PRODUCT for None', () => {
-    expect(products(undefined, dispatch(addProduct({})))).toEqual([]);
+    expect(dishes(undefined, dispatch(addDish({})))).toEqual([]);
   });
 
   it('can handle TOGGLE_PRODUCT_CHECKED', async () => {
@@ -48,8 +48,8 @@ describe('products reducer', () => {
         checked: true
       }])
     );
-    expect(products(testProduct, await dispatch(toggleProductChecked(1)))).toEqual(
-      testProduct.map(product => ({ ...product, checked: true }))
+    expect(dishes(testDish, await dispatch(toggleDishChecked(1)))).toEqual(
+      testDish.map(dish => ({ ...dish, checked: true }))
     );
   });
   it('can handle TOGGLE_PRODUCT_INACTIVE', async () => {
@@ -60,14 +60,14 @@ describe('products reducer', () => {
         checked: null
       }])
     );
-    expect(products(testProduct, await dispatch(toggleProductInactive(1, id)))).toEqual(
-      testProduct.map(product => ({ ...product, checked: null }))
+    expect(dishes(testDish, await dispatch(toggleDishInactive(1, id)))).toEqual(
+      testDish.map(dish => ({ ...dish, checked: null }))
     );
   });
 
   it('can handle REMOVE_PRODUCT', async () => {
     fetch.mockResponse(JSON.stringify([]));
-    expect(products(testProduct, await dispatch(removeProduct(1)))).toEqual([]);
+    expect(dishes(testDish, await dispatch(removeDish(1)))).toEqual([]);
   });
 
   it('can handle INACTIVATE_PRODUCTS', async () => {
@@ -79,16 +79,16 @@ describe('products reducer', () => {
       ])
     );
     expect(
-      products(
+      dishes(
         [
-          ...testProduct,
+          ...testDish,
           { id: 2, name: 'Apple', checked: true },
           { id: 3, name: 'Pear', checked: true },
         ],
-        await dispatch(inactivateProducts(null, id))
+        await dispatch(inactivateDishes(null, id))
       )
     ).toEqual([
-      ...testProduct,
+      ...testDish,
       { id: 2, name: 'Apple', checked: null },
       { id: 3, name: 'Pear', checked: null },
     ]);
@@ -105,13 +105,13 @@ describe('products reducer', () => {
       ])
     );
 
-    mockStore.dispatch(fetchProducts());
+    mockStore.dispatch(fetchDishes());
 
     setImmediate(() => {
       expect(mockStore.getActions()).toEqual([
         {
           type: 'FETCH_PRODUCTS',
-          products: [
+          dishes: [
             {
               id: 1,
               name: 'Milk',
@@ -127,13 +127,13 @@ describe('products reducer', () => {
     fetch.resetMocks();
     fetch.mockReject('Error');
 
-    dispatch(addProduct({ name: 'Milk' }));
-    dispatch(editProduct({ id: 1, name: 'Milk' }));
-    dispatch(toggleProductChecked(1));
-    dispatch(toggleProductInactive(1, id));
-    dispatch(removeProduct(1));
-    dispatch(inactivateProducts(null, id));
-    dispatch(fetchProducts());
+    dispatch(addDish({ name: 'Milk' }));
+    dispatch(editDish({ id: 1, name: 'Milk' }));
+    dispatch(toggleDishChecked(1));
+    dispatch(toggleDishInactive(1, id));
+    dispatch(removeDish(1));
+    dispatch(inactivateDishes(null, id));
+    dispatch(fetchDishes());
 
     expect(fetch.mock.calls.length).toEqual(7);
   });
