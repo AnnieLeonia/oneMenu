@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getTranslate } from 'react-localize-redux';
 import addicon from '../../assets/icons/add.svg';
-import oneuser from '../../assets/icons/one-user.svg';
-import twousers from '../../assets/icons/two-users.svg';
 import clearicon from '../../assets/icons/clear.svg';
-import { toggleCollaboration } from '../../actions/user';
 import Autosuggest from './Autosuggest';
 
 class New extends Component {
@@ -42,8 +39,6 @@ class New extends Component {
       translate,
       view,
       autosuggest,
-      isCollaboration,
-      onToggleCollaboration,
     } = this.props;
 
     const inputfield = autosuggest ? (
@@ -67,12 +62,6 @@ class New extends Component {
         />
       );
 
-    const toggle =
-      <div className={"toggle " + (autosuggest ? "" : "disabled")} onClick={() => onToggleCollaboration()}>
-        <img className={"one-user " + (!isCollaboration ? "active" : "")} alt="1" src={oneuser} height="18px" />
-        <img className={"two-users " + (isCollaboration ? "active" : "")} alt="2" src={twousers} height="24px" />
-      </div>
-
     return (
       <form className="search-form" onSubmit={evt => this.handleSubmit(evt)}>
         <span role="presentation" onClick={() => this.setState({ name: '' })}>
@@ -82,7 +71,6 @@ class New extends Component {
           <img className="add-icon" alt="add" src={addicon} height="12px" />
           {inputfield}
         </label>
-        {toggle}
       </form>
     );
   }
@@ -109,7 +97,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = (dispatch, { onAdd, onRemove }) => ({
   onAddItem: item => dispatch(onAdd(item)),
   onRemoveItem: id => dispatch(onRemove(id)),
-  onToggleCollaboration: () => dispatch(toggleCollaboration()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(New);

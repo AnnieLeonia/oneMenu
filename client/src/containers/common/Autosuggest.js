@@ -11,7 +11,6 @@ import {
   mergeWith,
   sortBy,
   toInteger,
-  uniqBy,
   zipObject,
 } from 'lodash/fp';
 
@@ -27,11 +26,9 @@ const getSuggestions = (value, state) => {
     get('name', find({ id: toInteger(category) }, state.categories));
 
   return flow(
-    uniqBy('id'),
     filter(search),
     map(product => ({
       ...product,
-      uid: state.user.isCollaboration ? 0 : state.user.id || 0,
       categoryName: getCategory(product),
     })),
     sortBy(({ name, uid }) => [name.toLowerCase(), uid]),

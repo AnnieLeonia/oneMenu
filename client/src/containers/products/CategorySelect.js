@@ -20,6 +20,7 @@ class CategorySelect extends Component {
         <span>{translate('edit.category')}:</span>
         {select ? (
           <select
+            multiple
             id="category"
             name="category"
             defaultValue={category}
