@@ -3,7 +3,6 @@ import {
   SUBMIT_USER,
   REQUEST_USER,
   RECIEVE_USER,
-  TOGGLE_COLLABORATION,
   LOGOUT_USER,
 } from '../constants/user';
 
@@ -15,7 +14,7 @@ export const updateUser = ({ target }) => ({
 
 export const logoutUser = () => dispatch => {
   dispatch({ type: LOGOUT_USER });
-  return fetch('/__/logout', { credentials: 'include' });
+  return fetch('/__/auth/logout', { credentials: 'include' });
 };
 
 export const fetchUser = () => dispatch => {
@@ -25,10 +24,6 @@ export const fetchUser = () => dispatch => {
     .then(user => dispatch({ type: RECIEVE_USER, user }))
     .catch(err => console.error(err));
 };
-
-export const toggleCollaboration = () => ({
-  type: TOGGLE_COLLABORATION
-});
 
 export const submitUser = (event, user) => dispatch => {
   event.preventDefault();

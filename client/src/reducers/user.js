@@ -3,7 +3,6 @@ import {
   SUBMIT_USER,
   REQUEST_USER,
   RECIEVE_USER,
-  TOGGLE_COLLABORATION,
   LOGOUT_USER,
 } from '../constants/user';
 
@@ -28,8 +27,6 @@ const user = (state = initialState, action) => {
         isFetching: false,
         isSubmitting: false,
       };
-    case TOGGLE_COLLABORATION:
-      return { ...state, isCollaboration: !state.isCollaboration };
     case LOGOUT_USER:
       return initialState;
     default:
