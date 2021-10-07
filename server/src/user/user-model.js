@@ -19,20 +19,27 @@
  *           type: string
  */
 
+ const { keyValuePairs } = require("../utils");
+
 module.exports = db => ({
-  create: async ({ username, name, email, photo, language }) => {
+  create: async (user) => {
+    const valid = ["username", "name", "email", "photo", "language"];
+    const { keys, values, indices } = keyValuePairs(valid, user);
+    
     const sql = `
-        INSERT INTO users (username, name, email, photo, language)
-        VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-    const { rows, err } = await db.query(sql, [username, name, email, photo, language]);
+        INSERT INTO users (${keys})
+        VALUES (${indices}) RETURNING *`;
+    const { rows, err } = await db.query(sql, values);
     return { user: rows[0], err };
   },
 
-  update: async (id, { username, name, photo, language }) => {
+  update: async (id, user) => {
+    const valid = ['username', 'name', 'photo', 'language']
+    const { keyIndices, values } = keyValuePairs(valid, user);
     const sql = `
-        UPDATE users SET (username, name, photo, language) = ($2, $3, $4, $5)
-        WHERE id = $1 RETURNING *`;
-    const { rows, err } = await db.query(sql, [id, username, name, photo, language]);
+        UPDATE users SET ${keyIndices}
+        WHERE id = ${id} RETURNING *`;
+    const { rows, err } = await db.query(sql, values);
     return { user: rows[0], err };
   },
 
