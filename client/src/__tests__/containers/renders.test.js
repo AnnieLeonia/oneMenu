@@ -3,9 +3,9 @@ import { mount } from 'enzyme';
 import Index from '../../index';
 import Root from '../../containers/Root';
 import { store } from '../store';
-import ShoppingList from '../../containers/shoppinglist';
+import DesiredList from '../../containers/desirables';
 import Categories from '../../containers/categories';
-import Products from '../../containers/products';
+import Dishes from '../../containers/dishes';
 import Settings from '../../containers/settings';
 
 describe('containers', () => {
@@ -15,8 +15,8 @@ describe('containers', () => {
     ).toBeDefined();
   });
 
-  it('ShoppingList renders ProductList with ListItem', () => {
-    const list = mount(Root(ShoppingList, store)).find('ProductList');
+  it('DesiredList renders Dishes with ListItem', () => {
+    const list = mount(Root(DesiredList, store)).find('Dishes');
     // expect(list.find('.section').text()).toEqual('Dairy');
     // expect(
     //   list
@@ -45,8 +45,8 @@ describe('containers', () => {
     // ).toEqual('Dairy');
   });
 
-  it('Products renders ProductList with ListItem', () => {
-    const list = mount(Root(Products, store)).find('ProductList');
+  it('Dishes renders Dishes with ListItem', () => {
+    const list = mount(Root(Dishes, store)).find('Dishes');
     // expect(list.find('.section').map(n => n.text())).toEqual(['Dairy', '']);
     // expect(
     //   list

@@ -8,7 +8,7 @@ const state = {
     options: {},
   },
   categories: [{ id: 1, name: 'Dairy' }],
-  products: [
+  dishes: [
     { id: 1, name: 'Milk', category: 1, inactive: false, checked: false },
     { id: 2, name: 'Potatoes', inactive: false, checked: true },
     { id: 3, name: 'Butter', inactive: true },

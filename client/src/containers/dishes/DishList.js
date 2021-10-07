@@ -14,8 +14,8 @@ import {
   zipObject,
 } from 'lodash/fp';
 
-import { toggleProductInactive } from '../../actions/products';
-import ProductList from '../../components/ProductList';
+import { toggleDishInactive } from '../../actions/dishes';
+import DishList from '../../components/DishList';
 
 // TODO: Move some of this logic to a helpers function
 
@@ -27,40 +27,40 @@ const active = (state) => {
   };
 
   return flow(
-    map(product => ({
-      ...product,
-      key: `${product.id}-${product.categoryId}`,
-      checked: product.active,
-      categoryName: getCategory(product),
+    map(dish => ({
+      ...dish,
+      key: `${dish.id}-${dish.categoryId}`,
+      checked: dish.active,
+      categoryName: getCategory(dish),
     })),
     sortBy(({ name, uid }) => [name.toLowerCase(), uid !== userId]),
     groupBy('categoryName'),
-    mergeWith((category, products) => ({
+    mergeWith((category, dishes) => ({
       ...category,
       value: getOr(uncategorized, 'name', category),
       orderidx: getOr(0, 'orderidx', category),
-      items: map(product => ({ ...product, value: product.name }), products),
+      items: map(dish => ({ ...dish, value: dish.name }), dishes),
     }))(zipObject(map('name', state.categories), state.categories)),
     filter('items.length'),
     sortBy('orderidx')
-  )(state.products);
+  )(state.dishes);
 };
 
 const mapStateToProps = state => ({
   active: active(state),
   checked: [],
   translate: getTranslate(state.locale),
-  linkTo: id => `/products/${id}`,
-  backUrl: '/products',
+  linkTo: id => `/dishes/${id}`,
+  backUrl: '/dishes',
   getData: (item) => ({ ...item, userId: state.user.isCollaboration ? 0 : state.user.id || 0 }),
 });
 
 const mapDispatchToProps = {
-  onItemClick: toggleProductInactive,
+  onItemClick: toggleDishInactive,
   onDoneClick: () => null,
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ProductList);
+)(DishList);

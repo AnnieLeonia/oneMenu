@@ -13,7 +13,7 @@ const ListItem = ({ id, value, checked, onClick, linkTo, backUrl }) => (
         onClick={onClick}
         checked={checked}
       />
-      <span className="productText">{value}</span>
+      <span className="dishText">{value}</span>
       <span className="checkmark" />
     </label>
     <Link to={{ pathname: linkTo, query: { backUrl } }}>

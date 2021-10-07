@@ -15,7 +15,7 @@ const li = (item, onItemClick, linkTo, backUrl) => (
   />
 );
 
-const ProductList = ({
+const DishList = ({
   active,
   onItemClick,
   linkTo,
@@ -36,7 +36,7 @@ const ProductList = ({
     </div>
   );
 
-ProductList.propTypes = {
+DishList.propTypes = {
   active: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -50,4 +50,4 @@ ProductList.propTypes = {
   view: PropTypes.string.isRequired,
 };
 
-export default ProductList;
+export default DishList;

@@ -3,9 +3,9 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 
 import makeStore from '../store';
-import EditProduct from '../../containers/products/EditProduct';
+import EditDish from '../../containers/dishes/EditDish';
 
-describe('Products', () => {
+describe('Dishes', () => {
   let store;
   let wrapper;
   let history;
@@ -16,7 +16,7 @@ describe('Products', () => {
     fetch.resetMocks();
     wrapper = mount(
       <Provider store={store}>
-        <EditProduct
+        <EditDish
           match={{ params: { id: 2 } }}
           history={{ push: url => history.push(url) }}
           location={{query: {}}}
@@ -25,12 +25,12 @@ describe('Products', () => {
     );
   });
 
-  it('should edit a product with new category', done => {
+  it('should edit a dish with new category', done => {
     fetch.mockResponse('[{"id": 1, "name": "Data"}]');
 
-    wrapper.find('input#productName').instance().value = 'Melody potatoes';
-    wrapper.find('input#productAmountText').instance().value = '3';
-    wrapper.find('input#productAmountUnit').instance().value = 'kg';
+    wrapper.find('input#dishName').instance().value = 'Melody potatoes';
+    wrapper.find('input#dishAmountText').instance().value = '3';
+    wrapper.find('input#dishAmountUnit').instance().value = 'kg';
 
     wrapper
       .find('CategorySelect')
@@ -52,7 +52,7 @@ describe('Products', () => {
       expect(store.getActions()).toEqual([
         {
           type: 'FETCH_PRODUCTS',
-          products: [{ id: 1, name: 'Data' }],
+          dishes: [{ id: 1, name: 'Data' }],
         },
         {
           type: 'FETCH_CATEGORIES',

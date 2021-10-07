@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import { localeReducer } from 'react-localize-redux';
 
-import products from './products';
+import dishes from './dishes';
 import categories from './categories';
 import user from './user';
 
 export default combineReducers({
   locale: localeReducer,
-  products,
+  dishes,
   categories,
   user,
 });

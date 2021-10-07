@@ -2,9 +2,9 @@
 
 module.exports = {
   nav: {
-    shoppinglist: ['Shopping List', 'Inköpslista'],
+    desirables: ['I want!', 'Vill ha!'],
     categories: ['Categories', 'Kategorier'],
-    products: ['Products', 'Varor'],
+    dishes: ['Dishes', 'Varor'],
   },
   edit: {
     edit: ['Edit', 'Redigera'],
@@ -23,10 +23,10 @@ module.exports = {
     input: ['New category...', 'Ny kategori...'],
     uncategorized: ['Uncategorized', 'Okategoriserad'],
   },
-  products: {
+  dishes: {
     cart: ['Cart', 'Varukorg'],
     remove: ['Done', 'Klar'],
-    input: ['New product...', 'Ny vara...'],
+    input: ['New dish...', 'Ny vara...'],
   },
   settings: {
     title: ['Settings', 'Inställningar'],

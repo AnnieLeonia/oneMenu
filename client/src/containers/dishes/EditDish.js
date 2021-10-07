@@ -5,12 +5,12 @@ import { getTranslate } from 'react-localize-redux';
 import { find, get, toInteger, toNumber } from 'lodash/fp';
 
 import { addCategory } from '../../actions/categories';
-import { editProduct, removeProduct } from '../../actions/products';
+import { editDish, removeDish } from '../../actions/dishes';
 import CategorySelect from './CategorySelect';
 
 const redirect = (history, location) => history.push((location.query || {}).backUrl || '/');
 
-const EditProduct = ({
+const EditDish = ({
   id,
   name,
   amount,
@@ -21,40 +21,40 @@ const EditProduct = ({
   history,
   location,
 }) => (
-  <div className="product">
+  <div className="dish">
     <div className="title">
       <b>{translate('edit.edit')}: </b>
       {name}
     </div>
     <div className="wrapper">
       <form onSubmit={evt => onSubmit(evt, id, history, location)}>
-        <label htmlFor="productName">
+        <label htmlFor="dishName">
           <span>{translate('edit.name')}:</span>
           <input
-            id="productName"
-            name="productName"
+            id="dishName"
+            name="dishName"
             autoComplete="off"
             defaultValue={name}
           />
         </label>
-        <label htmlFor="productAmountText">
+        <label htmlFor="dishAmountText">
           <span>{translate('edit.amount')}:</span>
           <div>
             <input
-              id="productAmountText"
+              id="dishAmountText"
               type="number"
               step=".01"
-              className="productAmountText"
+              className="dishAmountText"
               placeholder={translate('edit.selectAmount')}
-              name="productAmountText"
+              name="dishAmountText"
               autoComplete="off"
               defaultValue={amount}
             />
             <input
-              id="productAmountUnit"
-              className="productAmountUnit"
+              id="dishAmountUnit"
+              className="dishAmountUnit"
               placeholder={translate('edit.selectUnit')}
-              name="productAmountUnit"
+              name="dishAmountUnit"
               autoComplete="off"
               defaultValue={unit}
             />
@@ -86,13 +86,13 @@ const EditProduct = ({
   </div>
 );
 
-EditProduct.defaultProps = {
+EditDish.defaultProps = {
   name: '',
   amount: null,
   unit: null,
 };
 
-EditProduct.propTypes = {
+EditDish.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string,
   amount: PropTypes.number,
@@ -114,14 +114,14 @@ const handleSubmit = (event, id, history, location) => dispatch => {
   const data = new FormData(event.target);
 
   const [name, amount, unit, category, newCategory] = [
-    'productName',
-    'productAmountText',
-    'productAmountUnit',
+    'dishName',
+    'dishAmountText',
+    'dishAmountUnit',
     'category',
     'newCategory',
   ].map(type => data.get(type));
 
-  const edit = editProduct({
+  const edit = editDish({
     id,
     name,
     amount: amount || 0,
@@ -141,23 +141,23 @@ const handleSubmit = (event, id, history, location) => dispatch => {
 
 const mapStateToProps = (state, { match }) => {
   const id = toInteger(match.params.id);
-  const product = find({ id }, state.products);
+  const dish = find({ id }, state.dishes);
 
   return {
     id,
-    name: get('name', product),
-    amount: toNumber(get('amount', product)) || null,
-    unit: get('unit', product),
+    name: get('name', dish),
+    amount: toNumber(get('amount', dish)) || null,
+    unit: get('unit', dish),
     translate: getTranslate(state.locale),
   };
 };
 
 const mapDispatchToProps = {
   onSubmit: handleSubmit,
-  onRemove: removeProduct,
+  onRemove: removeDish,
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditProduct);
+)(EditDish);

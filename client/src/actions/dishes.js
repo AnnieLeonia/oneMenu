@@ -1,6 +1,6 @@
-import { FETCH_PRODUCTS } from "../constants/products";
+import { FETCH_PRODUCTS } from "../constants/dishes";
 
-export const addProduct = ({ name, uid }) => async (dispatch) => {
+export const addDish = ({ name, uid }) => async (dispatch) => {
   if (name) {
     try {
       await fetch("/__/dishes", {
@@ -12,14 +12,14 @@ export const addProduct = ({ name, uid }) => async (dispatch) => {
         credentials: "include",
         body: JSON.stringify({ name, uid }),
       });
-      return await dispatch(fetchProducts());
+      return await dispatch(fetchDishes());
     } catch (err) {
       console.error(err);
     }
   }
 };
 
-export const editProduct = ({ id, name, amount, unit, category }) => async (
+export const editDish = ({ id, name, amount, unit, category }) => async (
   dispatch
 ) => {
   try {
@@ -32,13 +32,13 @@ export const editProduct = ({ id, name, amount, unit, category }) => async (
       credentials: "include",
       body: JSON.stringify({ name, amount, unit, category: category || null }),
     });
-    return await dispatch(fetchProducts());
+    return await dispatch(fetchDishes());
   } catch (err) {
     console.error(err);
   }
 };
 
-export const toggleProductChecked = ({ id, uid }) => async (dispatch) => {
+export const toggleDishChecked = ({ id, uid }) => async (dispatch) => {
   try {
     await fetch(`/__/dishes/${id}/${uid}`, {
       method: "PUT",
@@ -49,13 +49,13 @@ export const toggleProductChecked = ({ id, uid }) => async (dispatch) => {
       },
       credentials: "include",
     });
-    return await dispatch(fetchProducts());
+    return await dispatch(fetchDishes());
   } catch (err) {
     console.error(err);
   }
 };
 
-export const toggleProductInactive = (id) => async (dispatch) => {
+export const toggleDishInactive = (id) => async (dispatch) => {
   try {
     await fetch(`/__/dishes/${id}`, {
       method: "PUT",
@@ -66,13 +66,13 @@ export const toggleProductInactive = (id) => async (dispatch) => {
       },
       credentials: "include",
     });
-    return await dispatch(fetchProducts());
+    return await dispatch(fetchDishes());
   } catch (err) {
     console.error(err);
   }
 };
 
-export const removeProduct = (id) => async (dispatch) => {
+export const removeDish = (id) => async (dispatch) => {
   try {
     await fetch(`/__/dishes/${id}`, {
       method: "DELETE",
@@ -82,13 +82,13 @@ export const removeProduct = (id) => async (dispatch) => {
       },
       credentials: "include",
     });
-    return await dispatch(fetchProducts());
+    return await dispatch(fetchDishes());
   } catch (err) {
     console.error(err);
   }
 };
 
-export const inactivateProducts = (_, getData) => async (dispatch) => {
+export const inactivateDishes = (_, getData) => async (dispatch) => {
   try {
     const { userId } = getData({});
     await fetch(`/__/inactivate/${userId}`, {
@@ -99,17 +99,17 @@ export const inactivateProducts = (_, getData) => async (dispatch) => {
       },
       credentials: "include",
     });
-    return await dispatch(fetchProducts());
+    return await dispatch(fetchDishes());
   } catch (err) {
     console.error(err);
   }
 };
 
-export const fetchProducts = () => async (dispatch) => {
+export const fetchDishes = () => async (dispatch) => {
   try {
     const res = await fetch("/__/dishes", { credentials: "include" });
-    const products = await res.json();
-    return dispatch({ type: FETCH_PRODUCTS, products });
+    const dishes = await res.json();
+    return dispatch({ type: FETCH_PRODUCTS, dishes });
   } catch (err) {
     console.error(err);
   }
