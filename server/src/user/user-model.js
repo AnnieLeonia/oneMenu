@@ -28,11 +28,11 @@ module.exports = db => ({
     return { user: rows[0], err };
   },
 
-  update: async (id, { name, photo }) => {
+  update: async (id, { username, name, photo, language }) => {
     const sql = `
-        UPDATE users SET (name, photo) = ($2, $3)
+        UPDATE users SET (username, name, photo, language) = ($2, $3, $4, $5)
         WHERE id = $1 RETURNING *`;
-    const { rows, err } = await db.query(sql, [id, name, photo]);
+    const { rows, err } = await db.query(sql, [id, username, name, photo, language]);
     return { user: rows[0], err };
   },
 
