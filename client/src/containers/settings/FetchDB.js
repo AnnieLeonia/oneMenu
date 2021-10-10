@@ -1,9 +1,9 @@
-import { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
-import { fetchDishes } from '../../actions/dishes';
-import { fetchCategories } from '../../actions/categories';
+import { fetchDishes } from "../../actions/dishes";
+import { fetchCategories } from "../../actions/categories";
 
 class FetchDB extends Component {
   constructor() {
@@ -26,7 +26,7 @@ class FetchDB extends Component {
 
     if (username !== this.props.user.username) {
       this.update();
-      intervalUpdate();
+      // intervalUpdate();
       window.onclick = intervalUpdate;
     }
   }
@@ -44,7 +44,7 @@ FetchDB.propTypes = {
   updateCategories: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   user: state.user,
 });
 
@@ -53,7 +53,4 @@ const mapDispatchToProps = {
   updateCategories: fetchCategories,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(FetchDB);
+export default connect(mapStateToProps, mapDispatchToProps)(FetchDB);

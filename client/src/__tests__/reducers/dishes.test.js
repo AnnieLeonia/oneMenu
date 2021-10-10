@@ -6,7 +6,6 @@ import {
   toggleDishChecked,
   toggleDishInactive,
   removeDish,
-  inactivateDishes,
   fetchDishes,
 } from '../../actions/dishes';
 
@@ -70,30 +69,6 @@ describe('dishes reducer', () => {
     expect(dishes(testDish, await dispatch(removeDish(1)))).toEqual([]);
   });
 
-  it('can handle INACTIVATE_PRODUCTS', async () => {
-    fetch.mockResponse(
-      JSON.stringify([
-        { id: 1, name: 'Milk' },
-        { id: 2, name: 'Apple', checked: null },
-        { id: 3, name: 'Pear', checked: null }
-      ])
-    );
-    expect(
-      dishes(
-        [
-          ...testDish,
-          { id: 2, name: 'Apple', checked: true },
-          { id: 3, name: 'Pear', checked: true },
-        ],
-        await dispatch(inactivateDishes(null, id))
-      )
-    ).toEqual([
-      ...testDish,
-      { id: 2, name: 'Apple', checked: null },
-      { id: 3, name: 'Pear', checked: null },
-    ]);
-  });
-
   it('can handle FETCH_PRODUCTS', done => {
     const mockStore = makeStore();
     fetch.mockResponse(
@@ -132,7 +107,6 @@ describe('dishes reducer', () => {
     dispatch(toggleDishChecked(1));
     dispatch(toggleDishInactive(1, id));
     dispatch(removeDish(1));
-    dispatch(inactivateDishes(null, id));
     dispatch(fetchDishes());
 
     expect(fetch.mock.calls.length).toEqual(7);

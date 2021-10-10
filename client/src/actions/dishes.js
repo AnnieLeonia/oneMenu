@@ -19,7 +19,7 @@ export const addDish = ({ name, uid }) => async (dispatch) => {
   }
 };
 
-export const editDish = ({ id, name, amount, unit, category }) => async (
+export const editDish = ({ id, name, categoryIds }) => async (
   dispatch
 ) => {
   try {
@@ -30,7 +30,7 @@ export const editDish = ({ id, name, amount, unit, category }) => async (
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ name, amount, unit, category: category || null }),
+      body: JSON.stringify({ name, categoryIds }),
     });
     return await dispatch(fetchDishes());
   } catch (err) {
@@ -76,23 +76,6 @@ export const removeDish = (id) => async (dispatch) => {
   try {
     await fetch(`/__/dishes/${id}`, {
       method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-    return await dispatch(fetchDishes());
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const inactivateDishes = (_, getData) => async (dispatch) => {
-  try {
-    const { userId } = getData({});
-    await fetch(`/__/inactivate/${userId}`, {
-      method: "PUT",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
