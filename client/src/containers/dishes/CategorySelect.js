@@ -1,72 +1,40 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import { find, get, getOr, maxBy, sortBy } from 'lodash/fp';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import { find, get, sortBy } from "lodash/fp";
 
 class CategorySelect extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { select: true };
-  }
-
   render() {
-    const { select } = this.state;
-    const { category, categories, translate } = this.props;
+    const { categoryIds, categories, translate } = this.props;
 
     return (
-      <label htmlFor="category">
-        <span>{translate('edit.category')}:</span>
-        {select ? (
-          <select
-            multiple
-            id="category"
-            name="category"
-            defaultValue={category}
-            onChange={({ target }) =>
-              this.setState({
-                select: target.selectedIndex < target.options.length - 1,
-              })
-            }
-          >
-            <option value="0">{translate('categories.uncategorized')}</option>
-            {categories.map(({ id, name }) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-            <option>{translate('categories.input')}</option>
-          </select>
-        ) : (
-          <div>
-            <input
-              id="category"
-              name="newCategory"
-              // eslint-disable-next-line
-              autoFocus
-              autoComplete="off"
-              placeholder={translate('categories.input')}
-            />
-            {/* TODO: get category last_inserted_id instead */}
-            <input
-              name="category"
-              type="hidden"
-              value={1 + getOr(0, 'id', maxBy('id', categories))}
-            />
-          </div>
-        )}
+      <label htmlFor="categoryIds">
+        <span>{translate("edit.category")}:</span>
+        <select
+          multiple
+          id="categoryIds"
+          name="categoryIds"
+          defaultValue={categoryIds}
+        >
+          <option value="null">{translate("categories.uncategorized")}</option>
+          {categories.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
       </label>
     );
   }
 }
 
 CategorySelect.defaultProps = {
-  category: 0,
+  categoryIds: [],
 };
 
 CategorySelect.propTypes = {
-  category: PropTypes.number,
+  categoryIds: PropTypes.arrayOf(PropTypes.number),
   categories: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -77,8 +45,8 @@ CategorySelect.propTypes = {
 };
 
 const mapStateToProps = (state, { id }) => ({
-  category: get('category', find({ id }, state.dishes)),
-  categories: sortBy('name', state.categories),
+  categoryIds: get("categoryIds", find({ id }, state.dishes)),
+  categories: sortBy("name", state.categories),
   translate: getTranslate(state.locale),
 });
 

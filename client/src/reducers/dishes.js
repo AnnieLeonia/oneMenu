@@ -1,8 +1,8 @@
-import { FETCH_PRODUCTS } from '../constants/dishes';
+import { FETCH_DISHES } from "../constants/dishes";
 
 const dishes = (state = [], action) => {
   switch (action.type) {
-    case FETCH_PRODUCTS:
+    case FETCH_DISHES:
       return action.dishes;
     default:
       return state;

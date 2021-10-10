@@ -1,19 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import { find, get, toInteger, toNumber } from 'lodash/fp';
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import { find, get, toInteger } from "lodash/fp";
 
-import { addCategory } from '../../actions/categories';
-import { editDish, removeDish } from '../../actions/dishes';
-import CategorySelect from './CategorySelect';
+import { editDish, removeDish } from "../../actions/dishes";
+import CategorySelect from "./CategorySelect";
 
-const redirect = (history, location) => history.push((location.query || {}).backUrl || '/');
+const redirect = (history, location) =>
+  history.push((location.query || {}).backUrl || "/");
 
 const EditDish = ({
   id,
   name,
-  amount,
   unit,
   translate,
   onRemove,
@@ -23,13 +22,13 @@ const EditDish = ({
 }) => (
   <div className="dish">
     <div className="title">
-      <b>{translate('edit.edit')}: </b>
+      <b>{translate("edit.edit")}: </b>
       {name}
     </div>
     <div className="wrapper">
-      <form onSubmit={evt => onSubmit(evt, id, history, location)}>
+      <form onSubmit={(evt) => onSubmit(evt, id, history, location)}>
         <label htmlFor="dishName">
-          <span>{translate('edit.name')}:</span>
+          <span>{translate("edit.name")}:</span>
           <input
             id="dishName"
             name="dishName"
@@ -37,49 +36,26 @@ const EditDish = ({
             defaultValue={name}
           />
         </label>
-        <label htmlFor="dishAmountText">
-          <span>{translate('edit.amount')}:</span>
-          <div>
-            <input
-              id="dishAmountText"
-              type="number"
-              step=".01"
-              className="dishAmountText"
-              placeholder={translate('edit.selectAmount')}
-              name="dishAmountText"
-              autoComplete="off"
-              defaultValue={amount}
-            />
-            <input
-              id="dishAmountUnit"
-              className="dishAmountUnit"
-              placeholder={translate('edit.selectUnit')}
-              name="dishAmountUnit"
-              autoComplete="off"
-              defaultValue={unit}
-            />
-          </div>
-        </label>
         <CategorySelect id={id} />
         <button
           className="deleteBtn"
           type="button"
           onClick={() => {
             onRemove(id);
-            redirect(history, location)
+            redirect(history, location);
           }}
         >
-          {translate('edit.delete')}
+          {translate("edit.delete")}
         </button>
         <button
           className="cancelBtn"
           type="button"
           onClick={() => redirect(history, location)}
         >
-          {translate('edit.cancel')}
+          {translate("edit.cancel")}
         </button>
         <button className="doneBtn" type="submit">
-          {translate('edit.save')}
+          {translate("edit.save")}
         </button>
       </form>
     </div>
@@ -87,16 +63,12 @@ const EditDish = ({
 );
 
 EditDish.defaultProps = {
-  name: '',
-  amount: null,
-  unit: null,
+  name: "",
 };
 
 EditDish.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string,
-  amount: PropTypes.number,
-  unit: PropTypes.string,
   translate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
@@ -110,33 +82,19 @@ EditDish.propTypes = {
   }).isRequired,
 };
 
-const handleSubmit = (event, id, history, location) => dispatch => {
+const handleSubmit = (event, id, history, location) => (dispatch) => {
   const data = new FormData(event.target);
-
-  const [name, amount, unit, category, newCategory] = [
-    'dishName',
-    'dishAmountText',
-    'dishAmountUnit',
-    'category',
-    'newCategory',
-  ].map(type => data.get(type));
 
   const edit = editDish({
     id,
-    name,
-    amount: amount || 0,
-    unit,
-    category: toInteger(category),
+    name: data.get("dishName"),
+    categoryIds: data.getAll("categoryIds"),
   });
 
-  if (newCategory) {
-    dispatch(addCategory({ name: newCategory }, () => dispatch(edit)));
-  } else {
-    dispatch(edit);
-  }
+  dispatch(edit);
 
   event.preventDefault();
-  redirect(history, location)
+  redirect(history, location);
 };
 
 const mapStateToProps = (state, { match }) => {
@@ -145,9 +103,7 @@ const mapStateToProps = (state, { match }) => {
 
   return {
     id,
-    name: get('name', dish),
-    amount: toNumber(get('amount', dish)) || null,
-    unit: get('unit', dish),
+    name: get("name", dish),
     translate: getTranslate(state.locale),
   };
 };
@@ -157,7 +113,4 @@ const mapDispatchToProps = {
   onRemove: removeDish,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EditDish);
+export default connect(mapStateToProps, mapDispatchToProps)(EditDish);
