@@ -25,12 +25,12 @@ TMP_ERR_FILE_PATH=".tmp.err"
 if [ ! -f "$ENV_PATH" ]
 then
   echo "WARN: .env file was not found in root, aborting migrations"
-  exit 1
+  exit 0
 else
   export $(grep -v '^#' $ENV_PATH | xargs)
   if [[ ! -n $DATABASE_URL ]]; then
     echo "WARN: DATABASE_URL variable was not found in .env, aborting migrations"
-    exit 1
+    exit 0
   fi
 fi
 
@@ -40,7 +40,7 @@ echo -e "logs for last migration run -- \"$(date)\"\n" > $LOG_FILE_PATH
 which psql &>/dev/null
 if [ $? -ne 0 ]; then
 	echo "WARN: psql is not installed, aborting migrations"
-	exit 1
+	exit 0
 fi
 
 while [[ $# -gt 0 ]]; do
