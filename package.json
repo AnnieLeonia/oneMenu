@@ -14,7 +14,7 @@
     "test": "npm-run-all -s test-client",
     "test-client": "cd client && npm test",
     "test-server": "cd server && npm test",
-    "db:migrate": "cd server && npm run db:migrate",
+    "db:migrate": "./server/migrations/run.sh",
     "db:pull": "pg_dump --format=c -h zolly.ml -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
   },
   "dependencies": {

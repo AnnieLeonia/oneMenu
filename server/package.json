@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index",
-    "postinstall": "npm run db:migrate?",
-    "db:migrate": "./migrations/run.sh onemenu --fix",
-    "db:migrate?": "./migrations/run.sh onemenu --check",
+    "postinstall": "./migrations/run.sh",
+    "db:migrate": "./migrations/run.sh --fix",
     "db:pull": "pg_dump --format=c -h zolly.ml -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
   },
   "dependencies": {
