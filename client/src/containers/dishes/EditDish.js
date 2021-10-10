@@ -104,8 +104,6 @@ const mapStateToProps = (state, { match }) => {
   return {
     id,
     name: get("name", dish),
-    amount: toNumber(get("amount", dish)) || null,
-    unit: get("unit", dish),
     translate: getTranslate(state.locale),
   };
 };

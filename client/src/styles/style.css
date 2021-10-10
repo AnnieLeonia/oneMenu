@@ -232,19 +232,6 @@ nav a.active {
   float: left;
 }
 
-.dish .dishAmountText{
-  width: calc((100% - 120px - 2em) * 0.6);
-  text-indent: 0.3em;
-  border-radius: 4px 0px 0px 4px;
-}
-  
-.dish .dishAmountUnit {
-  width: calc((100% - 120px - 2em) * 0.4);
-  text-indent: 0.3em;
-  border-radius: 0px 4px 4px 0px;
-}
-
-
 .dish input,
 .category input,
 .settings input,
@@ -357,13 +344,6 @@ nav a.active {
   font-size: 22px;
 }
 
-.listitem .amountText{
-  font-family: "Quicksand", sans-serif;
-  color: rgba(0, 0, 0, 0.6);
-  padding-left: 10px;
-  font-size: 18px;
-}
-
 /* Hide the browser's default checkbox */
 .listitem label input {
   position: absolute;
@@ -460,9 +440,7 @@ nav a.active {
   width: 100%;
 }
 
-.hidden,
-.dishes .done img,
-.dishes .done .amountText {
+.hidden {
   display: none;
 }
 
