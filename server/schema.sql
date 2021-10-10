@@ -36,7 +36,7 @@ CREATE TABLE dishes_categories (
   dish_id      INT           NOT NULL,
   category_id  INT           NOT NULL,
 
-  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE SET NULL,
+  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
   PRIMARY KEY (dish_id, category_id)
 );

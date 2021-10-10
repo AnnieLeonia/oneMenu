@@ -14,11 +14,25 @@
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
-VERSION_FILE='.version'
+ENV_PATH="../../.env"
+VERSION_FILE=".version"
 CURRENT_VERSION="`cat $VERSION_FILE 2>/dev/null || echo 0`"
-USAGE="Usage: $0 DATABASE [--check] [--fix] [-U <user>]"
+USAGE="Usage: $0 [--fix]"
 LOG_FILE_PATH=".migrations.log"
 TMP_ERR_FILE_PATH=".tmp.err"
+
+# Load the .env file
+if [ ! -f "$ENV_PATH" ]
+then
+  echo "WARN: .env file was not found in root, aborting migrations"
+  exit 0
+else
+  export $(grep -v '^#' $ENV_PATH | xargs)
+  if [[ ! -n $DATABASE_URL ]]; then
+    echo "WARN: DATABASE_URL variable was not found in .env, aborting migrations"
+    exit 0
+  fi
+fi
 
 echo -e "logs for last migration run -- \"$(date)\"\n" > $LOG_FILE_PATH
 
@@ -29,27 +43,11 @@ if [ $? -ne 0 ]; then
 	exit 0
 fi
 
-# Check if arguments exist
-if [ $# -eq 0 ]; then
-	echo $USAGE
-	exit 1
-fi
-DATABASE="$1"
-shift
-
 while [[ $# -gt 0 ]]; do
 case "$1" in
-    --check)
-    CHECK=YES
-    shift
-    ;;
     --fix)
     FIX=YES
     shift
-    ;;
-    -U)
-    USER=$2
-    shift; shift
     ;;
 	*)
 	echo $USAGE
@@ -62,7 +60,7 @@ for FNAME in `ls *.sql | sort -n`; do
 	if [ "$SCRIPT_VERSION" -gt "$CURRENT_VERSION" ]; then
 		SCRIPT_PATH="$FNAME"
 
-		if [[ -n $CHECK ]]; then
+		if [[ ! -n $FIX ]]; then
 			BLACK=$'\e[40;97m'
 			YELLOW=$'\e[103;30m'
 			GREEN=$'\e[92;40m'
@@ -73,33 +71,25 @@ for FNAME in `ls *.sql | sort -n`; do
 			echo "██  ██  ██ ██ ██    ██ ██   ██ ██   ██    ██    ██         "
 			echo "██      ██ ██  ██████  ██   ██ ██   ██    ██    ███████ ██ "
 			echo ""
-			echo "${BLACK}db${NC} ${YELLOW}WARN${NC} Please run migrations with ${GREEN}npm run db:migrate${NC}"
+			echo "${BLACK}db${NC} ${YELLOW}WARN${NC} Please run migrations with ${GREEN}$0 --fix${NC}"
 			echo ""
 			exit 0
-		fi
-
-		if [[ ! -n $FIX ]]; then
-			read -p "Do you want to run migration \"$SCRIPT_PATH\"? (y/N) " -n 1 -r MIGRATE; echo;
+    else
+      read -p "Do you want to run migration \"$SCRIPT_PATH\"? (y/N) " -n 1 -r MIGRATE; echo;
 			if [[ ! $MIGRATE =~ ^[Yy]$ ]]; then exit 0; fi
 		fi
 
 		# Load the .sql file
 		echo -n "$SCRIPT_PATH ... "
-    if [[ -n $USER ]]; then
-		  PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a -U $USER -d $DATABASE -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
-    else
-      PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a -d $DATABASE -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
-    fi
+    PSQL=$(psql -1 -v ON_ERROR_STOP=1 -a $DATABASE_URL -f $SCRIPT_PATH 2>$TMP_ERR_FILE_PATH)
 		RET_CODE=$?
 		echo -e "$SCRIPT_PATH\n$PSQL" >> $LOG_FILE_PATH
 
 		# Handle potential PostgreSQL errors
+    cat $TMP_ERR_FILE_PATH >> $LOG_FILE_PATH
 		if [ $RET_CODE -ne 0 ]; then
 			echo "ERR $RET_CODE"
-			cat $TMP_ERR_FILE_PATH
-
 			echo "- ERR $RET_CODE" >> $LOG_FILE_PATH
-			cat $TMP_ERR_FILE_PATH >> $LOG_FILE_PATH
 		else
 			echo "OK"
 			echo "- OK" >> $LOG_FILE_PATH
