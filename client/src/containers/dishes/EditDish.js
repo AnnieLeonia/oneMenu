@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
-import { find, get, toInteger, toNumber } from "lodash/fp";
+import { find, get, toInteger } from "lodash/fp";
 
 import { editDish, removeDish } from "../../actions/dishes";
 import CategorySelect from "./CategorySelect";
