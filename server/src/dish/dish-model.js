@@ -12,7 +12,7 @@ module.exports = db => ({
 
       const { rows, err } = await db.query(`
         UPDATE dishes SET (name, description) = ($2, $3)
-        WHERE id = $1`,
+        WHERE id = $1 RETURNING *`,
         [id, name, description]
       );
       if (err) throw err;
@@ -25,7 +25,7 @@ module.exports = db => ({
         if (err) throw err;
 
         // Fix this into one INSERT query with helper method
-        category_ids.map(parseInt).filter(Boolean).forEach(async category => {
+        category_ids.map(Number).filter(Boolean).forEach(async category => {
           const { err } = await db.query(`
             INSERT INTO dishes_categories (dish_id, category_id)
             VALUES ($1, $2)
