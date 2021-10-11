@@ -5,16 +5,17 @@ import New from '../common/New';
 import Snackbar from '../common/Snackbar';
 import { addDish, removeDish } from '../../actions/dishes';
 
-const Dishes = () => (
+const Dishes = (props) => (
   <div>
     <New
       view="dishes"
       autosuggest
       onAdd={addDish}
       onRemove={removeDish}
+      {...props}
     />
     <Snackbar />
-    <DishList view="dishes" />
+    <DishList view="dishes" {...props} />
   </div>
 );
 

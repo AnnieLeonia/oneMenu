@@ -9,6 +9,7 @@ module.exports = {
   edit: {
     edit: ['Edit', 'Redigera'],
     name: ['Name', 'Namn'],
+    description: ['Description', 'Beskrivning'],
     category: ['Category', 'Kategori'],
     color: ['Color', 'Färg'],
     selectColor: ['Select a color...', 'Välj färg...'],
@@ -24,6 +25,7 @@ module.exports = {
     cart: ['Cart', 'Varukorg'],
     remove: ['Done', 'Klar'],
     input: ['New dish...', 'Ny vara...'],
+    back: ['Back', 'Tillbaka'],
   },
   settings: {
     title: ['Settings', 'Inställningar'],

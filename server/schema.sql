@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS dishes CASCADE;
 CREATE TABLE dishes (
   id           SERIAL        NOT NULL,
   name         VARCHAR(255)  NOT NULL UNIQUE,
-  description  VARCHAR(255),
+  description  TEXT,
   active       BOOLEAN       DEFAULT TRUE,
 
   PRIMARY KEY (id)

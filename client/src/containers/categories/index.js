@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import CategoryList from './CategoryList';
-import New from '../common/New';
-import Snackbar from '../common/Snackbar';
-import { addCategory } from '../../actions/categories';
+import CategoryList from "./CategoryList";
+import New from "../common/New";
+import Snackbar from "../common/Snackbar";
+import { addCategory } from "../../actions/categories";
 
-const Categories = () => (
+const Categories = (props) => (
   <div>
-    <New view="categories" onAdd={addCategory} />
+    <New view="categories" onAdd={addCategory} {...props} />
     <Snackbar />
-    <CategoryList view="categories" />
+    <CategoryList view="categories" {...props} />
   </div>
 );
 

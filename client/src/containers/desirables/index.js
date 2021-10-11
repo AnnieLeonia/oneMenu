@@ -1,20 +1,21 @@
-import React from 'react';
+import React from "react";
 
-import DesiredList from './DesiredList';
-import New from '../common/New';
-import Snackbar from '../common/Snackbar';
-import { addDish, removeDish } from '../../actions/dishes';
+import DesiredList from "./DesiredList";
+import New from "../common/New";
+import Snackbar from "../common/Snackbar";
+import { addDish, removeDish } from "../../actions/dishes";
 
-const Dishes = () => (
+const Dishes = (props) => (
   <div>
     <New
       view="dishes"
       autosuggest
       onAdd={addDish}
       onRemove={removeDish}
+      {...props}
     />
     <Snackbar />
-    <DesiredList view="dishes" />
+    <DesiredList view="dishes" {...props} />
   </div>
 );
 
