@@ -13,7 +13,7 @@ const redirect = (history, location) =>
 const EditDish = ({
   id,
   name,
-  unit,
+  description,
   translate,
   onRemove,
   onSubmit,
@@ -34,6 +34,15 @@ const EditDish = ({
             name="dishName"
             autoComplete="off"
             defaultValue={name}
+          />
+        </label>
+        <label htmlFor="dishDescription">
+          <span>{translate("edit.description")}:</span>
+          <textarea
+            id="dishDescription"
+            name="dishDescription"
+            autoComplete="off"
+            defaultValue={description}
           />
         </label>
         <CategorySelect id={id} />
@@ -88,6 +97,7 @@ const handleSubmit = (event, id, history, location) => (dispatch) => {
   const edit = editDish({
     id,
     name: data.get("dishName"),
+    description: data.get("dishDescription"),
     categoryIds: data.getAll("categoryIds"),
   });
 
@@ -104,6 +114,7 @@ const mapStateToProps = (state, { match }) => {
   return {
     id,
     name: get("name", dish),
+    description: get("description", dish),
     translate: getTranslate(state.locale),
   };
 };

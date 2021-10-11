@@ -22,7 +22,7 @@ export const addDish =
   };
 
 export const editDish =
-  ({ id, name, categoryIds }) =>
+  ({ id, name, description, categoryIds }) =>
   async (dispatch) => {
     try {
       await fetch(`/__/dishes/${id}`, {
@@ -32,7 +32,7 @@ export const editDish =
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ name, categoryIds }),
+        body: JSON.stringify({ name, description, categoryIds }),
       });
       return await dispatch(fetchDishes());
     } catch (err) {
