@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import ReactAutosuggest from 'react-autosuggest';
-import deleteicon from '../assets/icons/delete.svg';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import ReactAutosuggest from "react-autosuggest";
+import deleteicon from "../assets/icons/delete.svg";
 
 class Autosuggest extends Component {
   constructor(props) {
@@ -14,27 +14,21 @@ class Autosuggest extends Component {
 
   render() {
     const { suggestions } = this.state;
-    const {
-      id,
-      value,
-      placeholder,
-      onSelect,
-      onChange,
-      getSuggestions,
-    } = this.props;
+    const { id, value, placeholder, onSelect, onChange, getSuggestions } =
+      this.props;
 
     return (
       <ReactAutosuggest
         multiSection
         suggestions={suggestions}
         onSuggestionSelected={onSelect}
-        onSuggestionsFetchRequested={info =>
+        onSuggestionsFetchRequested={(info) =>
           this.setState({ suggestions: getSuggestions(info.value) })
         }
         onSuggestionsClearRequested={() => this.setState({ suggestions: [] })}
-        getSuggestionValue={suggestion => suggestion}
-        getSectionSuggestions={section => section.suggestions}
-        renderSuggestion={suggestion => (
+        getSuggestionValue={(suggestion) => suggestion}
+        getSectionSuggestions={(section) => section.suggestions}
+        renderSuggestion={(suggestion) => (
           <div className="suggestions">
             <span>{suggestion.name}</span>
             <img
@@ -46,7 +40,7 @@ class Autosuggest extends Component {
             />
           </div>
         )}
-        renderSectionTitle={section => <strong>{section.title}</strong>}
+        renderSectionTitle={(section) => <strong>{section.title}</strong>}
         inputProps={{ id, value, placeholder, onChange }}
       />
     );

@@ -8,7 +8,6 @@ const passport = require("passport");
 
 const utils = require("./src/utils");
 
-console.log("asd");
 dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 const { PORT, DATABASE_URL, SESSION_SECRET_KEY1, SESSION_SECRET_KEY2 } =

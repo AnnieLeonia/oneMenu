@@ -22,7 +22,7 @@ module.exports = (passport, db) => {
     new GoogleStrategy(
       {
         clientID: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET
+        clientSecret: GOOGLE_CLIENT_SECRET,
       },
       (token, refreshToken, profile, done) => {
         // make the code asynchronous
@@ -32,7 +32,7 @@ module.exports = (passport, db) => {
           const username = email.split("@").shift();
           const name = get(["displayName"], profile);
           const photo = get(["photos", 0, "value"], profile);
-          const language = get(['_json', 'locale'], profile);
+          const language = get(["_json", "locale"], profile);
 
           const { user, err } = await User.getByEmail(email);
           if (err) return done(err);

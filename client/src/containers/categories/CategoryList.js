@@ -1,14 +1,14 @@
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
-import CategoryList from '../../components/CategoryList';
-import { reorderCategory } from '../../actions/categories';
+import CategoryList from "../../components/CategoryList";
+import { reorderCategory } from "../../actions/categories";
 
-const mapStateToProps = state => ({
-  items: state.categories.map(category => ({
+const mapStateToProps = (state) => ({
+  items: state.categories.map((category) => ({
     ...category,
     value: category.name,
   })),
-  linkTo: id => `/categories/${id}`,
+  linkTo: (id) => `/categories/${id}`,
 });
 
 const mapDispatchToProps = {

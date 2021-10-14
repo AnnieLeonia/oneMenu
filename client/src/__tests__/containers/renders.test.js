@@ -1,22 +1,22 @@
-import { mount } from 'enzyme';
+import { mount } from "enzyme";
 
-import Index from '../../index';
-import Root from '../../containers/Root';
-import { store } from '../store';
-import DesiredList from '../../containers/desirables';
-import Categories from '../../containers/categories';
-import Dishes from '../../containers/dishes';
-import Settings from '../../containers/settings';
+import Index from "../../index";
+import Root from "../../containers/Root";
+import { store } from "../store";
+import DesiredList from "../../containers/desirables";
+import Categories from "../../containers/categories";
+import Dishes from "../../containers/dishes";
+import Settings from "../../containers/settings";
 
-describe('containers', () => {
-  it('index renders without crashing', () => {
+describe("containers", () => {
+  it("index renders without crashing", () => {
     expect(
-      JSON.stringify({ ...Index, _reactInternalFiber: 'circular' })
+      JSON.stringify({ ...Index, _reactInternalFiber: "circular" })
     ).toBeDefined();
   });
 
-  it('DesiredList renders Dishes with ListItem', () => {
-    const list = mount(Root(DesiredList, store)).find('Dishes');
+  it("DesiredList renders Dishes with ListItem", () => {
+    const list = mount(Root(DesiredList, store)).find("Dishes");
     // expect(list.find('.section').text()).toEqual('Dairy');
     // expect(
     //   list
@@ -34,7 +34,7 @@ describe('containers', () => {
     // ).toEqual('Potatoes');
   });
 
-  it('Categories renders CategoryList with ListItem', () => {
+  it("Categories renders CategoryList with ListItem", () => {
     mount(Root(Categories, store));
     // expect(
     //   mount(Root(Categories, store))
@@ -45,8 +45,8 @@ describe('containers', () => {
     // ).toEqual('Dairy');
   });
 
-  it('Dishes renders Dishes with ListItem', () => {
-    const list = mount(Root(Dishes, store)).find('Dishes');
+  it("Dishes renders Dishes with ListItem", () => {
+    const list = mount(Root(Dishes, store)).find("Dishes");
     // expect(list.find('.section').map(n => n.text())).toEqual(['Dairy', '']);
     // expect(
     //   list
@@ -57,14 +57,14 @@ describe('containers', () => {
     // ).toEqual(['Milk', 'Butter', 'Potatoes']);
     expect(
       list
-        .find('.done')
-        .find('ListItem')
-        .find('label')
-        .map(n => n.text())
+        .find(".done")
+        .find("ListItem")
+        .find("label")
+        .map((n) => n.text())
     ).toEqual([]);
   });
 
-  it('Settings renders without crashing', () => {
+  it("Settings renders without crashing", () => {
     expect(mount(Root(Settings, store))).toBeDefined();
   });
 });

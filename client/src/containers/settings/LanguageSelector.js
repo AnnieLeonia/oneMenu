@@ -1,22 +1,22 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import {
   getLanguages,
   getTranslate,
   setActiveLanguage,
   getActiveLanguage,
-} from 'react-localize-redux';
-import { updateUser } from '../../actions/user';
+} from "react-localize-redux";
+import { updateUser } from "../../actions/user";
 
 const LanguageSelector = ({ myLanguage, translate, languages, update }) => (
   <div key={myLanguage.code}>
     <label htmlFor="land">
-      <span>{translate('settings.language')}</span>
+      <span>{translate("settings.language")}</span>
       <input name="lang" type="hidden" />
     </label>
     <select id="language" defaultValue={myLanguage.code} onChange={update}>
-      {languages.map(language => (
+      {languages.map((language) => (
         <option key={language.code}>{language.code}</option>
       ))}
     </select>
@@ -24,7 +24,7 @@ const LanguageSelector = ({ myLanguage, translate, languages, update }) => (
 );
 
 LanguageSelector.defaultProps = {
-  myLanguage: { code: 'en' },
+  myLanguage: { code: "en" },
 };
 
 LanguageSelector.propTypes = {
@@ -40,7 +40,7 @@ LanguageSelector.propTypes = {
   update: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   myLanguage: getActiveLanguage(state.locale),
   languages: getLanguages(state.locale),
   translate: getTranslate(state.locale),
@@ -52,7 +52,4 @@ const mapDispatchToProps = {
   update: updateUser,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LanguageSelector);
+export default connect(mapStateToProps, mapDispatchToProps)(LanguageSelector);

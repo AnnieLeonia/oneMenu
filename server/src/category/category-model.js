@@ -1,4 +1,4 @@
-module.exports = db => ({
+module.exports = (db) => ({
   create: async ({ name }) => {
     const sql = "INSERT INTO categories (name) VALUES ($1) RETURNING *";
     const { rows, err } = await db.query(sql, [name]);
@@ -11,7 +11,7 @@ module.exports = db => ({
     return { category: rows[0], err };
   },
 
-  delete: async id => {
+  delete: async (id) => {
     const sql = "DELETE FROM categories WHERE id = $1";
     const { rows, err } = await db.query(sql, [id]);
     return { category: rows[0], err };
@@ -68,5 +68,5 @@ module.exports = db => ({
       return { err };
     }
     return {};
-  }
+  },
 });

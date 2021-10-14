@@ -1,8 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import React from "react";
+import PropTypes from "prop-types";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-import ListItem from './ListItem';
+import ListItem from "./ListItem";
 
 const CategoryList = ({ view, items, linkTo, onItemReorder }) => (
   <div className={view}>
@@ -23,13 +23,13 @@ const CategoryList = ({ view, items, linkTo, onItemReorder }) => (
               <Draggable key={item.id} draggableId={item.id} index={index}>
                 {(provided, { isDragging }) => (
                   <div
-                    className={isDragging ? 'isDragging' : null}
+                    className={isDragging ? "isDragging" : null}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     style={{
                       ...provided.draggableProps.style,
-                      borderLeft: `5px solid ${item.color || '#ccc'}`,
+                      borderLeft: `5px solid ${item.color || "#ccc"}`,
                     }}
                   >
                     <ListItem

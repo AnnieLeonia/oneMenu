@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import ListItem from './ListItem';
+import ListItem from "./ListItem";
 
 const li = (item, onItemClick, linkTo, backUrl) => (
   <ListItem
@@ -15,26 +15,20 @@ const li = (item, onItemClick, linkTo, backUrl) => (
   />
 );
 
-const DishList = ({
-  active,
-  onItemClick,
-  linkTo,
-  backUrl,
-  view,
-}) => (
-    <div className={view}>
-      <div>
-        {active.map(({ value, color, items }) => (
-          <div key={value} style={{ borderLeft: `5px solid ${color || '#ccc'}` }}>
-            <div className="section">{value}</div>
-            <ul className="active">
-              {items.map(item => li(item, onItemClick, linkTo, backUrl))}
-            </ul>
-          </div>
-        ))}
-      </div>
+const DishList = ({ active, onItemClick, linkTo, backUrl, view }) => (
+  <div className={view}>
+    <div>
+      {active.map(({ value, color, items }) => (
+        <div key={value} style={{ borderLeft: `5px solid ${color || "#ccc"}` }}>
+          <div className="section">{value}</div>
+          <ul className="active">
+            {items.map((item) => li(item, onItemClick, linkTo, backUrl))}
+          </ul>
+        </div>
+      ))}
     </div>
-  );
+  </div>
+);
 
 DishList.propTypes = {
   active: PropTypes.arrayOf(

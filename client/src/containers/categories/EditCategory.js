@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import React from 'react';
-import { getTranslate } from 'react-localize-redux';
-import { find, get, toInteger } from 'lodash/fp';
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import React from "react";
+import { getTranslate } from "react-localize-redux";
+import { find, get, toInteger } from "lodash/fp";
 
-import { editCategory, removeCategory } from '../../actions/categories';
-import CategoryColors from './CategoryColors';
+import { editCategory, removeCategory } from "../../actions/categories";
+import CategoryColors from "./CategoryColors";
 
 const EditCategory = ({
   id,
@@ -17,13 +17,13 @@ const EditCategory = ({
 }) => (
   <div className="category">
     <div className="title">
-      <b>{translate('edit.edit')}: </b>
+      <b>{translate("edit.edit")}: </b>
       {category}
     </div>
     <div className="wrapper">
-      <form onSubmit={evt => onSubmit(evt, id, history)}>
+      <form onSubmit={(evt) => onSubmit(evt, id, history)}>
         <label htmlFor="categoryName">
-          <span>{translate('edit.category')}:</span>
+          <span>{translate("edit.category")}:</span>
           <input
             id="categoryName"
             name="categoryName"
@@ -37,20 +37,20 @@ const EditCategory = ({
           type="button"
           onClick={() => {
             onRemove(id);
-            history.push('/categories');
+            history.push("/categories");
           }}
         >
-          {translate('edit.delete')}
+          {translate("edit.delete")}
         </button>
         <button
           className="cancelBtn"
           type="button"
-          onClick={() => history.push('/categories')}
+          onClick={() => history.push("/categories")}
         >
-          {translate('edit.cancel')}
+          {translate("edit.cancel")}
         </button>
         <button className="doneBtn" type="submit">
-          {translate('edit.save')}
+          {translate("edit.save")}
         </button>
       </form>
     </div>
@@ -58,7 +58,7 @@ const EditCategory = ({
 );
 
 EditCategory.defaultProps = {
-  category: 'Uncategorized',
+  category: "Uncategorized",
 };
 
 EditCategory.propTypes = {
@@ -72,13 +72,13 @@ EditCategory.propTypes = {
   }).isRequired,
 };
 
-const handleSubmit = (event, id, history) => dispatch => {
+const handleSubmit = (event, id, history) => (dispatch) => {
   const data = new FormData(event.target);
-  const [name, color] = ['categoryName', 'color'].map(type => data.get(type));
+  const [name, color] = ["categoryName", "color"].map((type) => data.get(type));
 
   dispatch(editCategory({ id, name, color }));
   event.preventDefault();
-  history.push('/categories');
+  history.push("/categories");
 };
 
 const mapStateToProps = (state, { match }) => {
@@ -86,7 +86,7 @@ const mapStateToProps = (state, { match }) => {
 
   return {
     id,
-    category: get('name', find({ id }, state.categories)),
+    category: get("name", find({ id }, state.categories)),
     translate: getTranslate(state.locale),
   };
 };

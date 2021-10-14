@@ -1,11 +1,11 @@
-import React from 'react';
-import { mount } from 'enzyme';
-import { Provider } from 'react-redux';
+import React from "react";
+import { mount } from "enzyme";
+import { Provider } from "react-redux";
 
-import makeStore from '../store';
-import EditDish from '../../containers/dishes/EditDish';
+import makeStore from "../store";
+import EditDish from "../../containers/dishes/EditDish";
 
-describe('Dishes', () => {
+describe("Dishes", () => {
   let store;
   let wrapper;
   let history;
@@ -18,17 +18,17 @@ describe('Dishes', () => {
       <Provider store={store}>
         <EditDish
           match={{ params: { id: 2 } }}
-          history={{ push: url => history.push(url) }}
-          location={{query: {}}}
+          history={{ push: (url) => history.push(url) }}
+          location={{ query: {} }}
         />
       </Provider>
     );
   });
 
-  it('should cancel on cancel button', () => {
-    wrapper.find('.cancelBtn').simulate('click');
+  it("should cancel on cancel button", () => {
+    wrapper.find(".cancelBtn").simulate("click");
 
-    expect(history).toEqual(['/']);
+    expect(history).toEqual(["/"]);
     expect(store.getActions()).toEqual([]);
   });
 });

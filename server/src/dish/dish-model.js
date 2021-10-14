@@ -1,4 +1,4 @@
-module.exports = db => ({
+module.exports = (db) => ({
   create: async ({ name, description }) => {
     const sql =
       "INSERT INTO dishes (name, description) VALUES ($1, $2) RETURNING *";
@@ -10,7 +10,8 @@ module.exports = db => ({
     try {
       await db.query("BEGIN");
 
-      const { rows, err } = await db.query(`
+      const { rows, err } = await db.query(
+        `
         UPDATE dishes SET (name, description) = ($2, $3)
         WHERE id = $1 RETURNING *`,
         [id, name, description]
@@ -18,20 +19,29 @@ module.exports = db => ({
       if (err) throw err;
 
       if (category_ids) {
-        const { err } = await db.query(`
+        const { err } = await db.query(
+          `
           DELETE FROM dishes_categories
           WHERE dish_id = $1
-        `, [id]);
+        `,
+          [id]
+        );
         if (err) throw err;
 
         // Fix this into one INSERT query with helper method
-        category_ids.map(Number).filter(Boolean).forEach(async category => {
-          const { err } = await db.query(`
+        category_ids
+          .map(Number)
+          .filter(Boolean)
+          .forEach(async (category) => {
+            const { err } = await db.query(
+              `
             INSERT INTO dishes_categories (dish_id, category_id)
             VALUES ($1, $2)
-          `, [id, category]);
-          if (err) throw err;
-        });
+          `,
+              [id, category]
+            );
+            if (err) throw err;
+          });
       }
 
       await db.query("COMMIT");
@@ -43,13 +53,13 @@ module.exports = db => ({
     }
   },
 
-  toggleActive: async id => {
+  toggleActive: async (id) => {
     const sql = "UPDATE dishes SET active = NOT active WHERE id = $1";
     const { rows, err } = await db.query(sql, [id]);
     return { category: rows[0], err };
   },
 
-  delete: async id => {
+  delete: async (id) => {
     const sql = "DELETE FROM dishes WHERE id = $1";
     const { rows, err } = await db.query(sql, [id]);
     return { category: rows[0], err };
@@ -72,5 +82,5 @@ module.exports = db => ({
       GROUP BY name, id ORDER BY id
     `);
     return { dishes: rows, err };
-  }
+  },
 });

@@ -4,7 +4,7 @@ import {
   REQUEST_USER,
   RECIEVE_USER,
   LOGOUT_USER,
-} from '../constants/user';
+} from "../constants/user";
 
 export const updateUser = ({ target }) => ({
   type: UPDATE_USER,
@@ -12,38 +12,38 @@ export const updateUser = ({ target }) => ({
   value: target.value,
 });
 
-export const logoutUser = () => dispatch => {
+export const logoutUser = () => (dispatch) => {
   dispatch({ type: LOGOUT_USER });
-  return fetch('/__/auth/logout', { credentials: 'include' });
+  return fetch("/__/auth/logout", { credentials: "include" });
 };
 
-export const fetchUser = () => dispatch => {
+export const fetchUser = () => (dispatch) => {
   dispatch({ type: REQUEST_USER });
-  return fetch('/__/user', { credentials: 'include' })
-    .then(response => response.json())
-    .then(user => dispatch({ type: RECIEVE_USER, user }))
-    .catch(err => console.error(err));
+  return fetch("/__/user", { credentials: "include" })
+    .then((response) => response.json())
+    .then((user) => dispatch({ type: RECIEVE_USER, user }))
+    .catch((err) => console.error(err));
 };
 
-export const submitUser = (event, user) => dispatch => {
+export const submitUser = (event, user) => (dispatch) => {
   event.preventDefault();
   dispatch({ type: SUBMIT_USER });
-  return fetch('/__/user', {
-    method: 'PUT',
+  return fetch("/__/user", {
+    method: "PUT",
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
-    credentials: 'include',
+    credentials: "include",
     body: JSON.stringify(user),
   })
-    .then(response => {
+    .then((response) => {
       if (response.ok) return response.json();
       throw response;
     })
-    .then(json => dispatch({ type: RECIEVE_USER, user: json }))
-    .catch(err => {
-      err.json().then(json => console.error(json));
+    .then((json) => dispatch({ type: RECIEVE_USER, user: json }))
+    .catch((err) => {
+      err.json().then((json) => console.error(json));
       dispatch(fetchUser());
     });
 };
