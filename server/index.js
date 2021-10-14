@@ -8,14 +8,11 @@ const passport = require("passport");
 
 const utils = require("./src/utils");
 
+console.log("asd");
 dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
-const {
-  PORT,
-  DATABASE_URL,
-  SESSION_SECRET_KEY1,
-  SESSION_SECRET_KEY2
-} = process.env;
+const { PORT, DATABASE_URL, SESSION_SECRET_KEY1, SESSION_SECRET_KEY2 } =
+  process.env;
 
 const app = express();
 
@@ -33,7 +30,7 @@ app.use(
     resave: false,
     rolling: true,
     saveUninitialized: false,
-    maxAge: 30 * 24 * 60 * 60 * 1000 // one month
+    maxAge: 30 * 24 * 60 * 60 * 1000, // one month
   })
 );
 app.use(passport.initialize());
@@ -55,7 +52,7 @@ const props = {
   passport,
   pg,
   db: { query: utils.makeDbQuery(pg) },
-  isLoggedIn: utils.isLoggedIn
+  isLoggedIn: utils.isLoggedIn,
 };
 
 // routes
