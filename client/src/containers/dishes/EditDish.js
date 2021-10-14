@@ -1,83 +1,101 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
-import { find, get, toInteger } from "lodash/fp";
+import { get, toInteger } from "lodash/fp";
 
-import { editDish, removeDish } from "../../actions/dishes";
+import {
+  fetchDish,
+  editDish,
+  removeDish,
+  resetDish,
+} from "../../actions/dishes";
 import CategorySelect from "./CategorySelect";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
 
-const EditDish = ({
-  id,
-  name,
-  description,
-  translate,
-  onRemove,
-  onSubmit,
-  history,
-  location,
-}) => (
-  <div className="dish">
-    <div className="title">
-      <b>{translate("edit.edit")}: </b>
-      {name}
-    </div>
-    <div className="wrapper">
-      <form onSubmit={(evt) => onSubmit(evt, id, history, location)}>
-        <label htmlFor="dishName">
-          <span>{translate("edit.name")}:</span>
-          <input
-            id="dishName"
-            name="dishName"
-            autoComplete="off"
-            defaultValue={name}
-          />
-        </label>
-        <label htmlFor="dishDescription">
-          <span>{translate("edit.description")}:</span>
-          <textarea
-            id="dishDescription"
-            name="dishDescription"
-            autoComplete="off"
-            defaultValue={description}
-          />
-        </label>
-        <CategorySelect id={id} />
-        <button
-          className="deleteBtn"
-          type="button"
-          onClick={() => {
-            onRemove(id);
-            redirect(history, location);
-          }}
-        >
-          {translate("edit.delete")}
-        </button>
-        <button
-          className="cancelBtn"
-          type="button"
-          onClick={() => redirect(history, location)}
-        >
-          {translate("edit.cancel")}
-        </button>
-        <button className="doneBtn" type="submit">
-          {translate("edit.save")}
-        </button>
-      </form>
-    </div>
-  </div>
-);
+class EditDish extends Component {
+  componentDidMount() {
+    const { dish } = this.props;
+    this.props.getDish(dish.id);
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
+  render() {
+    const { dish, translate, history, location } = this.props;
+    const { onRemove, onSubmit } = this.props;
+
+    return (
+      <div className="dish">
+        <div className="title">
+          <b>{translate("edit.edit")}: </b>
+          {dish.name}
+        </div>
+        <div className="wrapper">
+          <form onSubmit={(evt) => onSubmit(evt, dish.id, history, location)}>
+            <label htmlFor="dishName">
+              <span>{translate("edit.name")}:</span>
+              <input
+                id="dishName"
+                name="dishName"
+                autoComplete="off"
+                defaultValue={dish.name}
+              />
+            </label>
+            <label htmlFor="dishDescription">
+              <span>{translate("edit.description")}:</span>
+              <textarea
+                id="dishDescription"
+                name="dishDescription"
+                autoComplete="off"
+                defaultValue={dish.description}
+              />
+            </label>
+            <CategorySelect id={dish.id} />
+            <button
+              className="deleteBtn"
+              type="button"
+              onClick={() => {
+                onRemove(dish.id);
+                redirect(history, location);
+              }}
+            >
+              {translate("edit.delete")}
+            </button>
+            <button
+              className="cancelBtn"
+              type="button"
+              onClick={() => redirect(history, location)}
+            >
+              {translate("edit.cancel")}
+            </button>
+            <button className="doneBtn" type="submit">
+              {translate("edit.save")}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+}
 
 EditDish.defaultProps = {
-  name: "",
+  dish: {
+    name: "",
+    description: "",
+  },
 };
 
 EditDish.propTypes = {
-  id: PropTypes.number.isRequired,
-  name: PropTypes.string,
+  dish: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string,
+    description: PropTypes.string,
+  }).isRequired,
   translate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
@@ -107,21 +125,20 @@ const handleSubmit = (event, id, history, location) => (dispatch) => {
   redirect(history, location);
 };
 
-const mapStateToProps = (state, { match }) => {
-  const id = toInteger(match.params.id);
-  const dish = find({ id }, state.dishes);
-
-  return {
-    id,
-    name: get("name", dish),
-    description: get("description", dish),
-    translate: getTranslate(state.locale),
-  };
-};
+const mapStateToProps = (state, { match }) => ({
+  dish: {
+    id: toInteger(match.params.id),
+    name: get("name", state.dish),
+    description: get("description", state.dish),
+  },
+  translate: getTranslate(state.locale),
+});
 
 const mapDispatchToProps = {
   onSubmit: handleSubmit,
   onRemove: removeDish,
+  getDish: fetchDish,
+  reset: resetDish,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EditDish);
