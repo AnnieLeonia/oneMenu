@@ -9,8 +9,8 @@ function pascalCase(str) {
 }
 
 function keyValuePairs(valid, obj) {
-  const keys = Object.keys(obj).filter(key => valid.includes(key));
-  const values = keys.map(key => obj[key]);
+  const keys = Object.keys(obj).filter((key) => valid.includes(key));
+  const values = keys.map((key) => obj[key]);
   const indices = keys.map((_, i) => `$${i + 1}`);
   const keyIndices = keys.map((key, i) => `${key} = $${i + 1}`);
   return { keys, values, indices, keyIndices };
@@ -23,22 +23,22 @@ function isLoggedIn(req, res, next) {
   return next();
 }
 
-const makeDbQuery = pg => async (query, values) => {
+const makeDbQuery = (pg) => async (query, values) => {
   try {
     const { rows } = await pg.query(query, values);
     return { rows };
   } catch ({ severity, message }) {
     return {
       rows: [],
-      err: `Database ${pascalCase(severity)}: ${message}\n in query: ${query}`
+      err: `Database ${pascalCase(severity)}: ${message}\n in query: ${query}`,
     };
   }
 };
 
-const camelcaseMiddleware = options => [
+const camelcaseMiddleware = (options) => [
   (_req, res, next) => {
     const send = res.send;
-    res.send = function(body) {
+    res.send = function (body) {
       if (typeof body === "object" && body != null) {
         body = camelcaseKeys(body, options);
       }
@@ -54,12 +54,12 @@ const camelcaseMiddleware = options => [
     req.query = snakecaseKeys(req.query, options);
 
     next();
-  }
+  },
 ];
 
 module.exports = {
   keyValuePairs,
   isLoggedIn,
   makeDbQuery,
-  camelcaseMiddleware
+  camelcaseMiddleware,
 };

@@ -4,7 +4,7 @@ import {
   REQUEST_USER,
   RECIEVE_USER,
   LOGOUT_USER,
-} from '../constants/user';
+} from "../constants/user";
 
 const initialState = {
   isFetching: false,

@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import { find, get } from 'lodash/fp';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import { find, get } from "lodash/fp";
 
-import dropdownicon from '../../assets/icons/dropdown.svg';
+import dropdownicon from "../../assets/icons/dropdown.svg";
 
 class CategoryColors extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ class CategoryColors extends Component {
   }
 
   renderColorList(colors) {
-    return colors.map(color => (
+    return colors.map((color) => (
       <li
         key={color}
         role="presentation"
@@ -27,22 +27,22 @@ class CategoryColors extends Component {
 
   render() {
     const colors = [
-      '#ff8080',
-      '#ff80b3',
-      '#ff80df',
-      '#ff80ff',
-      '#aa80ff',
-      '#8080ff',
-      '#80b3ff',
-      '#80ccff',
-      '#99e6e6',
-      '#80ffe5',
-      '#80ff80',
-      '#99e699',
-      '#bfff80',
-      '#dfff80',
-      '#ffe680',
-      '#ffbf80',
+      "#ff8080",
+      "#ff80b3",
+      "#ff80df",
+      "#ff80ff",
+      "#aa80ff",
+      "#8080ff",
+      "#80b3ff",
+      "#80ccff",
+      "#99e6e6",
+      "#80ffe5",
+      "#80ff80",
+      "#99e699",
+      "#bfff80",
+      "#dfff80",
+      "#ffe680",
+      "#ffbf80",
     ];
 
     const { open, color } = this.state;
@@ -50,14 +50,14 @@ class CategoryColors extends Component {
 
     return (
       <label htmlFor="color-btn">
-        <span>{translate('edit.color')}:</span>
+        <span>{translate("edit.color")}:</span>
         <button
           type="button"
           id="color-btn"
           onClick={() => this.setState({ open: !open })}
           style={{ backgroundColor: color }}
         >
-          {translate('edit.selectColor')}
+          {translate("edit.selectColor")}
           <img
             className="add-icon"
             alt="add"
@@ -75,7 +75,7 @@ class CategoryColors extends Component {
 }
 
 CategoryColors.defaultProps = {
-  color: '#ccc',
+  color: "#ccc",
 };
 
 CategoryColors.propTypes = {
@@ -84,7 +84,7 @@ CategoryColors.propTypes = {
 };
 
 const mapStateToProps = (state, { id }) => ({
-  color: get('color', find({ id }, state.categories)),
+  color: get("color", find({ id }, state.categories)),
   translate: getTranslate(state.locale),
 });
 

@@ -26,22 +26,9 @@
   },
   "devDependencies": {
     "eslint": "7.32.0",
-    "husky": "7.0.2",
-    "lint-staged": "11.1.2",
     "prettier": "1.19.1"
   },
   "engines": {
     "node": "12.x"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "prettier --write"
-    ]
   }
 }

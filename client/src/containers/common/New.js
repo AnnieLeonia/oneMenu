@@ -1,26 +1,26 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import addicon from '../../assets/icons/add.svg';
-import clearicon from '../../assets/icons/clear.svg';
-import Autosuggest from './Autosuggest';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import addicon from "../../assets/icons/add.svg";
+import clearicon from "../../assets/icons/clear.svg";
+import Autosuggest from "./Autosuggest";
 
 class New extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { name: '' };
+    this.state = { name: "" };
   }
 
   onSelect({ target }, { suggestion }) {
     const { onSelectItem, onRemoveItem } = this.props;
 
-    if (target.name === 'delete') {
+    if (target.name === "delete") {
       onRemoveItem(suggestion.id);
     } else {
       onSelectItem(suggestion.id);
-      this.setState({ name: '' });
+      this.setState({ name: "" });
     }
   }
 
@@ -29,17 +29,13 @@ class New extends Component {
     const { onAddItem, isCollaboration, uid } = this.props;
 
     onAddItem({ name, uid: isCollaboration ? null : uid });
-    this.setState({ name: '' });
+    this.setState({ name: "" });
     event.preventDefault();
   }
 
   render() {
     const { name } = this.state;
-    const {
-      translate,
-      view,
-      autosuggest,
-    } = this.props;
+    const { translate, view, autosuggest } = this.props;
 
     const inputfield = autosuggest ? (
       <Autosuggest
@@ -48,23 +44,23 @@ class New extends Component {
         placeholder={translate(`${view}.input`)}
         onSelect={(evt, values) => this.onSelect(evt, values)}
         onChange={({ target }, { method }) => {
-          if (method === 'type') this.setState({ name: target.value });
+          if (method === "type") this.setState({ name: target.value });
         }}
       />
     ) : (
-        <input
-          id="newItem"
-          type="text"
-          value={name}
-          autoComplete="off"
-          placeholder={translate(`${view}.input`)}
-          onChange={({ target }) => this.setState({ name: target.value })}
-        />
-      );
+      <input
+        id="newItem"
+        type="text"
+        value={name}
+        autoComplete="off"
+        placeholder={translate(`${view}.input`)}
+        onChange={({ target }) => this.setState({ name: target.value })}
+      />
+    );
 
     return (
-      <form className="search-form" onSubmit={evt => this.handleSubmit(evt)}>
-        <span role="presentation" onClick={() => this.setState({ name: '' })}>
+      <form className="search-form" onSubmit={(evt) => this.handleSubmit(evt)}>
+        <span role="presentation" onClick={() => this.setState({ name: "" })}>
           <img className="clear-icon" alt="X" src={clearicon} height="12px" />
         </span>
         <label htmlFor="newItem">
@@ -88,16 +84,16 @@ New.propTypes = {
   view: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   translate: getTranslate(state.locale),
   isCollaboration: state.user.isCollaboration,
-  uid: state.user.id
+  uid: state.user.id,
 });
 
 const mapDispatchToProps = (dispatch, { onAdd, onSelect, onRemove }) => ({
-  onAddItem: item => dispatch(onAdd(item)),
-  onSelectItem: id => dispatch(onSelect(id)),
-  onRemoveItem: id => dispatch(onRemove(id)),
+  onAddItem: (item) => dispatch(onAdd(item)),
+  onSelectItem: (id) => dispatch(onSelect(id)),
+  onRemoveItem: (id) => dispatch(onRemove(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(New);

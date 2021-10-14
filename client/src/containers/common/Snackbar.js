@@ -1,14 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
+import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
 
-const Snackbar = ({ isLoggedIn, isFetching, translate}) => (
+const Snackbar = ({ isLoggedIn, isFetching, translate }) => (
   <div>
     {!isLoggedIn && !isFetching && (
-      <div id="unauthenticated">
-        {translate('snackbar.unauthenticated')}
-      </div>
+      <div id="unauthenticated">{translate("snackbar.unauthenticated")}</div>
     )}
   </div>
 );
@@ -18,7 +16,7 @@ Snackbar.propTypes = {
   translate: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isLoggedIn: !!state.user.email,
   isFetching: !!state.user.isFetching,
   translate: getTranslate(state.locale),

@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import penselecticon from '../assets/icons/pen-select.svg';
+import React from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import penselecticon from "../assets/icons/pen-select.svg";
 
 const ListItem = ({ id, value, checked, onClick, linkTo, backUrl }) => (
   <li className="listitem">
@@ -30,10 +30,7 @@ ListItem.defaultProps = {
 };
 
 ListItem.propTypes = {
-  id: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.string,
-  ]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   value: PropTypes.string.isRequired,
   description: PropTypes.element,
   checked: PropTypes.bool,

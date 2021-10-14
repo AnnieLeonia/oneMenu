@@ -1,19 +1,13 @@
-import { connect } from 'react-redux';
-import { getTranslate } from 'react-localize-redux';
-import {
-  filter,
-  flow,
-  sortBy,
-  forEach,
-  values
-} from 'lodash/fp';
+import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import { filter, flow, sortBy, forEach, values } from "lodash/fp";
 
-import Autosuggest from '../../components/Autosuggest';
+import Autosuggest from "../../components/Autosuggest";
 
 // TODO: Move some of this logic to a helpers function
 
 const getSuggestions = (value, state) => {
-  const search = ({ name }) => name.match(new RegExp(value, 'i'));
+  const search = ({ name }) => name.match(new RegExp(value, "i"));
 
   const uncategorized = getTranslate(state.locale)("categories.uncategorized");
   const categories = state.categories.reduce(
@@ -41,11 +35,15 @@ const getSuggestions = (value, state) => {
     })
   )(state.dishes);
 
-  return flow(values, filter("suggestions.length"), sortBy("orderidx"))(categories);
+  return flow(
+    values,
+    filter("suggestions.length"),
+    sortBy("orderidx")
+  )(categories);
 };
 
-const mapStateToProps = state => ({
-  getSuggestions: value => getSuggestions(value, state),
+const mapStateToProps = (state) => ({
+  getSuggestions: (value) => getSuggestions(value, state),
 });
 
 export default connect(mapStateToProps)(Autosuggest);

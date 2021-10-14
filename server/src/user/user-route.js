@@ -38,7 +38,7 @@ module.exports = ({ app, db, isLoggedIn }) => {
    *               $ref: '#/components/schemas/User'
    */
 
-   app.put("/__/user", isLoggedIn, async (req, res, next) => {
+  app.put("/__/user", isLoggedIn, async (req, res, next) => {
     const { user: req_user = {} } = req;
     const { user, err } = await User.update(req_user.id, req.body);
     if (err) return next(err);

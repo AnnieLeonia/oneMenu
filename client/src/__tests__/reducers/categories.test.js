@@ -1,48 +1,48 @@
-import makeStore, { store } from '../store';
-import categories from '../../reducers/categories';
+import makeStore, { store } from "../store";
+import categories from "../../reducers/categories";
 import {
   addCategory,
   editCategory,
   removeCategory,
   reorderCategory,
   fetchCategories,
-} from '../../actions/categories';
+} from "../../actions/categories";
 
-describe('categories reducer', () => {
+describe("categories reducer", () => {
   const { dispatch } = store;
-  it('has a default state', () => {
-    expect(categories(undefined, { type: 'unexpected' })).toEqual([]);
+  it("has a default state", () => {
+    expect(categories(undefined, { type: "unexpected" })).toEqual([]);
   });
 
-  it('can handle ADD_CATEGORY', async () => {
+  it("can handle ADD_CATEGORY", async () => {
     fetch.mockResponse(
       JSON.stringify([
         {
           id: 1,
-          name: 'Vegetables',
+          name: "Vegetables",
         },
       ])
     );
-    const state = await dispatch(addCategory({ name: 'Vegetables' }));
+    const state = await dispatch(addCategory({ name: "Vegetables" }));
     expect(categories(undefined, state)).toEqual([
       {
         id: 1,
-        name: 'Vegetables',
+        name: "Vegetables",
       },
     ]);
   });
 
-  it('can handle ADD_CATEGORY for None', () => {
+  it("can handle ADD_CATEGORY for None", () => {
     expect(categories(undefined, dispatch(addCategory({})))).toEqual([]);
   });
 
-  it('can handle EDIT_CATEGORY', async () => {
+  it("can handle EDIT_CATEGORY", async () => {
     fetch.mockResponse(
       JSON.stringify([
         {
           id: 1,
-          name: 'Edit',
-          color: '#fff',
+          name: "Edit",
+          color: "#fff",
         },
       ])
     );
@@ -52,21 +52,21 @@ describe('categories reducer', () => {
         [
           {
             id: 1,
-            name: 'Vegetables',
+            name: "Vegetables",
           },
         ],
-        await dispatch(editCategory({ id: 1, name: 'Edit', color: '#fff' }))
+        await dispatch(editCategory({ id: 1, name: "Edit", color: "#fff" }))
       )
     ).toEqual([
       {
         id: 1,
-        name: 'Edit',
-        color: '#fff',
+        name: "Edit",
+        color: "#fff",
       },
     ]);
   });
 
-  it('can handle REORDER_CATEGORY', async () => {
+  it("can handle REORDER_CATEGORY", async () => {
     fetch.mockResponse(
       JSON.stringify([
         {
@@ -87,12 +87,12 @@ describe('categories reducer', () => {
         [
           {
             id: 1,
-            name: 'Vegetables',
+            name: "Vegetables",
             orderidx: 1,
           },
           {
             id: 2,
-            name: 'Meat',
+            name: "Meat",
             orderidx: 2,
           },
         ],
@@ -101,23 +101,23 @@ describe('categories reducer', () => {
     ).toEqual([
       {
         id: 2,
-        name: 'Meat',
+        name: "Meat",
         orderidx: 1,
       },
       {
         id: 1,
-        name: 'Vegetables',
+        name: "Vegetables",
         orderidx: 2,
       },
     ]);
   });
 
-  it('can handle REMOVE_CATEGORY', async () => {
+  it("can handle REMOVE_CATEGORY", async () => {
     fetch.mockResponse(
       JSON.stringify([
         {
           id: 2,
-          name: 'Meat',
+          name: "Meat",
         },
       ])
     );
@@ -127,11 +127,11 @@ describe('categories reducer', () => {
         [
           {
             id: 1,
-            name: 'Vegetables',
+            name: "Vegetables",
           },
           {
             id: 2,
-            name: 'Meat',
+            name: "Meat",
           },
         ],
         await dispatch(removeCategory(1))
@@ -139,18 +139,18 @@ describe('categories reducer', () => {
     ).toEqual([
       {
         id: 2,
-        name: 'Meat',
+        name: "Meat",
       },
     ]);
   });
 
-  it('can handle FETCH_CATEGORIES', (done) => {
+  it("can handle FETCH_CATEGORIES", (done) => {
     const mockStore = makeStore();
     fetch.mockResponse(
       JSON.stringify([
         {
           id: 1,
-          name: 'Vegetables',
+          name: "Vegetables",
         },
       ])
     );
@@ -160,11 +160,11 @@ describe('categories reducer', () => {
     setImmediate(() => {
       expect(mockStore.getActions()).toEqual([
         {
-          type: 'FETCH_CATEGORIES',
+          type: "FETCH_CATEGORIES",
           categories: [
             {
               id: 1,
-              name: 'Vegetables',
+              name: "Vegetables",
             },
           ],
         },

@@ -1,11 +1,11 @@
-import { Component } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import {
   getLanguages,
   setActiveLanguage,
   getActiveLanguage,
-} from 'react-localize-redux';
+} from "react-localize-redux";
 
 class SetLanguage extends Component {
   componentWillReceiveProps(props) {
@@ -35,9 +35,9 @@ SetLanguage.propTypes = {
   setLanguage: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   myLanguage: getActiveLanguage(state.locale).code,
-  languages: getLanguages(state.locale).map(language => language.code),
+  languages: getLanguages(state.locale).map((language) => language.code),
   user: state.user,
 });
 
@@ -45,7 +45,4 @@ const mapDispatchToProps = {
   setLanguage: setActiveLanguage,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SetLanguage);
+export default connect(mapStateToProps, mapDispatchToProps)(SetLanguage);
