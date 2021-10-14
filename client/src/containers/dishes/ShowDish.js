@@ -1,10 +1,12 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
-import { find, get, toInteger } from "lodash/fp";
+import { get, toInteger } from "lodash/fp";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
+
+import { fetchDish } from "../../actions/dishes";
 
 function createMarkup(description) {
   if (!description) return;
@@ -19,21 +21,31 @@ function createMarkup(description) {
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
 
-const ShowDish = ({ name, description, translate, history, location }) => (
-  <div className="dish">
-    <div className="title">{name}</div>
-    <div className="wrapper">
-      <div dangerouslySetInnerHTML={createMarkup(description)} />
-      <button
-        className="cancelBtn"
-        type="button"
-        onClick={() => redirect(history, location)}
-      >
-        {translate("dishes.back")}
-      </button>
-    </div>
-  </div>
-);
+class ShowDish extends Component {
+  componentDidMount() {
+    this.props.getDish(this.props.id);
+  }
+
+  render() {
+    const { name, description, translate, history, location } = this.props;
+
+    return (
+      <div className="dish">
+        <div className="title">{name}</div>
+        <div className="wrapper">
+          <div dangerouslySetInnerHTML={createMarkup(description)} />
+          <button
+            className="cancelBtn"
+            type="button"
+            onClick={() => redirect(history, location)}
+          >
+            {translate("dishes.back")}
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
 
 ShowDish.defaultProps = {
   name: "",
@@ -53,16 +65,15 @@ ShowDish.propTypes = {
   }).isRequired,
 };
 
-const mapStateToProps = (state, { match }) => {
-  const id = toInteger(match.params.id);
-  const dish = find({ id }, state.dishes);
+const mapStateToProps = (state, { match }) => ({
+  id: toInteger(match.params.id),
+  name: get("name", state.dish),
+  description: get("description", state.dish),
+  translate: getTranslate(state.locale),
+});
 
-  return {
-    id,
-    name: get("name", dish),
-    description: get("description", dish),
-    translate: getTranslate(state.locale),
-  };
+const mapDispatchToProps = {
+  getDish: fetchDish,
 };
 
-export default connect(mapStateToProps)(ShowDish);
+export default connect(mapStateToProps, mapDispatchToProps)(ShowDish);

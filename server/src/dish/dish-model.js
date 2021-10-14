@@ -55,9 +55,19 @@ module.exports = db => ({
     return { category: rows[0], err };
   },
 
-  getAll: async () => {
+  getById: async (id) => {
     const { rows, err } = await db.query(`
       SELECT dishes.*, ARRAY_AGG(category_id) AS category_ids FROM dishes
+      LEFT JOIN dishes_categories ON id = dishes_categories.dish_id
+      WHERE id = ${id}
+      GROUP BY name, id
+    `);
+    return { dish: rows[0], err };
+  },
+
+  getAll: async () => {
+    const { rows, err } = await db.query(`
+      SELECT id, name, active, ARRAY_AGG(category_id) AS category_ids FROM dishes
       LEFT JOIN dishes_categories ON id = dishes_categories.dish_id
       GROUP BY name, id ORDER BY id
     `);

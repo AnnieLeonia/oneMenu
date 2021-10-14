@@ -241,7 +241,7 @@ nav a.active {
 .category input,
 .settings input,
 #color-btn {
-  width: calc(100% - 120px - 2em);
+  width: calc(100% - 120px - 2em - 0.6em);
 }
 
 .dish select,
@@ -254,6 +254,11 @@ nav a.active {
 #color-btn img {
   float: right;
   margin: 0.2em 0.5em 0 0;
+}
+
+.dish textarea {
+  resize: vertical;
+  height: 8em;
 }
 
 .doneBtn,
@@ -269,7 +274,7 @@ nav a.active {
   border-radius: 3px;
   border: black solid 1px;
   box-shadow: 3px 3px 5px #888;
-  position: absolute;
+  position: fixed;
   margin: 0.5em 0;
   bottom: 0;
 }

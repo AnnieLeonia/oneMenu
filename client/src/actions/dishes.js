@@ -1,4 +1,4 @@
-import { FETCH_DISHES } from "../constants/dishes";
+import { FETCH_DISH, FETCH_DISHES } from "../constants/dishes";
 
 export const addDish =
   ({ name, uid }) =>
@@ -91,6 +91,18 @@ export const removeDish = (id) => async (dispatch) => {
     console.error(err);
   }
 };
+
+export const fetchDish = (id) => async (dispatch) => {
+  try {
+    const res = await fetch(`/__/dishes/${id}`, { credentials: "include" });
+    const dish = await res.json();
+    return dispatch({ type: FETCH_DISH, dish });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const resetDish = () => ({ type: FETCH_DISH, dish: {} });
 
 export const fetchDishes = () => async (dispatch) => {
   try {

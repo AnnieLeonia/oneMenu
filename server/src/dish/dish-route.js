@@ -13,6 +13,12 @@ module.exports = ({ app, db, isLoggedIn }) => {
     return res.send(dish);
   });
 
+  app.get("/__/dishes/:id", isLoggedIn, async (req, res, next) => {
+    const { dish, err } = await Dish.getById(req.params.id);
+    if (err) return next(err);
+    return res.send(dish);
+  });
+
   app.put("/__/dishes/:id", isLoggedIn, async (req, res, next) => {
     let response;
     if (req.get("Type") === "toggle-active") {
