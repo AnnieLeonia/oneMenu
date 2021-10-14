@@ -14,12 +14,12 @@ class New extends Component {
   }
 
   onSelect({ target }, { suggestion }) {
-    const { onAddItem, onRemoveItem } = this.props;
+    const { onSelectItem, onRemoveItem } = this.props;
 
     if (target.name === "delete") {
       onRemoveItem(suggestion.id);
     } else {
-      onAddItem(suggestion);
+      onSelectItem(suggestion.id);
       this.setState({ name: "" });
     }
   }
@@ -90,8 +90,9 @@ const mapStateToProps = (state) => ({
   uid: state.user.id,
 });
 
-const mapDispatchToProps = (dispatch, { onAdd, onRemove }) => ({
+const mapDispatchToProps = (dispatch, { onAdd, onSelect, onRemove }) => ({
   onAddItem: (item) => dispatch(onAdd(item)),
+  onSelectItem: (id) => dispatch(onSelect(id)),
   onRemoveItem: (id) => dispatch(onRemove(id)),
 });
 
