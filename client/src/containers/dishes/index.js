@@ -1,16 +1,16 @@
-import React from 'react';
+import React from "react";
 
-import DishList from './DishList';
-import New from '../common/New';
-import Snackbar from '../common/Snackbar';
-import { addDish, removeDish } from '../../actions/dishes';
+import DishList from "./DishList";
+import New from "../common/New";
+import Snackbar from "../common/Snackbar";
+import { toggleDishInactive, removeDish } from "../../actions/dishes";
 
 const Dishes = (props) => (
   <div>
     <New
       view="dishes"
       autosuggest
-      onAdd={addDish}
+      onAdd={(dish) => toggleDishInactive(dish.id)}
       onRemove={removeDish}
       {...props}
     />

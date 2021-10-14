@@ -3,14 +3,14 @@ import React from "react";
 import DesiredList from "./DesiredList";
 import New from "../common/New";
 import Snackbar from "../common/Snackbar";
-import { addDish, removeDish } from "../../actions/dishes";
+import { toggleDishInactive, removeDish } from "../../actions/dishes";
 
 const Dishes = (props) => (
   <div>
     <New
       view="dishes"
       autosuggest
-      onAdd={addDish}
+      onAdd={(dish) => toggleDishInactive(dish.id)}
       onRemove={removeDish}
       {...props}
     />
