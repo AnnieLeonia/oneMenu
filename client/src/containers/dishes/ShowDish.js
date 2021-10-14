@@ -3,6 +3,18 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
 import { find, get, toInteger } from "lodash/fp";
+import { micromark } from "micromark";
+import { gfm, gfmHtml } from "micromark-extension-gfm";
+
+function createMarkup(description) {
+  if (!description) return;
+  const html = micromark(description, {
+    extensions: [gfm()],
+    htmlExtensions: [gfmHtml()],
+  });
+
+  return { __html: html };
+}
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -11,7 +23,7 @@ const ShowDish = ({ name, description, translate, history, location }) => (
   <div className="dish">
     <div className="title">{name}</div>
     <div className="wrapper">
-      <div>{description}</div>
+      <div dangerouslySetInnerHTML={createMarkup(description)} />
       <button
         className="cancelBtn"
         type="button"
