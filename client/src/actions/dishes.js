@@ -40,25 +40,6 @@ export const editDish =
     }
   };
 
-export const toggleDishChecked =
-  ({ id, uid }) =>
-  async (dispatch) => {
-    try {
-      await fetch(`/__/dishes/${id}/${uid}`, {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Type: "toggle-checked",
-        },
-        credentials: "include",
-      });
-      return await dispatch(fetchDishes());
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
 export const toggleDishInactive = (id) => async (dispatch) => {
   try {
     await fetch(`/__/dishes/${id}`, {
