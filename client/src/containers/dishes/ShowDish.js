@@ -27,19 +27,34 @@ class ShowDish extends Component {
   }
 
   render() {
-    const { name, description, translate, history, location } = this.props;
+    const { id, name, description, translate, history, location } = this.props;
 
     return (
       <div className="dish">
         <div className="title">{name}</div>
         <div className="wrapper">
           <div dangerouslySetInnerHTML={createMarkup(description)} />
+          <br />
+          <br />
+          <br />
           <button
             className="cancelBtn"
             type="button"
             onClick={() => redirect(history, location)}
           >
             {translate("dishes.back")}
+          </button>
+          <button
+            className="doneBtn"
+            type="button"
+            onClick={() =>
+              history.push({
+                pathname: `/dishes/${id}`,
+                query: { backUrl: `/dish/${id}` },
+              })
+            }
+          >
+            {translate("edit.edit")}
           </button>
         </div>
       </div>
