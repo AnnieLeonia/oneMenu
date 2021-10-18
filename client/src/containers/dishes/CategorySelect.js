@@ -7,6 +7,7 @@ import { find, get, sortBy } from "lodash/fp";
 class CategorySelect extends Component {
   render() {
     const { categoryIds, categories, translate } = this.props;
+    if (categories.length === 0) return null;
 
     return (
       <label htmlFor="categoryIds">
