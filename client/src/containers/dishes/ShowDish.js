@@ -34,6 +34,9 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="wrapper">
           <div dangerouslySetInnerHTML={createMarkup(description)} />
+          <br />
+          <br />
+          <br />
           <button
             className="cancelBtn"
             type="button"
