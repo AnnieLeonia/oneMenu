@@ -27,7 +27,7 @@ class ShowDish extends Component {
   }
 
   render() {
-    const { name, description, translate, history, location } = this.props;
+    const { id, name, description, translate, history, location } = this.props;
 
     return (
       <div className="dish">
@@ -40,6 +40,18 @@ class ShowDish extends Component {
             onClick={() => redirect(history, location)}
           >
             {translate("dishes.back")}
+          </button>
+          <button
+            className="doneBtn"
+            type="button"
+            onClick={() =>
+              history.push({
+                pathname: `/dishes/${id}`,
+                query: { backUrl: `/dish/${id}` },
+              })
+            }
+          >
+            {translate("edit.edit")}
           </button>
         </div>
       </div>
