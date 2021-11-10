@@ -4,6 +4,7 @@ import { Route } from "react-router-dom";
 import Header from "./common/Header";
 import DesiredList from "./desirables";
 import Categories from "./categories";
+import CategoryDishes from "./categories/CategoryDishes";
 import EditCategory from "./categories/EditCategory";
 import Dishes from "./dishes";
 import ShowDish from "./dishes/ShowDish";
@@ -19,11 +20,12 @@ const App = () => (
     <Route path="/" component={Header} />
     <Route exact path="/" component={DesiredList} />
     <Route exact path="/categories" component={Categories} />
-    <Route path="/categories/:id" component={EditCategory} />
+    <Route exact path="/categories/:id" component={CategoryDishes} />
+    <Route exact path="/categories/edit/:id" component={EditCategory} />
     <Route exact path="/dishes" component={Dishes} />
-    <Route path="/dish/:id" component={ShowDish} />
-    <Route path="/dishes/:id" component={EditDish} />
-    <Route path="/settings" component={Settings} />
+    <Route exact path="/dishes/:id" component={ShowDish} />
+    <Route exact path="/dishes/edit/:id" component={EditDish} />
+    <Route exact path="/settings" component={Settings} />
     <SetLanguage />
     <FetchDB />
   </div>

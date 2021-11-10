@@ -20,6 +20,7 @@ module.exports = {
   categories: {
     input: ["New category...", "Ny kategori..."],
     uncategorized: ["Uncategorized", "Okategoriserad"],
+    nonexistent: ["Category does not exist", "Kategorin finns inte"],
   },
   dishes: {
     cart: ["Cart", "Varukorg"],

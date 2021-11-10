@@ -49,8 +49,8 @@ class ShowDish extends Component {
             type="button"
             onClick={() =>
               history.push({
-                pathname: `/dishes/${id}`,
-                query: { backUrl: `/dish/${id}` },
+                pathname: `/dishes/edit/${id}`,
+                query: { backUrl: `/dishes/${id}` },
               })
             }
           >
