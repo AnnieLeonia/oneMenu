@@ -18,7 +18,7 @@ const active = ({ user, ...state }) => {
 const mapStateToProps = (state, props) => ({
   active: active(state),
   translate: getTranslate(state.locale),
-  linkTo: (id) => `/dishes/${id}`,
+  linkTo: (id) => `/dishes/edit/${id}`,
   backUrl: "/",
   isLoggedIn: !!state.user.email,
 });

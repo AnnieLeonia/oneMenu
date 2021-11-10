@@ -41,7 +41,7 @@ const mapStateToProps = (state) => ({
   active: active(state),
   checked: [],
   translate: getTranslate(state.locale),
-  linkTo: (id) => `/dishes/${id}`,
+  linkTo: (id) => `/dishes/edit/${id}`,
   backUrl: "/dishes",
 });
 

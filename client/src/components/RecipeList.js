@@ -9,7 +9,7 @@ const li = (item, history, linkTo, backUrl) => (
     key={item.id}
     value={item.value}
     checked={item.checked}
-    onClick={() => history.push(`/dish/${item.id}`)}
+    onClick={() => history.push(`/dishes/${item.id}`)}
     linkTo={linkTo(item.id)}
     backUrl={backUrl}
   />
