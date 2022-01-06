@@ -2,34 +2,28 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import penselecticon from "../assets/icons/pen-select.svg";
+import onemenuicon from "../assets/icons/onemenu.svg";
 
-const ListItem = ({ id, value, checked, onClick, linkTo, backUrl }) => (
+const DishItem = ({ value, img, onClick, linkTo, backUrl }) => (
   <li className="listitem">
-    <label role="presentation" onKeyDown={onClick} htmlFor={id}>
-      <input
-        readOnly
-        id={id}
-        type="checkbox"
-        onClick={onClick}
-        checked={checked}
-      />
-      <span className="dishText">{value}</span>
-      <span className="checkmark" />
-    </label>
+    <span onClick={onClick}>
+      <img src={img || onemenuicon} alt="Dish" className="dishImg"></img>
+      <span className="dishText small">{value}</span>
+    </span>
     <Link to={{ pathname: linkTo, query: { backUrl } }} className="dishEdit">
       <img src={penselecticon} alt="Edit" height="27px" />
     </Link>
   </li>
 );
 
-ListItem.defaultProps = {
+DishItem.defaultProps = {
   checked: false,
   onClick: null,
   description: null,
   backUrl: null,
 };
 
-ListItem.propTypes = {
+DishItem.propTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   value: PropTypes.string.isRequired,
   description: PropTypes.element,
@@ -39,4 +33,4 @@ ListItem.propTypes = {
   backUrl: PropTypes.string,
 };
 
-export default ListItem;
+export default DishItem;

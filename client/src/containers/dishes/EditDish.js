@@ -46,6 +46,15 @@ class EditDish extends Component {
                 defaultValue={dish.name}
               />
             </label>
+            <label htmlFor="dishImg">
+              <span>{translate("edit.img")}:</span>
+              <input
+                id="dishImg"
+                name="dishImg"
+                autoComplete="off"
+                defaultValue={dish.img}
+              />
+            </label>
             <label htmlFor="dishDescription">
               <span>{translate("edit.description")}:</span>
               <textarea
@@ -86,6 +95,7 @@ class EditDish extends Component {
 EditDish.defaultProps = {
   dish: {
     name: "",
+    img: "",
     description: "",
   },
 };
@@ -94,6 +104,7 @@ EditDish.propTypes = {
   dish: PropTypes.shape({
     id: PropTypes.number.isRequired,
     name: PropTypes.string,
+    img: PropTypes.string,
     description: PropTypes.string,
   }).isRequired,
   translate: PropTypes.func.isRequired,
@@ -115,6 +126,7 @@ const handleSubmit = (event, id, history, location) => (dispatch) => {
   const edit = editDish({
     id,
     name: data.get("dishName"),
+    img: data.get("dishImg"),
     description: data.get("dishDescription"),
     categoryIds: data.getAll("categoryIds"),
   });
@@ -129,6 +141,7 @@ const mapStateToProps = (state, { match }) => ({
   dish: {
     id: toInteger(match.params.id),
     name: get("name", state.dish),
+    img: get("img", state.dish),
     description: get("description", state.dish),
   },
   translate: getTranslate(state.locale),

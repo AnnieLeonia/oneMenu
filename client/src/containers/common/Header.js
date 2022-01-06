@@ -10,8 +10,8 @@ const Header = ({ translate }) => (
   <div className="header">
     <div className="top">
       <img id="headericon" src={onemenuicon} alt="Settings" height="30px" />
-      <a href="https://shop.zolly.ml">
-        <h1>OneMenu</h1>
+      <a id="headertitle" href="https://shop.zolly.ml">
+        OneMenu
       </a>
       <NavLink to="/settings">
         <img id="settingicon" src={settingicon} alt="Settings" height="28px" />

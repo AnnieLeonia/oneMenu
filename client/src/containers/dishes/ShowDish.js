@@ -7,6 +7,7 @@ import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 
 import { fetchDish } from "../../actions/dishes";
+import onemenuicon from "../../assets/icons/onemenu.svg";
 
 function createMarkup(description) {
   if (!description) return;
@@ -27,36 +28,45 @@ class ShowDish extends Component {
   }
 
   render() {
-    const { id, name, description, translate, history, location } = this.props;
+    const { id, name, img, description, translate, history, location } =
+      this.props;
 
     return (
       <div className="dish">
         <div className="title">{name}</div>
-        <div className="wrapper">
-          <div dangerouslySetInnerHTML={createMarkup(description)} />
-          <br />
-          <br />
-          <br />
-          <button
-            className="cancelBtn"
-            type="button"
-            onClick={() => redirect(history, location)}
-          >
-            {translate("dishes.back")}
-          </button>
-          <button
-            className="doneBtn"
-            type="button"
-            onClick={() =>
-              history.push({
-                pathname: `/dishes/edit/${id}`,
-                query: { backUrl: `/dishes/${id}` },
-              })
-            }
-          >
-            {translate("edit.edit")}
-          </button>
+        <div className="container">
+          <img
+            src={img || onemenuicon}
+            alt="Dish image"
+            className="responsive"
+          ></img>
+          <div
+            dangerouslySetInnerHTML={createMarkup(description)}
+            className="markdown-body"
+          />
         </div>
+        <br />
+        <br />
+        <br />
+        <button
+          className="cancelBtn"
+          type="button"
+          onClick={() => redirect(history, location)}
+        >
+          {translate("dishes.back")}
+        </button>
+        <button
+          className="doneBtn"
+          type="button"
+          onClick={() =>
+            history.push({
+              pathname: `/dishes/edit/${id}`,
+              query: { backUrl: `/dishes/${id}` },
+            })
+          }
+        >
+          {translate("edit.edit")}
+        </button>
       </div>
     );
   }
@@ -64,11 +74,13 @@ class ShowDish extends Component {
 
 ShowDish.defaultProps = {
   name: "",
+  img: "",
 };
 
 ShowDish.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string,
+  img: PropTypes.string,
   translate: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
@@ -83,6 +95,7 @@ ShowDish.propTypes = {
 const mapStateToProps = (state, { match }) => ({
   id: toInteger(match.params.id),
   name: get("name", state.dish),
+  img: get("img", state.dish),
   description: get("description", state.dish),
   translate: getTranslate(state.locale),
 });

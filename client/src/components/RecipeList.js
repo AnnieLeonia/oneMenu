@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import ListItem from "./ListItem";
+import DishItem from "./DishItem";
 
-const li = (item, history, linkTo, backUrl) => (
-  <ListItem
+const di = (item, history, linkTo, backUrl) => (
+  <DishItem
     id={item.id}
     key={item.id}
     value={item.value}
-    checked={item.checked}
+    img={item.img}
     onClick={() => history.push(`/dishes/${item.id}`)}
     linkTo={linkTo(item.id)}
     backUrl={backUrl}
@@ -19,7 +19,7 @@ const RecipeList = ({ active, linkTo, backUrl, view, history }) => (
   <div className={view}>
     <div style={{ borderLeft: "5px solid #ccc" }}>
       <ul className="active">
-        {active.map((item) => li(item, history, linkTo, backUrl))}
+        {active.map((item) => di(item, history, linkTo, backUrl))}
       </ul>
     </div>
   </div>

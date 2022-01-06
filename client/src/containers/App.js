@@ -14,6 +14,7 @@ import SetLanguage from "./settings/SetLanguage";
 import FetchDB from "./settings/FetchDB";
 
 import "../styles/style.css";
+import "../styles/markdown.css";
 
 const App = () => (
   <div>
