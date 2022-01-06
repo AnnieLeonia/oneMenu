@@ -364,6 +364,7 @@ nav a.active {
 }
 
 .listitem .dishImg {
+  cursor: pointer;
   object-fit: cover;
   vertical-align: bottom;
   width: 50px;
@@ -377,6 +378,7 @@ nav a.active {
 }
 
 .listitem .dishText.small {
+  cursor: pointer;
   padding-left: 10px;
 }
 
