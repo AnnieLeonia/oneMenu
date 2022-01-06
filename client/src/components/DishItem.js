@@ -17,17 +17,15 @@ const DishItem = ({ value, img, onClick, linkTo, backUrl }) => (
 );
 
 DishItem.defaultProps = {
-  checked: false,
+  img: "",
   onClick: null,
-  description: null,
   backUrl: null,
 };
 
 DishItem.propTypes = {
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   value: PropTypes.string.isRequired,
-  description: PropTypes.element,
-  checked: PropTypes.bool,
+  img: PropTypes.string,
   onClick: PropTypes.func,
   linkTo: PropTypes.string.isRequired,
   backUrl: PropTypes.string,
