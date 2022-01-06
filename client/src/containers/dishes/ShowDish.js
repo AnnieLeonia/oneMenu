@@ -35,11 +35,7 @@ class ShowDish extends Component {
       <div className="dish">
         <div className="title">{name}</div>
         <div className="container">
-          <img
-            src={img || onemenuicon}
-            alt="Dish image"
-            className="responsive"
-          ></img>
+          <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
           <div
             dangerouslySetInnerHTML={createMarkup(description)}
             className="markdown-body"
