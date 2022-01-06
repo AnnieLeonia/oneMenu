@@ -16,6 +16,7 @@ CREATE TABLE dishes (
   id           SERIAL        NOT NULL,
   name         VARCHAR(255)  NOT NULL UNIQUE,
   description  TEXT,
+  img          VARCHAR(255),
   active       BOOLEAN       DEFAULT TRUE,
 
   PRIMARY KEY (id)

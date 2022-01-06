@@ -1,20 +1,20 @@
 module.exports = (db) => ({
-  create: async ({ name, description }) => {
+  create: async ({ name, img, description }) => {
     const sql =
-      "INSERT INTO dishes (name, description) VALUES ($1, $2) RETURNING *";
-    const { rows, err } = await db.query(sql, [name, description]);
+      "INSERT INTO dishes (name, img, description) VALUES ($1, $2, $3) RETURNING *";
+    const { rows, err } = await db.query(sql, [name, img, description]);
     return { category: rows[0], err };
   },
 
-  update: async (id, { name, description, category_ids }) => {
+  update: async (id, { name, img, description, category_ids }) => {
     try {
       await db.query("BEGIN");
 
       const { rows, err } = await db.query(
         `
-        UPDATE dishes SET (name, description) = ($2, $3)
+        UPDATE dishes SET (name, img, description) = ($2, $3, $4)
         WHERE id = $1 RETURNING *`,
-        [id, name, description]
+        [id, name, img, description]
       );
       if (err) throw err;
 
@@ -77,7 +77,7 @@ module.exports = (db) => ({
 
   getAll: async () => {
     const { rows, err } = await db.query(`
-      SELECT id, name, active, ARRAY_AGG(category_id) AS category_ids FROM dishes
+      SELECT id, name, img, active, ARRAY_AGG(category_id) AS category_ids FROM dishes
       LEFT JOIN dishes_categories ON id = dishes_categories.dish_id
       GROUP BY name, id ORDER BY id
     `);

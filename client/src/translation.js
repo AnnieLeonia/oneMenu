@@ -9,6 +9,7 @@ module.exports = {
   edit: {
     edit: ["Edit", "Redigera"],
     name: ["Name", "Namn"],
+    img: ["Image URL", "Bild-url"],
     description: ["Description", "Beskrivning"],
     category: ["Category", "Kategori"],
     color: ["Color", "Färg"],

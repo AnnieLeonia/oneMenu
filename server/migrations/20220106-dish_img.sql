@@ -1,0 +1,2 @@
+ALTER TABLE dishes
+ADD COLUMN img VARCHAR(255);
