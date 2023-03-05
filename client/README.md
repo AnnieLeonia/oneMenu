@@ -1,4 +1,4 @@
-# qr-hunt-client
+# one-menu-client
 
 ## Project setup
 
