@@ -1,8 +1,8 @@
-import { get, toInteger } from "lodash/fp";
-import PropTypes from "prop-types";
 import React, { Component } from "react";
-import { getTranslate } from "react-localize-redux";
+import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { getTranslate } from "react-localize-redux";
+import { get, toInteger } from "lodash/fp";
 
 import {
   editDish,
