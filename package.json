@@ -15,7 +15,7 @@
     "test-client": "cd client && npm test",
     "test-server": "cd server && npm test",
     "db:migrate": "./server/migrations/run.sh",
-    "db:pull": "pg_dump --format=c -h zolly.ml -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
+    "db:pull": "pg_dump --format=c -h codies.se -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
   },
   "dependencies": {
     "dotenv": "10.0.0",
