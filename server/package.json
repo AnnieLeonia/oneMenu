@@ -7,7 +7,7 @@
     "start": "nodemon index",
     "postinstall": "./migrations/run.sh",
     "db:migrate": "./migrations/run.sh --fix",
-    "db:pull": "pg_dump --format=c -h zolly.ml -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
+    "db:pull": "pg_dump --format=c -h codies.se -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
   },
   "dependencies": {
     "camelcase-keys": "7.0.0",
