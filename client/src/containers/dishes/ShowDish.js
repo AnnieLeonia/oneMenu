@@ -1,23 +1,12 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { getTranslate } from "react-localize-redux";
 import { get, toInteger } from "lodash/fp";
-import { micromark } from "micromark";
-import { gfm, gfmHtml } from "micromark-extension-gfm";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { getTranslate } from "react-localize-redux";
+import { connect } from "react-redux";
 
 import { fetchDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
-
-function createMarkup(description) {
-  if (!description) return;
-  const html = micromark(description, {
-    extensions: [gfm()],
-    htmlExtensions: [gfmHtml()],
-  });
-
-  return { __html: html };
-}
+import { createMarkup } from "../../utils";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
