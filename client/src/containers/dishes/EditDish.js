@@ -5,20 +5,32 @@ import { getTranslate } from "react-localize-redux";
 import { get, toInteger } from "lodash/fp";
 
 import {
-  fetchDish,
   editDish,
+  fetchDish,
   removeDish,
   resetDish,
 } from "../../actions/dishes";
+import { createMarkup } from "../../utils";
 import CategorySelect from "./CategorySelect";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
 
 class EditDish extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: "",
+      description: "",
+      img: "",
+      category: "",
+    };
+  }
+
   componentDidMount() {
     const { dish } = this.props;
-    this.props.getDish(dish.id);
+    this.props.getDish(dish.id).then((res) => this.setState(res.dish));
   }
 
   componentWillUnmount() {
@@ -33,17 +45,21 @@ class EditDish extends Component {
       <div className="dish">
         <div className="title">
           <b>{translate("edit.edit")}: </b>
-          {dish.name}
+          {this.state.name}
         </div>
-        <div className="wrapper">
-          <form onSubmit={(evt) => onSubmit(evt, dish.id, history, location)}>
+        <div className="flex flex-row wrapper">
+          <form
+            className="flex flex-col"
+            onSubmit={(evt) => onSubmit(evt, dish.id, history, location)}
+          >
             <label htmlFor="dishName">
               <span>{translate("edit.name")}:</span>
               <input
                 id="dishName"
                 name="dishName"
                 autoComplete="off"
-                defaultValue={dish.name}
+                value={this.state.name}
+                onChange={(evt) => this.setState({ name: evt.target.value })}
               />
             </label>
             <label htmlFor="dishImg">
@@ -52,19 +68,26 @@ class EditDish extends Component {
                 id="dishImg"
                 name="dishImg"
                 autoComplete="off"
-                defaultValue={dish.img}
+                value={this.state.img}
+                onChange={(evt) => this.setState({ img: evt.target.value })}
               />
             </label>
-            <label htmlFor="dishDescription">
+            <label className="flex flex-row" htmlFor="dishDescription">
               <span>{translate("edit.description")}:</span>
               <textarea
                 id="dishDescription"
                 name="dishDescription"
                 autoComplete="off"
-                defaultValue={dish.description}
+                value={this.state.description}
+                onChange={(evt) =>
+                  this.setState({ description: evt.target.value })
+                }
               />
             </label>
             <CategorySelect id={dish.id} />
+            <br />
+            <br />
+            <br />
             <button
               className="deleteBtn"
               type="button"
@@ -86,6 +109,10 @@ class EditDish extends Component {
               {translate("edit.save")}
             </button>
           </form>
+          <div
+            dangerouslySetInnerHTML={createMarkup(this.state.description)}
+            className="flex flex-col markdown-body markdown-preview"
+          />
         </div>
       </div>
     );

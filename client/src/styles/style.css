@@ -217,6 +217,18 @@ nav a.active {
   margin: 0.5em;
 }
 
+.flex {
+  display: flex;
+  flex: 1 1;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+.flex-row {
+  flex-direction: row;
+}
+
 .dish .wrapper,
 .category .wrapper {
   padding-top: 1em;
@@ -224,6 +236,19 @@ nav a.active {
   overflow: auto;
   background-color: white;
 }
+
+.markdown-preview.markdown-preview {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .markdown-preview.markdown-preview {
+    display: flex;
+    padding-left: 2em;
+    padding-bottom: 4em;
+  }
+}
+
 
 .dish label span,
 .category label span,
@@ -273,7 +298,7 @@ nav a.active {
 
 .dish textarea {
   resize: vertical;
-  height: 8em;
+  height: auto;
 }
 
 .doneBtn,
