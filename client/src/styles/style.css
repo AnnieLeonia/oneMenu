@@ -214,7 +214,9 @@ nav a.active {
 }
 
 .container {
-  margin: 0.5em;
+  padding: 0.5em;
+  margin: auto;
+  max-width: 1024px;
 }
 
 .dish .wrapper,
