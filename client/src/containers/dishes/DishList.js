@@ -5,9 +5,8 @@ import { filter, flow, forEach, sortBy, values } from "lodash/fp";
 import { toggleDishInactive } from "../../actions/dishes";
 import DishList from "../../components/DishList";
 
-// TODO: Move some of this logic to a helpers function
-
-const active = (state) => {
+const mapItems = (state) => {
+  const { search } = state;
   const uncategorized = getTranslate(state.locale)("categories.uncategorized");
 
   const categories = state.categories.reduce(
@@ -20,6 +19,8 @@ const active = (state) => {
 
   flow(
     sortBy(({ name }) => [name.toLowerCase()]),
+    filter((dish) => dish.name.match(new RegExp(search, "i"))),
+    filter((dish) => (search ? true : dish.img)), // TODO: Remove this line when we have images for all dishes
     forEach((dish) => {
       (dish.categoryIds || []).forEach((categoryId) => {
         const category = categories[categoryId];
@@ -38,11 +39,11 @@ const active = (state) => {
 };
 
 const mapStateToProps = (state) => ({
-  active: active(state),
+  items: mapItems(state),
   checked: [],
   translate: getTranslate(state.locale),
   linkTo: (id) => `/dishes/edit/${id}`,
-  backUrl: "/dishes",
+  backUrl: "/",
 });
 
 const mapDispatchToProps = {

@@ -2,9 +2,8 @@
 
 module.exports = {
   nav: {
-    desirables: ["I want!", "Vill ha!"],
-    categories: ["Categories", "Kategorier"],
     dishes: ["Dishes", "Varor"],
+    categories: ["Categories", "Kategorier"],
   },
   edit: {
     edit: ["Edit", "Redigera"],
