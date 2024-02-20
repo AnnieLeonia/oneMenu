@@ -58,7 +58,7 @@ class EditDish extends Component {
                 id="dishName"
                 name="dishName"
                 autoComplete="off"
-                value={this.state.name}
+                value={this.state.name || ""}
                 onChange={(evt) => this.setState({ name: evt.target.value })}
               />
             </label>
@@ -68,7 +68,7 @@ class EditDish extends Component {
                 id="dishImg"
                 name="dishImg"
                 autoComplete="off"
-                value={this.state.img}
+                value={this.state.img || ""}
                 onChange={(evt) => this.setState({ img: evt.target.value })}
               />
             </label>
@@ -78,7 +78,7 @@ class EditDish extends Component {
                 id="dishDescription"
                 name="dishDescription"
                 autoComplete="off"
-                value={this.state.description}
+                value={this.state.description || ""}
                 onChange={(evt) =>
                   this.setState({ description: evt.target.value })
                 }
@@ -91,9 +91,9 @@ class EditDish extends Component {
             <button
               className="deleteBtn"
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 onRemove(dish.id);
-                redirect(history, location);
+                history.push("/");
               }}
             >
               {translate("edit.delete")}

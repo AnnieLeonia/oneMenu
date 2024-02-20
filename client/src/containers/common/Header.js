@@ -21,14 +21,11 @@ const Header = ({ translate }) => (
       <ul>
         <li>
           <NavLink exact to="/">
-            {translate("nav.desirables")}
+            {translate("nav.dishes")}
           </NavLink>
         </li>
         <li>
           <NavLink to="/categories">{translate("nav.categories")}</NavLink>
-        </li>
-        <li>
-          <NavLink to="/dishes">{translate("nav.dishes")}</NavLink>
         </li>
       </ul>
     </nav>

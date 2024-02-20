@@ -1,37 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import ListItem from "./ListItem";
+import DishItem from "./DishItem";
 
-const li = (item, onItemClick, linkTo, backUrl) => (
-  <ListItem
-    id={item.key}
-    key={item.key}
+const di = (item, history, backUrl) => (
+  <DishItem
+    id={item.id}
+    key={item.id}
     value={item.value}
-    checked={item.checked}
-    onClick={() => onItemClick(item.id)}
-    linkTo={linkTo(item.id)}
-    backUrl={backUrl}
+    img={item.img}
+    onClick={() =>
+      history.push({ pathname: `/dishes/${item.id}`, query: { backUrl } })
+    }
   />
 );
 
-const DishList = ({ active, onItemClick, linkTo, backUrl, view }) => (
-  <div className={view}>
-    <div>
-      {active.map(({ value, color, items }) => (
-        <div key={value} style={{ borderLeft: `5px solid ${color || "#ccc"}` }}>
-          <div className="section">{value}</div>
-          <ul className="active">
-            {items.map((item) => li(item, onItemClick, linkTo, backUrl))}
-          </ul>
+const DishList = ({ items, backUrl, history }) => (
+  <div>
+    {items.map(({ value, color, items }) => (
+      <div key={value} style={{ borderLeft: `5px solid ${color || "#ccc"}` }}>
+        <div className="section">{value}</div>
+        <div className="grid">
+          {items.map((item) => di(item, history, backUrl))}
         </div>
-      ))}
-    </div>
+      </div>
+    ))}
   </div>
 );
 
 DishList.propTypes = {
-  active: PropTypes.arrayOf(
+  items: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
       color: PropTypes.string,
@@ -41,7 +39,6 @@ DishList.propTypes = {
   onItemClick: PropTypes.func.isRequired,
   linkTo: PropTypes.func.isRequired,
   backUrl: PropTypes.string.isRequired,
-  view: PropTypes.string.isRequired,
 };
 
 export default DishList;

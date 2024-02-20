@@ -1,11 +1,11 @@
-import { FETCH_DISH, FETCH_DISHES } from "../constants/dishes";
+import { FETCH_DISH, FETCH_DISHES, SEARCH_INPUT } from "../constants/dishes";
 
 export const addDish =
   ({ name, uid }) =>
   async (dispatch) => {
     if (name) {
       try {
-        await fetch("/__/dishes", {
+        const res = await fetch("/__/dishes", {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -14,7 +14,11 @@ export const addDish =
           credentials: "include",
           body: JSON.stringify({ name, uid }),
         });
-        return await dispatch(fetchDishes());
+        const dish = await res.json();
+
+        await dispatch(fetchDishes());
+
+        return dish;
       } catch (err) {
         console.error(err);
       }
@@ -25,7 +29,7 @@ export const editDish =
   ({ id, name, img, description, categoryIds }) =>
   async (dispatch) => {
     try {
-      await fetch(`/__/dishes/${id}`, {
+      const res = await fetch(`/__/dishes/${id}`, {
         method: "PUT",
         headers: {
           Accept: "application/json",
@@ -34,7 +38,11 @@ export const editDish =
         credentials: "include",
         body: JSON.stringify({ name, img, description, categoryIds }),
       });
-      return await dispatch(fetchDishes());
+      const dish = await res.json();
+
+      await dispatch(fetchDishes());
+
+      return dish;
     } catch (err) {
       console.error(err);
     }
@@ -59,7 +67,7 @@ export const toggleDishInactive = (id) => async (dispatch) => {
 
 export const removeDish = (id) => async (dispatch) => {
   try {
-    await fetch(`/__/dishes/${id}`, {
+    const res = await fetch(`/__/dishes/${id}`, {
       method: "DELETE",
       headers: {
         Accept: "application/json",
@@ -67,7 +75,11 @@ export const removeDish = (id) => async (dispatch) => {
       },
       credentials: "include",
     });
-    return await dispatch(fetchDishes());
+    const dish = await res.json();
+
+    await dispatch(fetchDishes());
+
+    return dish;
   } catch (err) {
     console.error(err);
   }
@@ -90,6 +102,14 @@ export const fetchDishes = () => async (dispatch) => {
     const res = await fetch("/__/dishes", { credentials: "include" });
     const dishes = await res.json();
     return dispatch({ type: FETCH_DISHES, dishes });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const searchInput = (input) => async (dispatch) => {
+  try {
+    return dispatch({ type: SEARCH_INPUT, input });
   } catch (err) {
     console.error(err);
   }

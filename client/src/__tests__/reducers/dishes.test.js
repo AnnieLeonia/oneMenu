@@ -3,7 +3,6 @@ import dishes from "../../reducers/dishes";
 import {
   addDish,
   editDish,
-  toggleDishChecked,
   toggleDishInactive,
   removeDish,
   fetchDishes,
@@ -41,20 +40,6 @@ describe("dishes reducer", () => {
     expect(dishes(undefined, dispatch(addDish({})))).toEqual([]);
   });
 
-  it("can handle TOGGLE_DISH_CHECKED", async () => {
-    fetch.mockResponse(
-      JSON.stringify([
-        {
-          id: 1,
-          name: "Milk",
-          checked: true,
-        },
-      ])
-    );
-    expect(dishes(testDish, await dispatch(toggleDishChecked(1)))).toEqual(
-      testDish.map((dish) => ({ ...dish, checked: true }))
-    );
-  });
   it("can handle TOGGLE_DISH_INACTIVE", async () => {
     fetch.mockResponse(
       JSON.stringify([
@@ -110,11 +95,10 @@ describe("dishes reducer", () => {
 
     dispatch(addDish({ name: "Milk" }));
     dispatch(editDish({ id: 1, name: "Milk" }));
-    dispatch(toggleDishChecked(1));
     dispatch(toggleDishInactive(1, id));
     dispatch(removeDish(1));
     dispatch(fetchDishes());
 
-    expect(fetch.mock.calls.length).toEqual(6);
+    expect(fetch.mock.calls.length).toEqual(5);
   });
 });

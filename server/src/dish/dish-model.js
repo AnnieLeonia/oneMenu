@@ -3,7 +3,7 @@ module.exports = (db) => ({
     const sql =
       "INSERT INTO dishes (name, img, description) VALUES ($1, $2, $3) RETURNING *";
     const { rows, err } = await db.query(sql, [name, img, description]);
-    return { category: rows[0], err };
+    return { dish: rows[0], err };
   },
 
   update: async (id, { name, img, description, category_ids }) => {
@@ -46,7 +46,7 @@ module.exports = (db) => ({
 
       await db.query("COMMIT");
 
-      return { category: rows[0], err };
+      return { dish: rows[0], err };
     } catch (err) {
       await db.query("ROLLBACK");
       return { err };
@@ -54,15 +54,16 @@ module.exports = (db) => ({
   },
 
   toggleActive: async (id) => {
-    const sql = "UPDATE dishes SET active = NOT active WHERE id = $1";
+    const sql =
+      "UPDATE dishes SET active = NOT active WHERE id = $1 RETURNING *";
     const { rows, err } = await db.query(sql, [id]);
-    return { category: rows[0], err };
+    return { dish: rows[0], err };
   },
 
   delete: async (id) => {
-    const sql = "DELETE FROM dishes WHERE id = $1";
+    const sql = "DELETE FROM dishes WHERE id = $1 RETURNING *";
     const { rows, err } = await db.query(sql, [id]);
-    return { category: rows[0], err };
+    return { dish: rows[0], err };
   },
 
   getById: async (id) => {
