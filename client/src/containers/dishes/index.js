@@ -3,12 +3,8 @@ import React from "react";
 import DishList from "./DishList";
 import New from "../common/New";
 import Snackbar from "../common/Snackbar";
-import {
-  addDish,
-  toggleDishInactive,
-  removeDish,
-  searchInput,
-} from "../../actions/dishes";
+import { addDish, toggleDishInactive, removeDish } from "../../actions/dishes";
+import { searchInput } from "../../actions/search";
 
 const Dishes = (props) => (
   <div>

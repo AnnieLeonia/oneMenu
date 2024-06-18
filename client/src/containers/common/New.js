@@ -7,6 +7,11 @@ import clearicon from "../../assets/icons/clear.svg";
 import Autosuggest from "./Autosuggest";
 
 class New extends Component {
+  componentDidMount() {
+    const { onInputSearch } = this.props;
+    onInputSearch("");
+  }
+
   onSelect({ target }, { suggestion }) {
     const { onSelectItem, onRemoveItem, onInputSearch } = this.props;
 
