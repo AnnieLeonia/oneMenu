@@ -4,10 +4,12 @@ import CategoryList from "../../components/CategoryList";
 import { reorderCategory } from "../../actions/categories";
 
 const mapStateToProps = (state) => ({
-  items: state.categories.map((category) => ({
-    ...category,
-    value: category.name,
-  })),
+  items: state.categories
+    .filter((category) => category.name.match(new RegExp(state.search, "i")))
+    .map((category) => ({
+      ...category,
+      value: category.name,
+    })),
   linkTo: (id) => `/categories/edit/${id}`,
 });
 

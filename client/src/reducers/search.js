@@ -1,4 +1,4 @@
-import { SEARCH_INPUT } from "../constants/dishes";
+import { SEARCH_INPUT } from "../constants/search";
 
 const search = (state = "", action) => {
   switch (action.type) {

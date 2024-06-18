@@ -1,4 +1,4 @@
-import { FETCH_DISH, FETCH_DISHES, SEARCH_INPUT } from "../constants/dishes";
+import { FETCH_DISH, FETCH_DISHES } from "../constants/dishes";
 
 export const addDish =
   ({ name, uid }) =>
@@ -102,14 +102,6 @@ export const fetchDishes = () => async (dispatch) => {
     const res = await fetch("/__/dishes", { credentials: "include" });
     const dishes = await res.json();
     return dispatch({ type: FETCH_DISHES, dishes });
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const searchInput = (input) => async (dispatch) => {
-  try {
-    return dispatch({ type: SEARCH_INPUT, input });
   } catch (err) {
     console.error(err);
   }

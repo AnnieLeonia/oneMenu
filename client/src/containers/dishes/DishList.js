@@ -6,7 +6,6 @@ import { toggleDishInactive } from "../../actions/dishes";
 import DishList from "../../components/DishList";
 
 const mapItems = (state) => {
-  const { search } = state;
   const uncategorized = getTranslate(state.locale)("categories.uncategorized");
 
   const categories = state.categories.reduce(
@@ -19,8 +18,8 @@ const mapItems = (state) => {
 
   flow(
     sortBy(({ name }) => [name.toLowerCase()]),
-    filter((dish) => dish.name.match(new RegExp(search, "i"))),
-    filter((dish) => (search ? true : dish.img)), // TODO: Remove this line when we have images for all dishes
+    filter((dish) => dish.name.match(new RegExp(state.search, "i"))),
+    filter((dish) => (state.search ? true : dish.img)), // TODO: Remove this line when we have images for all dishes
     forEach((dish) => {
       (dish.categoryIds || []).forEach((categoryId) => {
         const category = categories[categoryId];
