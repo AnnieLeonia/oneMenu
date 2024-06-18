@@ -29,8 +29,8 @@ class EditDish extends Component {
   }
 
   componentDidMount() {
-    const { dish } = this.props;
-    this.props.getDish(dish.id).then((res) => this.setState(res.dish));
+    const { dish, history } = this.props;
+    this.props.getDish(dish.id, history).then((res) => this.setState(res.dish));
   }
 
   componentWillUnmount() {

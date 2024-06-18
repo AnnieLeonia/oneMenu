@@ -2,6 +2,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 
 import Header from "./common/Header";
+import NotFound from "./common/NotFound";
 import Categories from "./categories";
 import CategoryDishes from "./categories/CategoryDishes";
 import EditCategory from "./categories/EditCategory";
@@ -25,6 +26,7 @@ const App = () => (
     <Route exact path="/dishes/:id" component={ShowDish} />
     <Route exact path="/dishes/edit/:id" component={EditDish} />
     <Route exact path="/settings" component={Settings} />
+    <Route exact path="/not-found" render={NotFound} />
     <SetLanguage />
     <FetchDB />
   </div>

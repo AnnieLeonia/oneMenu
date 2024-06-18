@@ -13,7 +13,7 @@ const redirect = (history, location) =>
 
 class ShowDish extends Component {
   componentDidMount() {
-    this.props.getDish(this.props.id);
+    this.props.getDish(this.props.id, this.props.history);
   }
 
   render() {
