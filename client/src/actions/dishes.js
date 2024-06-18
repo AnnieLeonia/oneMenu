@@ -85,9 +85,13 @@ export const removeDish = (id) => async (dispatch) => {
   }
 };
 
-export const fetchDish = (id) => async (dispatch) => {
+export const fetchDish = (id, history) => async (dispatch) => {
   try {
     const res = await fetch(`/__/dishes/${id}`, { credentials: "include" });
+    if (res.status === 404) {
+      history.push("/not-found");
+      return;
+    }
     const dish = await res.json();
     return dispatch({ type: FETCH_DISH, dish });
   } catch (err) {

@@ -19,7 +19,6 @@ const mapItems = (state) => {
   flow(
     sortBy(({ name }) => [name.toLowerCase()]),
     filter((dish) => dish.name.match(new RegExp(state.search, "i"))),
-    filter((dish) => (state.search ? true : dish.img)), // TODO: Remove this line when we have images for all dishes
     forEach((dish) => {
       (dish.categoryIds || []).forEach((categoryId) => {
         const category = categories[categoryId];

@@ -557,6 +557,18 @@ nav a.active {
   text-align: center;
 }
 
+.not-found {
+  text-align: center;
+}
+
+.not-found :nth-child(odd) {
+  transform: rotate(-5deg);
+}
+
+.not-found :nth-child(even) {
+  transform: rotate(5deg);
+}
+
 .userform img {
   border-radius: 50%;
   margin: 0.5em;

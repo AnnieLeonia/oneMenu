@@ -16,6 +16,7 @@ module.exports = ({ app, db, isLoggedIn }) => {
   app.get("/__/dishes/:id", isLoggedIn, async (req, res, next) => {
     const { dish, err } = await Dish.getById(req.params.id);
     if (err) return next(err);
+    if (!dish) return res.status(404).send({ message: "Dish not found" });
     return res.send(dish);
   });
 
