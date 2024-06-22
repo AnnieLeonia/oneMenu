@@ -596,8 +596,15 @@ nav a.active {
   font-family: "PatrickHandSC";
   src: url("../assets/fonts/PatrickHandSC-Regular.ttf");
 }
+
 /*FONT: Quicksand*/
 @font-face {
   font-family: "Quicksand";
   src: url("../assets/fonts/Quicksand-Regular.ttf");
+}
+
+/*FONT: Reddit Mono*/
+@font-face {
+  font-family: "Reddit Mono";
+  src: url("../assets/fonts/RedditMono-Regular.ttf");
 }
