@@ -42,7 +42,7 @@ class EditDish extends Component {
     const { onRemove, onSubmit } = this.props;
 
     return (
-      <div className="dish">
+      <div className="dish flex flex-col">
         <div className="title">
           <b>{translate("edit.edit")}: </b>
           {this.state.name}
