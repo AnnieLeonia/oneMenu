@@ -608,3 +608,12 @@ nav a.active {
   font-family: "Reddit Mono";
   src: url("../assets/fonts/RedditMono-VariableFont_wght.ttf");
 }
+
+/*FONT: Source Serif*/
+@font-face {
+  font-family: "Source Serif";
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  src: url("../assets/fonts/SourceSerifPro-Regular.ttf.woff") format("woff");
+}
