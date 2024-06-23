@@ -467,7 +467,7 @@ nav a.active {
   padding-left: 0.5em;
   margin-top: 0.3em;
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .dishes .done {
@@ -579,25 +579,32 @@ nav a.active {
   outline: none;
 }
 
-/*FONT: Antic Didone*/
+/* FONT: Antic Didone */
 @font-face {
   font-family: "Antic Didone";
   src: url("../assets/fonts/AnticDidone-Regular.ttf");
 }
 
-/*FONT: AmaticSC*/
+/* FONT: AmaticSC */
 @font-face {
   font-family: "AmaticSC";
   src: url("../assets/fonts/AmaticSC-Regular.ttf");
 }
 
-/*FONT: PatrickHandSC*/
+/* FONT: PatrickHandSC */
 @font-face {
   font-family: "PatrickHandSC";
   src: url("../assets/fonts/PatrickHandSC-Regular.ttf");
 }
-/*FONT: Quicksand*/
+
+/* FONT: Quicksand */
 @font-face {
   font-family: "Quicksand";
-  src: url("../assets/fonts/Quicksand-Regular.ttf");
+  src: url("../assets/fonts/Quicksand-VariableFont_wght.ttf");
+}
+
+/* FONT: Comfortaa */
+@font-face {
+  font-family: "Comfortaa";
+  src: url("../assets/fonts/Comfortaa-VariableFont_wght.ttf");
 }
