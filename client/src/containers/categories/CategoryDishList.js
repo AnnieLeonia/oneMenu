@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
-import { flow, forEach, sortBy } from "lodash/fp";
+import { flow, filter, forEach, sortBy } from "lodash/fp";
 
 import { toggleDishInactive } from "../../actions/dishes";
 import DishList from "../../components/DishList";
@@ -18,6 +18,7 @@ const mapItems = (state, categoryId) => {
 
   flow(
     sortBy(({ name }) => [name.toLowerCase()]),
+    filter((dish) => dish.name.match(new RegExp(state.search, "i"))),
     forEach((dish) => {
       (dish.categoryIds || []).forEach((_categoryId) => {
         if (_categoryId === categoryId)
