@@ -18,7 +18,9 @@ const mapItems = (state) => {
 
   flow(
     sortBy(({ name }) => [name.toLowerCase()]),
-    filter((dish) => dish.name.match(new RegExp(state.search, "i"))),
+    filter((dish) =>
+      `${dish.name}-${dish.description}`.match(new RegExp(state.search, "i"))
+    ),
     forEach((dish) => {
       (dish.categoryIds || []).forEach((categoryId) => {
         const category = categories[categoryId];
