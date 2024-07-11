@@ -10,6 +10,7 @@ import {
   removeDish,
   resetDish,
 } from "../../actions/dishes";
+import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import { createMarkup } from "../../utils";
 import CategorySelect from "./CategorySelect";
 
@@ -78,7 +79,7 @@ class EditDish extends Component {
                 id="dishDescription"
                 name="dishDescription"
                 autoComplete="off"
-                value={this.state.description || ""}
+                value={this.state.description ?? DEFAULT_DESCRIPTION(dish)}
                 onChange={(evt) =>
                   this.setState({ description: evt.target.value })
                 }
