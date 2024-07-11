@@ -67,6 +67,7 @@ describe("dishes reducer", () => {
         {
           id: 1,
           name: "Milk",
+          description: "Got Milk?",
         },
       ])
     );
@@ -81,6 +82,7 @@ describe("dishes reducer", () => {
             {
               id: 1,
               name: "Milk",
+              description: "Got Milk?",
             },
           ],
         },
