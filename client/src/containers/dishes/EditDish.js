@@ -10,8 +10,8 @@ import {
   removeDish,
   resetDish,
 } from "../../actions/dishes";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
-import { createMarkup } from "../../utils";
 import CategorySelect from "./CategorySelect";
 
 const redirect = (history, location) =>
@@ -110,8 +110,8 @@ class EditDish extends Component {
               {translate("edit.save")}
             </button>
           </form>
-          <div
-            dangerouslySetInnerHTML={createMarkup(this.state.description)}
+          <MarkdownRenderer
+            markdown={this.state.description}
             className="flex flex-col markdown-body markdown-preview"
           />
         </div>

@@ -6,7 +6,7 @@ import { get, toInteger } from "lodash/fp";
 
 import { fetchDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
-import { createMarkup } from "../../utils";
+import MarkdownRenderer from "../../components/MarkdownRenderer";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -25,10 +25,7 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          <div
-            dangerouslySetInnerHTML={createMarkup(description)}
-            className="markdown-body"
-          />
+          <MarkdownRenderer markdown={description} className="markdown-body" />
         </div>
         <br />
         <br />
