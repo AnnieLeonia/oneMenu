@@ -29,10 +29,8 @@ module.exports = (passport, db) => {
         // User.findOne won't fire until we have all our data back from Google
         process.nextTick(async () => {
           const email = get(["emails", 0, "value"], profile); // pull the first email
-          const username = email.split("@").shift();
           const name = get(["displayName"], profile);
           const photo = get(["photos", 0, "value"], profile);
-          const language = get(["_json", "locale"], profile);
 
           const { user, err } = await User.getByEmail(email);
           if (err) return done(err);
@@ -42,13 +40,10 @@ module.exports = (passport, db) => {
             // all is well, return successful user
             return done(null, user);
           }
+
           // if there is no user with that email
-          // create the user
-          const newUser = { email, username, name, photo, language };
-
-          const dbCreate = await User.create(newUser);
-
-          return done(dbCreate.err, dbCreate.user);
+          // deny the login
+          return done(null, false, { message: "User not found" });
         });
       }
     )

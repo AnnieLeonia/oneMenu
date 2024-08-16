@@ -17,7 +17,7 @@ function keyValuePairs(valid, obj) {
 }
 
 function isLoggedIn(req, res, next) {
-  if (!req.isAuthenticated() && process.env.NODE_ENV === "production") {
+  if (!req.isAuthenticated()) {
     return res.sendStatus(401);
   }
   return next();

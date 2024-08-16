@@ -24,11 +24,9 @@ class FetchDB extends Component {
       this.interval = setInterval(this.update, 5000);
     };
 
-    if (username !== this.props.user.username) {
-      this.update();
-      intervalUpdate();
-      window.onclick = intervalUpdate;
-    }
+    this.update();
+    intervalUpdate();
+    window.onclick = intervalUpdate;
   }
 
   render() {

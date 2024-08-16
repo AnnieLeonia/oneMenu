@@ -11,6 +11,7 @@ const mapStateToProps = (state) => ({
       value: category.name,
     })),
   linkTo: (id) => `/categories/edit/${id}`,
+  isLoggedIn: !!state.user.email,
 });
 
 const mapDispatchToProps = {

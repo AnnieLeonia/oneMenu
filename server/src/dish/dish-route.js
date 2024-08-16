@@ -1,7 +1,7 @@
 module.exports = ({ app, db, isLoggedIn }) => {
   const Dish = require("./dish-model")(db);
 
-  app.get("/__/dishes", isLoggedIn, async (req, res, next) => {
+  app.get("/__/dishes", async (req, res, next) => {
     const { dishes, err } = await Dish.getAll();
     if (err) return next(err);
     return res.send(dishes);
@@ -13,7 +13,7 @@ module.exports = ({ app, db, isLoggedIn }) => {
     return res.send(dish);
   });
 
-  app.get("/__/dishes/:id", isLoggedIn, async (req, res, next) => {
+  app.get("/__/dishes/:id", async (req, res, next) => {
     const { dish, err } = await Dish.getById(req.params.id);
     if (err) return next(err);
     if (!dish) return res.status(404).send({ message: "Dish not found" });
