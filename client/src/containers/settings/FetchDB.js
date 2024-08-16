@@ -12,8 +12,7 @@ class FetchDB extends Component {
     this.update = () => {};
   }
 
-  componentWillReceiveProps({ user, updateDishes, updateCategories }) {
-    const { username } = user;
+  componentWillReceiveProps({ updateDishes, updateCategories }) {
     this.update = () => {
       updateDishes();
       updateCategories();
@@ -24,11 +23,9 @@ class FetchDB extends Component {
       this.interval = setInterval(this.update, 5000);
     };
 
-    if (username !== this.props.user.username) {
-      this.update();
-      intervalUpdate();
-      window.onclick = intervalUpdate;
-    }
+    this.update();
+    intervalUpdate();
+    window.onclick = intervalUpdate;
   }
 
   render() {

@@ -1,7 +1,7 @@
 module.exports = ({ app, db, isLoggedIn }) => {
   const Category = require("./category-model")(db);
 
-  app.get("/__/categories", isLoggedIn, async (req, res, next) => {
+  app.get("/__/categories", async (req, res, next) => {
     const { categories, err } = await Category.getAll();
     if (err) return next(err);
     return res.send(categories);

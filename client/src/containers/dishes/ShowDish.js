@@ -17,8 +17,16 @@ class ShowDish extends Component {
   }
 
   render() {
-    const { id, name, img, description, translate, history, location } =
-      this.props;
+    const {
+      id,
+      name,
+      img,
+      description,
+      translate,
+      history,
+      location,
+      isLoggedIn,
+    } = this.props;
 
     return (
       <div className="dish">
@@ -37,18 +45,20 @@ class ShowDish extends Component {
         >
           {translate("dishes.back")}
         </button>
-        <button
-          className="doneBtn"
-          type="button"
-          onClick={() =>
-            history.push({
-              pathname: `/dishes/edit/${id}`,
-              query: { backUrl: `/dishes/${id}` },
-            })
-          }
-        >
-          {translate("edit.edit")}
-        </button>
+        {isLoggedIn && (
+          <button
+            className="doneBtn"
+            type="button"
+            onClick={() =>
+              history.push({
+                pathname: `/dishes/edit/${id}`,
+                query: { backUrl: `/dishes/${id}` },
+              })
+            }
+          >
+            {translate("edit.edit")}
+          </button>
+        )}
       </div>
     );
   }
@@ -80,6 +90,7 @@ const mapStateToProps = (state, { match }) => ({
   img: get("img", state.dish),
   description: get("description", state.dish),
   translate: getTranslate(state.locale),
+  isLoggedIn: !!state.user.email,
 });
 
 const mapDispatchToProps = {

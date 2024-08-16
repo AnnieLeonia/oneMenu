@@ -3,7 +3,15 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import penselecticon from "../assets/icons/pen-select.svg";
 
-const ListItem = ({ id, value, checked, onClick, linkTo, backUrl }) => (
+const ListItem = ({
+  id,
+  value,
+  checked,
+  onClick,
+  linkTo,
+  backUrl,
+  isLoggedIn,
+}) => (
   <li className="listitem">
     <label role="presentation" onKeyDown={onClick} htmlFor={id}>
       <input
@@ -16,9 +24,11 @@ const ListItem = ({ id, value, checked, onClick, linkTo, backUrl }) => (
       <span className="dishText">{value}</span>
       <span className="checkmark" />
     </label>
-    <Link to={{ pathname: linkTo, query: { backUrl } }} className="dishEdit">
-      <img src={penselecticon} alt="Edit" height="27px" />
-    </Link>
+    {isLoggedIn && (
+      <Link to={{ pathname: linkTo, query: { backUrl } }} className="dishEdit">
+        <img src={penselecticon} alt="Edit" height="27px" />
+      </Link>
+    )}
   </li>
 );
 
@@ -27,6 +37,7 @@ ListItem.defaultProps = {
   onClick: null,
   description: null,
   backUrl: null,
+  isLoggedIn: false,
 };
 
 ListItem.propTypes = {
@@ -37,6 +48,7 @@ ListItem.propTypes = {
   onClick: PropTypes.func,
   linkTo: PropTypes.string.isRequired,
   backUrl: PropTypes.string,
+  isLoggedIn: PropTypes.bool,
 };
 
 export default ListItem;

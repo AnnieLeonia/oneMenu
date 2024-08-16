@@ -24,15 +24,27 @@ class New extends Component {
   }
 
   handleSubmit(event) {
-    const { search, onAddItem, isCollaboration, uid, onSubmit, onInputSearch } =
-      this.props;
+    event.preventDefault();
+
+    const {
+      search,
+      onAddItem,
+      isCollaboration,
+      uid,
+      onSubmit,
+      onInputSearch,
+      isLoggedIn,
+    } = this.props;
+
+    if (!isLoggedIn) {
+      return;
+    }
 
     onAddItem({
       name: search,
       uid: isCollaboration ? null : uid,
     }).then((res) => onSubmit(res));
     onInputSearch("");
-    event.preventDefault();
   }
 
   render() {
@@ -92,6 +104,7 @@ const mapStateToProps = (state) => ({
   search: state.search,
   translate: getTranslate(state.locale),
   isCollaboration: state.user.isCollaboration,
+  isLoggedIn: !!state.user.email,
   uid: state.user.id,
 });
 
