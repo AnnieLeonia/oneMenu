@@ -12,8 +12,7 @@ class FetchDB extends Component {
     this.update = () => {};
   }
 
-  componentWillReceiveProps({ user, updateDishes, updateCategories }) {
-    const { username } = user;
+  componentWillReceiveProps({ updateDishes, updateCategories }) {
     this.update = () => {
       updateDishes();
       updateCategories();
