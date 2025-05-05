@@ -25,10 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install and cache dependencies
-        uses: cypress-io/github-action@v2
-        with:
-          runTests: false
+      - name: Install
+        run: npm ci
 
       - name: Build
         run: npm run build
