@@ -42,7 +42,7 @@ const mapStateToProps = (state, { match }) => ({
   checked: [],
   translate: getTranslate(state.locale),
   linkTo: (id) => `/dishes/edit/${id}`,
-  backUrl: "/categories",
+  backUrl: `/categories/${match.params.id}`,
 });
 
 const mapDispatchToProps = {
