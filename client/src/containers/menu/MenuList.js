@@ -65,6 +65,7 @@ const mapStateToProps = (state, { week, year }) => ({
   checked: [],
   linkTo: (id) => `/dishes/edit/${id}`,
   backUrl: "/menu",
+  layout: "scroll",
 });
 
 const mapDispatchToProps = {
