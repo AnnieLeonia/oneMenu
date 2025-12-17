@@ -20,7 +20,7 @@ const DishList = ({ items, backUrl, history }) => (
     {items.map(({ value, color, items }) => (
       <div key={value} style={{ borderLeft: `5px solid ${color || "#ccc"}` }}>
         <div className="section">{value}</div>
-        <div className="grid">
+        <div className="flex-scroll-row">
           {items.map((item) => di(item, history, backUrl))}
         </div>
       </div>

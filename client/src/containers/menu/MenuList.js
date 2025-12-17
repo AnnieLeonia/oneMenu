@@ -4,7 +4,6 @@ import { filter, flow, forEach, sortBy } from "lodash/fp";
 import { toggleDishInactive } from "../../actions/dishes";
 import DishList from "../../components/DishList";
 
-const DISHES_PER_DAY = 3;
 const BASE_YEAR = 2020;
 
 const seededShuffle = (array, seed) => {
@@ -17,34 +16,16 @@ const seededShuffle = (array, seed) => {
   return shuffled;
 };
 
-const getRotationDishes = (dishes, week, year, dayId) => {
+const shuffleDishesForWeek = (dishes, week, year, dayId) => {
   if (dishes.length === 0) return [];
-  if (dishes.length <= DISHES_PER_DAY) return dishes;
 
   const totalWeeks = (year - BASE_YEAR) * 52 + week;
+  const seed = totalWeeks * 1000 + dayId;
 
-  const weeksPerCycle = Math.ceil(dishes.length / DISHES_PER_DAY);
-  const cycleNumber = Math.floor(totalWeeks / weeksPerCycle);
-  const weekInCycle = totalWeeks % weeksPerCycle;
-
-  const seed = cycleNumber * 1000 + dayId;
-  const shuffled = seededShuffle(dishes, seed);
-
-  const start = weekInCycle * DISHES_PER_DAY;
-  const primary = shuffled.slice(start, start + DISHES_PER_DAY);
-
-  if (primary.length < DISHES_PER_DAY) {
-    const primaryIds = new Set(primary.map((d) => d.id));
-    const others = shuffled.filter((d) => !primaryIds.has(d.id));
-    const fillSeed = seed + totalWeeks;
-    const fillShuffled = seededShuffle(others, fillSeed);
-    primary.push(...fillShuffled.slice(0, DISHES_PER_DAY - primary.length));
-  }
-
-  return primary;
+  return seededShuffle(dishes, seed);
 };
 
-const mapItems = (state, week, year, showAll) => {
+const mapItems = (state, week, year) => {
   const menuDays = state.menuDays.reduce((map, day) => {
     map[day.id] = { ...day, value: day.name, items: [] };
     return map;
@@ -75,14 +56,12 @@ const mapItems = (state, week, year, showAll) => {
     .sort((a, b) => a.orderidx - b.orderidx)
     .map((day) => ({
       ...day,
-      items: showAll
-        ? day.items
-        : getRotationDishes(day.items, week, year, day.id),
+      items: shuffleDishesForWeek(day.items, week, year, day.id),
     }));
 };
 
-const mapStateToProps = (state, { week, year, showAll }) => ({
-  items: mapItems(state, week, year, showAll),
+const mapStateToProps = (state, { week, year }) => ({
+  items: mapItems(state, week, year),
   checked: [],
   linkTo: (id) => `/dishes/edit/${id}`,
   backUrl: "/menu",

@@ -1,7 +1,4 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { getTranslate } from "react-localize-redux";
+import React from "react";
 
 import MenuList from "./MenuList";
 import Snackbar from "../common/Snackbar";
@@ -20,98 +17,17 @@ const getYear = (date) => {
   return d.getFullYear();
 };
 
-class Menu extends Component {
-  constructor(props) {
-    super(props);
-    const now = new Date();
-    this.state = {
-      week: getWeekNumber(now),
-      year: getYear(now),
-      showAll: true,
-    };
-  }
+const Menu = (props) => {
+  const now = new Date();
+  const week = getWeekNumber(now);
+  const year = getYear(now);
 
-  changeWeek = (delta) => {
-    let { week, year } = this.state;
-    week += delta;
-
-    if (week < 1) {
-      year -= 1;
-      week = 52;
-    } else if (week > 52) {
-      year += 1;
-      week = 1;
-    }
-
-    this.setState({ week, year });
-  };
-
-  goToCurrentWeek = () => {
-    const now = new Date();
-    this.setState({
-      week: getWeekNumber(now),
-      year: getYear(now),
-    });
-  };
-
-  toggleShowAll = () => {
-    this.setState((state) => ({ showAll: !state.showAll }));
-  };
-
-  render() {
-    const { translate, ...props } = this.props;
-    const { week, year, showAll } = this.state;
-
-    return (
-      <div>
-        <Snackbar />
-        {!showAll && (
-          <>
-            <div className="week-navigation">
-              <button type="button" onClick={() => this.changeWeek(-1)}>
-                ◀ {translate("menu.prevWeek")}
-              </button>
-              <span className="week-display">
-                {translate("menu.week")} {week}, {year}
-              </span>
-              <button type="button" onClick={() => this.changeWeek(1)}>
-                {translate("menu.nextWeek")} ▶
-              </button>
-            </div>
-            <button
-              type="button"
-              className="current-week-btn"
-              onClick={this.goToCurrentWeek}
-            >
-              {translate("menu.currentWeek")}
-            </button>
-          </>
-        )}
-        <button
-          type="button"
-          className={`show-all-btn ${showAll ? "active" : ""}`}
-          onClick={this.toggleShowAll}
-        >
-          {showAll ? translate("menu.showWeek") : translate("menu.showAll")}
-        </button>
-        <MenuList
-          week={week}
-          year={year}
-          showAll={showAll}
-          translate={translate}
-          {...props}
-        />
-      </div>
-    );
-  }
-}
-
-Menu.propTypes = {
-  translate: PropTypes.func.isRequired,
+  return (
+    <div>
+      <Snackbar />
+      <MenuList week={week} year={year} {...props} />
+    </div>
+  );
 };
 
-const mapStateToProps = (state) => ({
-  translate: getTranslate(state.locale),
-});
-
-export default connect(mapStateToProps)(Menu);
+export default Menu;
