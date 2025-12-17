@@ -1,0 +1,1 @@
+export const FETCH_MENU_DAYS = "FETCH_MENU_DAYS";

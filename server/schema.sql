@@ -41,3 +41,23 @@ CREATE TABLE dishes_categories (
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
   PRIMARY KEY (dish_id, category_id)
 );
+
+DROP TABLE IF EXISTS menu_days CASCADE;
+CREATE TABLE menu_days (
+  id           SERIAL        NOT NULL,
+  name         VARCHAR(255)  NOT NULL UNIQUE,
+  orderidx     INT           NOT NULL,
+
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS dishes_menu_days CASCADE;
+CREATE TABLE dishes_menu_days (
+  dish_id      INT           NOT NULL,
+  menu_day_id  INT           NOT NULL,
+
+  FOREIGN KEY (dish_id) REFERENCES dishes(id) ON DELETE CASCADE,
+  FOREIGN KEY (menu_day_id) REFERENCES menu_days(id) ON DELETE CASCADE,
+  PRIMARY KEY (dish_id, menu_day_id),
+  UNIQUE (dish_id)
+);

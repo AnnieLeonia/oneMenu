@@ -13,6 +13,7 @@ import {
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import CategorySelect from "./CategorySelect";
+import DaySelect from "./DaySelect";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -86,6 +87,7 @@ class EditDish extends Component {
               />
             </label>
             <CategorySelect id={dish.id} />
+            <DaySelect id={dish.id} />
             <br />
             <br />
             <br />
@@ -151,12 +153,16 @@ EditDish.propTypes = {
 const handleSubmit = (event, id, history, location) => (dispatch) => {
   const data = new FormData(event.target);
 
+  const menuDayId = data.get("menuDayIds");
+  const menuDayIds = menuDayId ? [menuDayId] : [];
+
   const edit = editDish({
     id,
     name: data.get("dishName"),
     img: data.get("dishImg"),
     description: data.get("dishDescription"),
     categoryIds: data.getAll("categoryIds"),
+    menuDayIds,
   });
 
   dispatch(edit);

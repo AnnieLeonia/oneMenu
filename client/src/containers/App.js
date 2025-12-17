@@ -10,6 +10,7 @@ import EditCategory from "./categories/EditCategory";
 import Dishes from "./dishes";
 import ShowDish from "./dishes/ShowDish";
 import EditDish from "./dishes/EditDish";
+import Menu from "./menu";
 import Settings from "./settings";
 import SetLanguage from "./settings/SetLanguage";
 import FetchDB from "./settings/FetchDB";
@@ -21,6 +22,7 @@ const App = () => (
   <div>
     <Route path="/" component={Header} />
     <Route exact path="/" component={Dishes} />
+    <Route exact path="/menu" component={Menu} />
     <Route exact path="/categories" component={Categories} />
     <Route exact path="/categories/:id" component={CategoryDishes} />
     <Route exact path="/categories/edit/:id" component={EditCategory} />
