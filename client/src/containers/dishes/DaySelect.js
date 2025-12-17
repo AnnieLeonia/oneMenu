@@ -10,13 +10,9 @@ class DaySelect extends Component {
     if (menuDays.length === 0) return null;
 
     return (
-      <label htmlFor="menuDayIds">
+      <label htmlFor="menuDayId">
         <span>{translate("edit.day")}:</span>
-        <select
-          id="menuDayIds"
-          name="menuDayIds"
-          defaultValue={menuDayId || ""}
-        >
+        <select id="menuDayId" name="menuDayId" defaultValue={menuDayId || ""}>
           <option value="">{translate("menu.noDay")}</option>
           {menuDays.map(({ id, name }) => (
             <option key={id} value={id}>
@@ -46,9 +42,7 @@ DaySelect.propTypes = {
 
 const mapStateToProps = (state, { id }) => {
   const dish = find({ id }, state.dishes);
-  const menuDayIds = get("menuDayIds", dish) || [];
-  // Get the first menu day id (since only one is allowed)
-  const menuDayId = menuDayIds.find((id) => id !== null) || null;
+  const menuDayId = get("menuDayId", dish) || null;
 
   return {
     menuDayId,

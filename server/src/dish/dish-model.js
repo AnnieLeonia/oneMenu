@@ -6,10 +6,7 @@ module.exports = (db) => ({
     return { dish: rows[0], err };
   },
 
-  update: async (
-    id,
-    { name, img, description, category_ids, menu_day_ids }
-  ) => {
+  update: async (id, { name, img, description, category_ids, menu_day_id }) => {
     try {
       await db.query("BEGIN");
 
@@ -47,7 +44,7 @@ module.exports = (db) => ({
           });
       }
 
-      if (menu_day_ids !== undefined) {
+      if (menu_day_id !== undefined) {
         const { err } = await db.query(
           `
           DELETE FROM dishes_menu_days
@@ -58,7 +55,7 @@ module.exports = (db) => ({
         if (err) throw err;
 
         // Insert menu day assignment (only one allowed due to UNIQUE constraint)
-        const menuDayId = Number(menu_day_ids[0]);
+        const menuDayId = Number(menu_day_id);
         if (menuDayId) {
           const { err } = await db.query(
             `
@@ -97,7 +94,7 @@ module.exports = (db) => ({
     const { rows, err } = await db.query(`
       SELECT dishes.*,
         ARRAY_AGG(DISTINCT dishes_categories.category_id) AS category_ids,
-        ARRAY_AGG(DISTINCT dishes_menu_days.menu_day_id) AS menu_day_ids
+        MAX(dishes_menu_days.menu_day_id) AS menu_day_id
       FROM dishes
       LEFT JOIN dishes_categories ON dishes.id = dishes_categories.dish_id
       LEFT JOIN dishes_menu_days ON dishes.id = dishes_menu_days.dish_id
@@ -111,7 +108,7 @@ module.exports = (db) => ({
     const { rows, err } = await db.query(`
       SELECT dishes.id, dishes.name, dishes.description, dishes.img, dishes.active,
         ARRAY_AGG(DISTINCT dishes_categories.category_id) AS category_ids,
-        ARRAY_AGG(DISTINCT dishes_menu_days.menu_day_id) AS menu_day_ids
+        MAX(dishes_menu_days.menu_day_id) AS menu_day_id
       FROM dishes
       LEFT JOIN dishes_categories ON dishes.id = dishes_categories.dish_id
       LEFT JOIN dishes_menu_days ON dishes.id = dishes_menu_days.dish_id

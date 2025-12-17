@@ -55,7 +55,8 @@ const mapItems = (state, week, year, showAll) => {
       `${dish.name}-${dish.description}`.match(new RegExp(state.search, "i"))
     ),
     forEach((dish) => {
-      (dish.menuDayIds || []).forEach((menuDayId) => {
+      const menuDayId = dish.menuDayId;
+      if (menuDayId) {
         const menuDay = menuDays[menuDayId];
         if (menuDay) {
           menuDay.items.push({
@@ -65,7 +66,7 @@ const mapItems = (state, week, year, showAll) => {
             value: dish.name,
           });
         }
-      });
+      }
     })
   )(state.dishes);
 

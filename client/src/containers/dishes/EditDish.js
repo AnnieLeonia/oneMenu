@@ -153,16 +153,13 @@ EditDish.propTypes = {
 const handleSubmit = (event, id, history, location) => (dispatch) => {
   const data = new FormData(event.target);
 
-  const menuDayId = data.get("menuDayIds");
-  const menuDayIds = menuDayId ? [menuDayId] : [];
-
   const edit = editDish({
     id,
     name: data.get("dishName"),
     img: data.get("dishImg"),
     description: data.get("dishDescription"),
     categoryIds: data.getAll("categoryIds"),
-    menuDayIds,
+    menuDayId: data.get("menuDayId"),
   });
 
   dispatch(edit);

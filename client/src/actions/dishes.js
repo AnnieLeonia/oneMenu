@@ -26,7 +26,7 @@ export const addDish =
   };
 
 export const editDish =
-  ({ id, name, img, description, categoryIds, menuDayIds }) =>
+  ({ id, name, img, description, categoryIds, menuDayId }) =>
   async (dispatch) => {
     try {
       const res = await fetch(`/__/dishes/${id}`, {
@@ -41,7 +41,7 @@ export const editDish =
           img,
           description,
           categoryIds,
-          menuDayIds,
+          menuDayId,
         }),
       });
       const dish = await res.json();
