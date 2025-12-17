@@ -59,6 +59,7 @@ require("./src/auth/auth")(props);
 require("./src/user/user-route")(props);
 require("./src/dish/dish-route")(props);
 require("./src/category/category-route")(props);
+require("./src/menu-day/menu-day-route")(props);
 
 app.get("/__/*", async (_, res) => {
   return res.sendStatus(501);

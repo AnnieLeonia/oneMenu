@@ -43,6 +43,10 @@ class CategoryColors extends Component {
       "#dfff80",
       "#ffe680",
       "#ffbf80",
+      "#e0e0e0",
+      "#a0a0a0",
+      "#707070",
+      "#404040",
     ];
 
     const { open, color } = this.state;
@@ -65,7 +69,7 @@ class CategoryColors extends Component {
             height="12px"
           />
         </button>
-        <input name="color" type="hidden" value={color} />
+        <input name="color" type="hidden" value={color || ""} />
         {open ? (
           <ul className="color-list">{this.renderColorList(colors)}</ul>
         ) : null}

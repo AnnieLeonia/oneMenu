@@ -3,6 +3,7 @@
 module.exports = {
   nav: {
     dishes: ["Dishes", "Varor", "Platos"],
+    menu: ["Menu", "Meny", "Menú"],
     categories: ["Categories", "Kategorier", "Categorías"],
   },
   edit: {
@@ -11,16 +12,34 @@ module.exports = {
     img: ["Image URL", "Bild-url", "URL de imagen"],
     description: ["Description", "Beskrivning", "Descripción"],
     category: ["Category", "Kategori", "Categoría"],
+    day: ["Day", "Dag", "Día"],
     color: ["Color", "Färg", "Color"],
-    selectColor: ["Select a color...", "Välj färg...", "Selecciona un color..."],
+    selectColor: [
+      "Select a color...",
+      "Välj färg...",
+      "Selecciona un color...",
+    ],
     cancel: ["Cancel", "Avbryt", "Cancelar"],
     save: ["Save", "Spara", "Guardar"],
     delete: ["Delete", "Radera", "Eliminar"],
   },
+  menu: {
+    noDay: ["No day", "Ingen dag", "Sin día"],
+    week: ["Week", "Vecka", "Semana"],
+    prevWeek: ["Prev", "Förra", "Anterior"],
+    nextWeek: ["Next", "Nästa", "Siguiente"],
+    currentWeek: ["Current week", "Nuvarande vecka", "Semana actual"],
+    showAll: ["Show all dishes", "Visa alla rätter", "Mostrar todos"],
+    showWeek: ["Show weekly menu", "Visa veckans meny", "Mostrar menú semanal"],
+  },
   categories: {
     input: ["New category...", "Ny kategori...", "Nueva categoría..."],
     uncategorized: ["Uncategorized", "Okategoriserad", "Sin categoría"],
-    nonexistent: ["Category does not exist", "Kategorin finns inte", "La categoría no existe"],
+    nonexistent: [
+      "Category does not exist",
+      "Kategorin finns inte",
+      "La categoría no existe",
+    ],
   },
   dishes: {
     cart: ["Cart", "Varukorg", "Carrito"],

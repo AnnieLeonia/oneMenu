@@ -15,18 +15,22 @@ const di = (item, history, backUrl) => (
   />
 );
 
-const DishList = ({ items, backUrl, history }) => (
+const DishList = ({ items, backUrl, history, layout }) => (
   <div>
     {items.map(({ value, color, items }) => (
       <div key={value} style={{ borderLeft: `5px solid ${color || "#ccc"}` }}>
         <div className="section">{value}</div>
-        <div className="grid">
+        <div className={layout === "scroll" ? "flex-scroll-row" : "grid"}>
           {items.map((item) => di(item, history, backUrl))}
         </div>
       </div>
     ))}
   </div>
 );
+
+DishList.defaultProps = {
+  layout: "grid",
+};
 
 DishList.propTypes = {
   items: PropTypes.arrayOf(
@@ -39,6 +43,7 @@ DishList.propTypes = {
   onItemClick: PropTypes.func.isRequired,
   linkTo: PropTypes.func.isRequired,
   backUrl: PropTypes.string.isRequired,
+  layout: PropTypes.oneOf(["grid", "scroll"]),
 };
 
 export default DishList;

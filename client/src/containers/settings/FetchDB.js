@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import { fetchDishes } from "../../actions/dishes";
 import { fetchCategories } from "../../actions/categories";
+import { fetchMenuDays } from "../../actions/menu-days";
 
 class FetchDB extends Component {
   constructor() {
@@ -12,10 +13,15 @@ class FetchDB extends Component {
     this.update = () => {};
   }
 
-  componentWillReceiveProps({ updateDishes, updateCategories }) {
+  componentWillReceiveProps({
+    updateDishes,
+    updateCategories,
+    updateMenuDays,
+  }) {
     this.update = () => {
       updateDishes();
       updateCategories();
+      updateMenuDays();
     };
 
     const intervalUpdate = () => {
@@ -39,6 +45,7 @@ FetchDB.propTypes = {
   }).isRequired,
   updateDishes: PropTypes.func.isRequired,
   updateCategories: PropTypes.func.isRequired,
+  updateMenuDays: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -48,6 +55,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   updateDishes: fetchDishes,
   updateCategories: fetchCategories,
+  updateMenuDays: fetchMenuDays,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(FetchDB);

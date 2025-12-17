@@ -23,6 +23,9 @@ const Header = ({ translate }) => (
           </NavLink>
         </li>
         <li>
+          <NavLink to="/menu">{translate("nav.menu")}</NavLink>
+        </li>
+        <li>
           <NavLink to="/categories">{translate("nav.categories")}</NavLink>
         </li>
       </ul>

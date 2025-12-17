@@ -13,6 +13,7 @@ import {
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import CategorySelect from "./CategorySelect";
+import DaySelect from "./DaySelect";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -86,6 +87,7 @@ class EditDish extends Component {
               />
             </label>
             <CategorySelect id={dish.id} />
+            <DaySelect id={dish.id} />
             <br />
             <br />
             <br />
@@ -157,6 +159,7 @@ const handleSubmit = (event, id, history, location) => (dispatch) => {
     img: data.get("dishImg"),
     description: data.get("dishDescription"),
     categoryIds: data.getAll("categoryIds"),
+    menuDayId: data.get("menuDayId"),
   });
 
   dispatch(edit);
