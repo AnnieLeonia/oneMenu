@@ -5,6 +5,7 @@ import { toggleDishInactive } from "../../actions/dishes";
 import DishList from "../../components/DishList";
 
 const DISHES_PER_DAY = 3;
+const BASE_YEAR = 2020;
 
 const seededShuffle = (array, seed) => {
   const shuffled = [...array];
@@ -20,7 +21,7 @@ const getRotationDishes = (dishes, week, year, dayId) => {
   if (dishes.length === 0) return [];
   if (dishes.length <= DISHES_PER_DAY) return dishes;
 
-  const totalWeeks = (year - 2020) * 52 + week;
+  const totalWeeks = (year - BASE_YEAR) * 52 + week;
 
   const weeksPerCycle = Math.ceil(dishes.length / DISHES_PER_DAY);
   const cycleNumber = Math.floor(totalWeeks / weeksPerCycle);

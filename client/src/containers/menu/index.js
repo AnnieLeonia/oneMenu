@@ -6,7 +6,6 @@ import { getTranslate } from "react-localize-redux";
 import MenuList from "./MenuList";
 import Snackbar from "../common/Snackbar";
 
-// Get ISO week number
 const getWeekNumber = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
@@ -36,7 +35,6 @@ class Menu extends Component {
     let { week, year } = this.state;
     week += delta;
 
-    // Handle year boundaries
     if (week < 1) {
       year -= 1;
       week = 52;

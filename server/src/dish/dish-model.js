@@ -28,20 +28,20 @@ module.exports = (db) => ({
         );
         if (err) throw err;
 
-        // Fix this into one INSERT query with helper method
-        category_ids
-          .map(Number)
-          .filter(Boolean)
-          .forEach(async (category) => {
-            const { err } = await db.query(
-              `
+        const validCategoryIds = category_ids.map(Number).filter(Boolean);
+        if (validCategoryIds.length > 0) {
+          const values = validCategoryIds
+            .map((_, i) => `($1, $${i + 2})`)
+            .join(", ");
+          const { err } = await db.query(
+            `
             INSERT INTO dishes_categories (dish_id, category_id)
-            VALUES ($1, $2)
+            VALUES ${values}
           `,
-              [id, category]
-            );
-            if (err) throw err;
-          });
+            [id, ...validCategoryIds]
+          );
+          if (err) throw err;
+        }
       }
 
       if (menu_day_id !== undefined) {
@@ -54,7 +54,6 @@ module.exports = (db) => ({
         );
         if (err) throw err;
 
-        // Insert menu day assignment (only one allowed due to UNIQUE constraint)
         const menuDayId = Number(menu_day_id);
         if (menuDayId) {
           const { err } = await db.query(
@@ -91,16 +90,19 @@ module.exports = (db) => ({
   },
 
   getById: async (id) => {
-    const { rows, err } = await db.query(`
+    const { rows, err } = await db.query(
+      `
       SELECT dishes.*,
         ARRAY_AGG(DISTINCT dishes_categories.category_id) AS category_ids,
         MAX(dishes_menu_days.menu_day_id) AS menu_day_id
       FROM dishes
       LEFT JOIN dishes_categories ON dishes.id = dishes_categories.dish_id
       LEFT JOIN dishes_menu_days ON dishes.id = dishes_menu_days.dish_id
-      WHERE dishes.id = ${id}
+      WHERE dishes.id = $1
       GROUP BY dishes.id
-    `);
+    `,
+      [id]
+    );
     return { dish: rows[0], err };
   },
 
