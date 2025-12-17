@@ -46,6 +46,7 @@ DROP TABLE IF EXISTS menu_days CASCADE;
 CREATE TABLE menu_days (
   id           SERIAL        NOT NULL,
   name         VARCHAR(255)  NOT NULL UNIQUE,
+  color        VARCHAR(255),
   orderidx     INT           NOT NULL,
 
   PRIMARY KEY (id)

@@ -25,6 +25,12 @@ module.exports = {
   },
   menu: {
     noDay: ["No day", "Ingen dag", "Sin día"],
+    week: ["Week", "Vecka", "Semana"],
+    prevWeek: ["Prev", "Förra", "Anterior"],
+    nextWeek: ["Next", "Nästa", "Siguiente"],
+    currentWeek: ["Current week", "Nuvarande vecka", "Semana actual"],
+    showAll: ["Show all dishes", "Visa alla rätter", "Mostrar todos"],
+    showWeek: ["Show weekly menu", "Visa veckans meny", "Mostrar menú semanal"],
   },
   categories: {
     input: ["New category...", "Ny kategori...", "Nueva categoría..."],
