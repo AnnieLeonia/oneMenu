@@ -1,4 +1,5 @@
 export const FETCH_DISH = "FETCH_DISH";
+export const RESET_DISH = "RESET_DISH";
 export const FETCH_DISHES = "FETCH_DISHES";
 
 export const DEFAULT_DESCRIPTION = (dish) => `# ${dish.name}

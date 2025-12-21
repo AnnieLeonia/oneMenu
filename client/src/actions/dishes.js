@@ -1,4 +1,4 @@
-import { FETCH_DISH, FETCH_DISHES } from "../constants/dishes";
+import { FETCH_DISH, FETCH_DISHES, RESET_DISH } from "../constants/dishes";
 
 export const addDish =
   ({ name, uid }) =>
@@ -105,7 +105,7 @@ export const fetchDish = (id, history) => async (dispatch) => {
   }
 };
 
-export const resetDish = () => ({ type: FETCH_DISH, dish: {} });
+export const resetDish = () => ({ type: RESET_DISH });
 
 export const fetchDishes = () => async (dispatch) => {
   try {
