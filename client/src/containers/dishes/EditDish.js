@@ -43,6 +43,10 @@ class EditDish extends Component {
     const { dish, translate, history, location } = this.props;
     const { onRemove, onSubmit } = this.props;
 
+    if (!dish.name) {
+      return null;
+    }
+
     return (
       <div className="dish flex flex-col">
         <div className="title">

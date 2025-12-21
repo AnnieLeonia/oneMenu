@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
 import { get, toInteger } from "lodash/fp";
 
-import { fetchDish } from "../../actions/dishes";
+import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 
@@ -14,6 +14,10 @@ const redirect = (history, location) =>
 class ShowDish extends Component {
   componentDidMount() {
     this.props.getDish(this.props.id, this.props.history);
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
   }
 
   render() {
@@ -27,6 +31,10 @@ class ShowDish extends Component {
       location,
       isLoggedIn,
     } = this.props;
+
+    if (!name) {
+      return null;
+    }
 
     return (
       <div className="dish">
@@ -95,6 +103,7 @@ const mapStateToProps = (state, { match }) => ({
 
 const mapDispatchToProps = {
   getDish: fetchDish,
+  reset: resetDish,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShowDish);
