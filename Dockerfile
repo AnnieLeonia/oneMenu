@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build-client
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build-client
 
 WORKDIR /app/client
 
