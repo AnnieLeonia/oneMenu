@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
 import onemenuicon from "../../assets/icons/onemenu.svg";
 import settingicon from "../../assets/icons/settings.svg";
+import searchicon from "../../assets/icons/search.svg";
 
 const Header = ({ translate }) => (
   <div className="header">
@@ -17,6 +18,16 @@ const Header = ({ translate }) => (
     </div>
     <nav>
       <ul>
+        <li className="nav-find">
+          <NavLink exact to="/find" title={translate("nav.find")}>
+            <img
+              className="nav-search-icon"
+              src={searchicon}
+              alt={translate("nav.find")}
+              height="22px"
+            />
+          </NavLink>
+        </li>
         <li>
           <NavLink exact to="/">
             {translate("nav.dishes")}
