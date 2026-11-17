@@ -44,4 +44,6 @@ jobs:
     with:
       app: onemenu
       image_tag: preview-pr-${{ github.event.pull_request.number }}
-    secrets: inherit
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}

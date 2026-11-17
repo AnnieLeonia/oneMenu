@@ -11,4 +11,6 @@ jobs:
     uses: VictorWinberg/raspberry-pi-setup/.github/workflows/preview-remove.yml@main
     with:
       app: onemenu
-    secrets: inherit
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
