@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
+import { SettingsMigrationLink } from "../../migration";
 
 import LanguageSelector from "./LanguageSelector";
 import User from "./User";
@@ -16,6 +17,7 @@ const Settings = ({ translate, isLoggedIn, logout }) => (
       <div>
         <p>{translate("settings.authenticated")}</p>
         <User />
+        <SettingsMigrationLink translate={translate} isLoggedIn={isLoggedIn} />
         <button className="logoutBtn" onClick={logout}>
           {translate("user.logout")}
         </button>

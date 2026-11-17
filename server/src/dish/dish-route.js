@@ -1,5 +1,6 @@
 module.exports = ({ app, db, isLoggedIn }) => {
   const Dish = require("./dish-model")(db);
+  const { readVerifyMarkdown } = require("./dish-verify");
 
   app.get("/__/dishes", async (req, res, next) => {
     const { dishes, err } = await Dish.getAll();
@@ -36,5 +37,15 @@ module.exports = ({ app, db, isLoggedIn }) => {
     const { dish, err } = await Dish.delete(req.params.id);
     if (err) return next(err);
     return res.send(dish);
+  });
+
+  app.get("/__/dish-verify/:id", isLoggedIn, async (req, res) => {
+    const { file, markdown } = readVerifyMarkdown(req.params.id);
+    if (!file || markdown == null) {
+      return res
+        .status(404)
+        .send({ message: "No verify markdown for this dish" });
+    }
+    return res.send({ id: Number(req.params.id), file, markdown });
   });
 };

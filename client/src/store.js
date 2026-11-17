@@ -5,6 +5,7 @@ import { initialize, addTranslation } from "react-localize-redux";
 
 import reducers from "./reducers";
 import translation from "./translation";
+import { migrationTranslation } from "./migration";
 import { fetchUser } from "./actions/user";
 
 const store = createStore(
@@ -13,6 +14,7 @@ const store = createStore(
 );
 store.dispatch(initialize(["en", "sv", "es"], { defaultLanguage: "sv" }));
 store.dispatch(addTranslation(translation));
+store.dispatch(addTranslation(migrationTranslation));
 store.dispatch(fetchUser());
 
 export default store;

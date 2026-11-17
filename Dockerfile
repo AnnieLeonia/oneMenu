@@ -17,6 +17,7 @@ COPY server/package.json server/package-lock.json ./server/
 RUN cd server && npm ci --omit=dev --ignore-scripts
 
 COPY server/ ./server/
+COPY tmp/dish-verify ./tmp/dish-verify
 COPY --from=build-client /app/client/build ./client/build
 
 ENV NODE_ENV=production

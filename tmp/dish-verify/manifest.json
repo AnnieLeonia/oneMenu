@@ -1,0 +1,592 @@
+{
+  "exportedAt": "2026-11-17T17:57:42.616Z",
+  "source": "tmp/dish-verify",
+  "dishCount": 117,
+  "dishes": [
+    {
+      "id": 1,
+      "file": "1-flygande-jakob.md",
+      "name": "flygande jakob"
+    },
+    {
+      "id": 100,
+      "file": "100-vitloksbrod.md",
+      "name": "vitloksbrod"
+    },
+    {
+      "id": 101,
+      "file": "101-kycklinggratang-med-adelost-och-broccoli.md",
+      "name": "kycklinggratang med adelost och broccoli"
+    },
+    {
+      "id": 102,
+      "file": "102-sotpotatissoppa-med-curry-och-lime.md",
+      "name": "sotpotatissoppa med curry och lime"
+    },
+    {
+      "id": 103,
+      "file": "103-flaskkotlett-med-potatis-och-svampsas.md",
+      "name": "flaskkotlett med potatis och svampsas"
+    },
+    {
+      "id": 104,
+      "file": "104-rakrora-i-varm-brioche.md",
+      "name": "rakrora i varm brioche"
+    },
+    {
+      "id": 105,
+      "file": "105-pastasallad.md",
+      "name": "pastasallad"
+    },
+    {
+      "id": 106,
+      "file": "106-orange-chicken.md",
+      "name": "orange chicken"
+    },
+    {
+      "id": 107,
+      "file": "107-fiskarhustruns-fisksoppa.md",
+      "name": "fiskarhustruns fisksoppa"
+    },
+    {
+      "id": 108,
+      "file": "108-oreganostekt-kyckling-med-tzatziki-och-rostad-potatis.md",
+      "name": "oreganostekt kyckling med tzatziki och rostad potatis"
+    },
+    {
+      "id": 109,
+      "file": "109-saffransdoftande-sotpotatissoppa.md",
+      "name": "saffransdoftande sotpotatissoppa"
+    },
+    {
+      "id": 110,
+      "file": "110-mojito.md",
+      "name": "mojito"
+    },
+    {
+      "id": 111,
+      "file": "111-gloggsangria.md",
+      "name": "gloggsangria"
+    },
+    {
+      "id": 112,
+      "file": "112-vodka-lime.md",
+      "name": "vodka lime"
+    },
+    {
+      "id": 115,
+      "file": "115-citrondrink-med-flader-och-hallon.md",
+      "name": "citrondrink med flader och hallon"
+    },
+    {
+      "id": 116,
+      "file": "116-limoncello-gin-fizz.md",
+      "name": "limoncello gin fizz"
+    },
+    {
+      "id": 117,
+      "file": "117-fladerspritzer.md",
+      "name": "fladerspritzer"
+    },
+    {
+      "id": 118,
+      "file": "118-amaretto-sour.md",
+      "name": "amaretto sour"
+    },
+    {
+      "id": 119,
+      "file": "119-mimosa.md",
+      "name": "mimosa"
+    },
+    {
+      "id": 120,
+      "file": "120-aperol-spritz.md",
+      "name": "aperol spritz"
+    },
+    {
+      "id": 121,
+      "file": "121-kyiv-mule.md",
+      "name": "kyiv mule"
+    },
+    {
+      "id": 122,
+      "file": "122-orgasm.md",
+      "name": "orgasm"
+    },
+    {
+      "id": 123,
+      "file": "123-rosa-pantern.md",
+      "name": "rosa pantern"
+    },
+    {
+      "id": 124,
+      "file": "124-gin-fizz.md",
+      "name": "gin fizz"
+    },
+    {
+      "id": 125,
+      "file": "125-p2.md",
+      "name": "p2"
+    },
+    {
+      "id": 126,
+      "file": "126-p3.md",
+      "name": "p3"
+    },
+    {
+      "id": 127,
+      "file": "127-zombie.md",
+      "name": "zombie"
+    },
+    {
+      "id": 128,
+      "file": "128-blue-hawaii.md",
+      "name": "blue hawaii"
+    },
+    {
+      "id": 129,
+      "file": "129-pina-colada.md",
+      "name": "pina colada"
+    },
+    {
+      "id": 131,
+      "file": "131-gin-hazz.md",
+      "name": "gin hazz"
+    },
+    {
+      "id": 132,
+      "file": "132-hugo-spritz.md",
+      "name": "hugo spritz"
+    },
+    {
+      "id": 133,
+      "file": "133-pornstar-martini.md",
+      "name": "pornstar martini"
+    },
+    {
+      "id": 134,
+      "file": "134-milk-punch.md",
+      "name": "milk punch"
+    },
+    {
+      "id": 135,
+      "file": "135-fidel-castro.md",
+      "name": "fidel castro"
+    },
+    {
+      "id": 136,
+      "file": "136-spaghetti-bolognese.md",
+      "name": "spaghetti bolognese"
+    },
+    {
+      "id": 137,
+      "file": "137-pinnbrod.md",
+      "name": "pinnbrod"
+    },
+    {
+      "id": 139,
+      "file": "139-pizzabullar.md",
+      "name": "pizzabullar"
+    },
+    {
+      "id": 14,
+      "file": "14-falukorv-i-ugn-och-potatismos.md",
+      "name": "falukorv i ugn och potatismos"
+    },
+    {
+      "id": 141,
+      "file": "141-gog-sallad.md",
+      "name": "gog sallad"
+    },
+    {
+      "id": 142,
+      "file": "142-lussekatter.md",
+      "name": "lussekatter"
+    },
+    {
+      "id": 143,
+      "file": "143-kramig-pasta-med-soltorkade-tomater-och-champinjoner.md",
+      "name": "kramig pasta med soltorkade tomater och champinjoner"
+    },
+    {
+      "id": 144,
+      "file": "144-senapssill-2.md",
+      "name": "senapssill 2"
+    },
+    {
+      "id": 145,
+      "file": "145-falukorvspanna-med-rodbetor.md",
+      "name": "falukorvspanna med rodbetor"
+    },
+    {
+      "id": 146,
+      "file": "146-kycklingsoppa.md",
+      "name": "kycklingsoppa"
+    },
+    {
+      "id": 147,
+      "file": "147-sommarrullar-med-rakor.md",
+      "name": "sommarrullar med rakor"
+    },
+    {
+      "id": 148,
+      "file": "148-flaskfarsbiffar-bun-cha.md",
+      "name": "flaskfarsbiffar bun cha"
+    },
+    {
+      "id": 149,
+      "file": "149-asiatisk-nudelsallad-med-kyckling.md",
+      "name": "asiatisk nudelsallad med kyckling"
+    },
+    {
+      "id": 15,
+      "file": "15-flaskfilegryta-med-champinjoner.md",
+      "name": "flaskfilegryta med champinjoner"
+    },
+    {
+      "id": 150,
+      "file": "150-belgiska-vafflor.md",
+      "name": "belgiska vafflor"
+    },
+    {
+      "id": 151,
+      "file": "151-pastagratang-med-bacon-och-purjolok.md",
+      "name": "pastagratang med bacon och purjolok"
+    },
+    {
+      "id": 152,
+      "file": "152-lax-med-krispigt-ris-och-honungs-ingefarsdressing.md",
+      "name": "lax med krispigt ris och honungs ingefarsdressing"
+    },
+    {
+      "id": 154,
+      "file": "154-blabarssmoothie.md",
+      "name": "blabarssmoothie"
+    },
+    {
+      "id": 156,
+      "file": "156-hallonsmoothie-med-havre.md",
+      "name": "hallonsmoothie med havre"
+    },
+    {
+      "id": 157,
+      "file": "157-banan-och-limecolada.md",
+      "name": "banan och limecolada"
+    },
+    {
+      "id": 159,
+      "file": "159-apelsin-och-jordgubbssmoothie-med-banan.md",
+      "name": "apelsin och jordgubbssmoothie med banan"
+    },
+    {
+      "id": 16,
+      "file": "16-kyckling-satay-med-jordnotssas.md",
+      "name": "kyckling satay med jordnotssas"
+    },
+    {
+      "id": 161,
+      "file": "161-hallon-och-jordgubbsglass.md",
+      "name": "hallon och jordgubbsglass"
+    },
+    {
+      "id": 163,
+      "file": "163-jordgubbssmoothie-med-banan.md",
+      "name": "jordgubbssmoothie med banan"
+    },
+    {
+      "id": 166,
+      "file": "166-marry-me-chicken.md",
+      "name": "marry me chicken"
+    },
+    {
+      "id": 167,
+      "file": "167-vafflor.md",
+      "name": "vafflor"
+    },
+    {
+      "id": 168,
+      "file": "168-lakritsshot.md",
+      "name": "lakritsshot"
+    },
+    {
+      "id": 17,
+      "file": "17-halloumipytt.md",
+      "name": "halloumipytt"
+    },
+    {
+      "id": 170,
+      "file": "170-kyckling-pesto-i-ugn.md",
+      "name": "kyckling pesto i ugn"
+    },
+    {
+      "id": 172,
+      "file": "172-kycklinggratang-med-soltorkade-tomater.md",
+      "name": "kycklinggratang med soltorkade tomater"
+    },
+    {
+      "id": 173,
+      "file": "173-flaskpannkaka.md",
+      "name": "flaskpannkaka"
+    },
+    {
+      "id": 174,
+      "file": "174-falukorvsgratang.md",
+      "name": "falukorvsgratang"
+    },
+    {
+      "id": 175,
+      "file": "175-udonnudlar-med-kimchi.md",
+      "name": "udonnudlar med kimchi"
+    },
+    {
+      "id": 21,
+      "file": "21-karre-med-klyftpotatis.md",
+      "name": "karre med klyftpotatis"
+    },
+    {
+      "id": 22,
+      "file": "22-korvstroganoff-med-ris.md",
+      "name": "korvstroganoff med ris"
+    },
+    {
+      "id": 23,
+      "file": "23-tunn-kotlett-med-graddsas.md",
+      "name": "tunn kotlett med graddsas"
+    },
+    {
+      "id": 24,
+      "file": "24-kottfarsrulle.md",
+      "name": "kottfarsrulle"
+    },
+    {
+      "id": 25,
+      "file": "25-pasta-med-halloumi-och-tomat.md",
+      "name": "pasta med halloumi och tomat"
+    },
+    {
+      "id": 28,
+      "file": "28-kyckling-i-teriyakisas-och-nudlar.md",
+      "name": "kyckling i teriyakisas och nudlar"
+    },
+    {
+      "id": 43,
+      "file": "43-varldens-godaste-pastagratang.md",
+      "name": "varldens godaste pastagratang"
+    },
+    {
+      "id": 45,
+      "file": "45-pizza-bianco-med-skogssvamp.md",
+      "name": "pizza bianco med skogssvamp"
+    },
+    {
+      "id": 47,
+      "file": "47-revbensspjall-med-honungsglaze.md",
+      "name": "revbensspjall med honungsglaze"
+    },
+    {
+      "id": 54,
+      "file": "54-tacos.md",
+      "name": "tacos"
+    },
+    {
+      "id": 59,
+      "file": "59-pad-thai.md",
+      "name": "pad thai"
+    },
+    {
+      "id": 6,
+      "file": "6-alskade-alskling.md",
+      "name": "alskade alskling"
+    },
+    {
+      "id": 60,
+      "file": "60-baconlindad-flaskfile-i-ugn.md",
+      "name": "baconlindad flaskfile i ugn"
+    },
+    {
+      "id": 63,
+      "file": "63-fetaostlax-med-gronsakspasta.md",
+      "name": "fetaostlax med gronsakspasta"
+    },
+    {
+      "id": 64,
+      "file": "64-kottgryta.md",
+      "name": "kottgryta"
+    },
+    {
+      "id": 65,
+      "file": "65-buffalo-wings.md",
+      "name": "buffalo wings"
+    },
+    {
+      "id": 66,
+      "file": "66-enchiladas-tortillas.md",
+      "name": "enchiladas tortillas"
+    },
+    {
+      "id": 67,
+      "file": "67-pulled-pork-hamburgare.md",
+      "name": "pulled pork hamburgare"
+    },
+    {
+      "id": 68,
+      "file": "68-tagliatelle-med-champinjoner.md",
+      "name": "tagliatelle med champinjoner"
+    },
+    {
+      "id": 69,
+      "file": "69-grillade-kycklingspett-med-fetaostsallad-och-tzatziki.md",
+      "name": "grillade kycklingspett med fetaostsallad och tzatziki"
+    },
+    {
+      "id": 7,
+      "file": "7-hamburgare-och-sotpotatispommes.md",
+      "name": "hamburgare och sotpotatispommes"
+    },
+    {
+      "id": 70,
+      "file": "70-smashad-potatis-med-brynt-persiljesmor-och-bakad-fetaost.md",
+      "name": "smashad potatis med brynt persiljesmor och bakad fetaost"
+    },
+    {
+      "id": 71,
+      "file": "71-lax-och-sparris-forratt.md",
+      "name": "lax och sparris forratt"
+    },
+    {
+      "id": 72,
+      "file": "72-lasagne-med-halloumi-spenat-och-pumpakarnor.md",
+      "name": "lasagne med halloumi spenat och pumpakarnor"
+    },
+    {
+      "id": 73,
+      "file": "73-vitloksdoftande-pasta-med-flaskfile-och-basilika.md",
+      "name": "vitloksdoftande pasta med flaskfile och basilika"
+    },
+    {
+      "id": 74,
+      "file": "74-kycklinggratang-med-ris-och-grona-artor.md",
+      "name": "kycklinggratang med ris och grona artor"
+    },
+    {
+      "id": 75,
+      "file": "75-farsbiffar-med-tzatziki-och-bulgur.md",
+      "name": "farsbiffar med tzatziki och bulgur"
+    },
+    {
+      "id": 76,
+      "file": "76-senapssill-1.md",
+      "name": "senapssill 1"
+    },
+    {
+      "id": 77,
+      "file": "77-smash-burger-taco.md",
+      "name": "smash burger taco"
+    },
+    {
+      "id": 78,
+      "file": "78-flaskbowl-banh-mi.md",
+      "name": "flaskbowl banh mi"
+    },
+    {
+      "id": 79,
+      "file": "79-dumplingsplockmiddag.md",
+      "name": "dumplingsplockmiddag"
+    },
+    {
+      "id": 80,
+      "file": "80-bibimbap.md",
+      "name": "bibimbap"
+    },
+    {
+      "id": 81,
+      "file": "81-vietnamesisk-glasnudelsallad-med-rakor.md",
+      "name": "vietnamesisk glasnudelsallad med rakor"
+    },
+    {
+      "id": 82,
+      "file": "82-lax-asian-style-med-broccoli-lime-och-cashewnotter.md",
+      "name": "lax asian style med broccoli lime och cashewnotter"
+    },
+    {
+      "id": 83,
+      "file": "83-pannkakor.md",
+      "name": "pannkakor"
+    },
+    {
+      "id": 84,
+      "file": "84-rocky-road.md",
+      "name": "rocky road"
+    },
+    {
+      "id": 85,
+      "file": "85-risotto-med-skogschampinjoner.md",
+      "name": "risotto med skogschampinjoner"
+    },
+    {
+      "id": 86,
+      "file": "86-blabarspaj-med-smuldeg.md",
+      "name": "blabarspaj med smuldeg"
+    },
+    {
+      "id": 87,
+      "file": "87-kramig-pasta-med-kyckling.md",
+      "name": "kramig pasta med kyckling"
+    },
+    {
+      "id": 88,
+      "file": "88-morots-och-halloumibiffar.md",
+      "name": "morots och halloumibiffar"
+    },
+    {
+      "id": 89,
+      "file": "89-potatis-och-purjolokssoppa.md",
+      "name": "potatis och purjolokssoppa"
+    },
+    {
+      "id": 90,
+      "file": "90-kyckling-med-woksas-och-nudlar.md",
+      "name": "kyckling med woksas och nudlar"
+    },
+    {
+      "id": 91,
+      "file": "91-parmesangratinerad-torsk.md",
+      "name": "parmesangratinerad torsk"
+    },
+    {
+      "id": 92,
+      "file": "92-lax-i-kramig-sas-med-soltorkad-tomat-och-spenat.md",
+      "name": "lax i kramig sas med soltorkad tomat och spenat"
+    },
+    {
+      "id": 93,
+      "file": "93-biff-stroganoff.md",
+      "name": "biff stroganoff"
+    },
+    {
+      "id": 94,
+      "file": "94-lax-i-kramig-parmesansas.md",
+      "name": "lax i kramig parmesansas"
+    },
+    {
+      "id": 95,
+      "file": "95-pumpasoppa-med-baconkrisp-och-pumpafron.md",
+      "name": "pumpasoppa med baconkrisp och pumpafron"
+    },
+    {
+      "id": 97,
+      "file": "97-kramig-kycklingpasta-med-soltorkad-tomat.md",
+      "name": "kramig kycklingpasta med soltorkad tomat"
+    },
+    {
+      "id": 98,
+      "file": "98-tomatsoppa-med-basilikacreme.md",
+      "name": "tomatsoppa med basilikacreme"
+    },
+    {
+      "id": 99,
+      "file": "99-rostad-fransk-potatissallad.md",
+      "name": "rostad fransk potatissallad"
+    }
+  ]
+}

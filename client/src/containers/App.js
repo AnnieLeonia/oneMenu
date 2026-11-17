@@ -13,6 +13,7 @@ import EditDish from "./dishes/EditDish";
 import Find from "./find";
 import Menu from "./menu";
 import Settings from "./settings";
+import { MigrationRoute } from "../migration";
 import SetLanguage from "./settings/SetLanguage";
 import FetchDB from "./settings/FetchDB";
 
@@ -31,6 +32,7 @@ const App = () => (
     <Route exact path="/dishes/:id" component={ShowDish} />
     <Route exact path="/dishes/edit/:id" component={EditDish} />
     <Route exact path="/settings" component={Settings} />
+    <MigrationRoute />
     <Route exact path="/not-found" render={NotFound} />
     <Route exact path="/forbidden" render={Forbidden} />
     <SetLanguage />
