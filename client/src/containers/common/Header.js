@@ -17,17 +17,17 @@ const Header = ({ translate }) => (
       </NavLink>
     </div>
     <nav>
+      <div className="nav-find">
+        <NavLink exact to="/find" title={translate("nav.find")}>
+          <img
+            className="nav-search-icon"
+            src={searchicon}
+            alt={translate("nav.find")}
+            height="22px"
+          />
+        </NavLink>
+      </div>
       <ul>
-        <li className="nav-find">
-          <NavLink exact to="/find" title={translate("nav.find")}>
-            <img
-              className="nav-search-icon"
-              src={searchicon}
-              alt={translate("nav.find")}
-              height="22px"
-            />
-          </NavLink>
-        </li>
         <li>
           <NavLink exact to="/">
             {translate("nav.dishes")}
