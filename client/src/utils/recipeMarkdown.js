@@ -1,5 +1,16 @@
 import matter from "gray-matter";
-import { isEmpty, isString } from "lodash/fp";
+import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
+
+const H1 = "# ";
+const H3 = "### ";
+const INGREDIENTS = "## Ingredienser";
+const COOKING = "## Tillagning";
+const ING_TABLE = ["Mängd | Ingrediens", "----- | ----------"];
+const META_TABLE = [
+  "Svårighetsgrad   | Tid",
+  "---------------- | -------------",
+];
+const EMPTY_AMOUNT = "&nbsp;";
 
 export function parseDescription(description) {
   if (!isString(description) || isEmpty(description)) {
@@ -8,7 +19,7 @@ export function parseDescription(description) {
   try {
     const { data, content } = matter(description);
     return {
-      data: data && typeof data === "object" ? data : {},
+      data: isObject(data) ? data : {},
       content: content || "",
     };
   } catch {
@@ -16,7 +27,131 @@ export function parseDescription(description) {
   }
 }
 
-/** Markdown body for preview/render (optional YAML frontmatter strip). */
+function normalizeIngredients(raw) {
+  if (!Array.isArray(raw) || !raw.length) return null;
+
+  const items = raw
+    .map((item) => {
+      if (!item) return null;
+      if (typeof item === "string") {
+        const name = item.trim();
+        return name ? { name } : null;
+      }
+      if (typeof item !== "object" || !item.name) return null;
+      const name = toString(item.name);
+      if (!name) return null;
+      return {
+        name,
+        quantity:
+          !isNil(item.quantity) && item.quantity !== ""
+            ? item.quantity
+            : undefined,
+        unit: toString(item.unit) || undefined,
+        group: toString(item.group) || undefined,
+      };
+    })
+    .filter(Boolean);
+
+  return items.length ? items : null;
+}
+
+function ingredientsMarkdown(items) {
+  if (!items?.length) return "";
+
+  const lines = [INGREDIENTS];
+  const allGrouped = items.every((i) => toString(i.group));
+  if (!allGrouped) lines.push(...ING_TABLE);
+
+  let currentGroup = null;
+  for (const item of items) {
+    const group = item.group ? toString(item.group) : null;
+    if (group && group !== currentGroup) {
+      const isFirst = currentGroup == null;
+      currentGroup = group;
+      if (!isFirst || !allGrouped) lines.push("");
+      lines.push(`${H3}${group}`, ...ING_TABLE);
+    }
+
+    const name = toString(item.name);
+    if (!name) continue;
+
+    const { quantity, unit } = item;
+    let amount = EMPTY_AMOUNT;
+    if (!isNil(quantity) && quantity !== "") {
+      amount = unit ? `${quantity} ${unit}` : toString(quantity);
+    } else if (unit) {
+      amount = unit;
+    }
+
+    lines.push(`${amount} | ${name}`);
+  }
+
+  return lines.join("\n");
+}
+
+function stepsMarkdown(data) {
+  const { steps } = data;
+  if (steps == null) return "";
+
+  if (typeof steps === "string") {
+    return steps.trim();
+  }
+
+  if (!Array.isArray(steps) || !steps.length) return "";
+
+  const lines = steps
+    .map((step) => {
+      if (step == null) return "";
+      if (typeof step === "string") return step.trim();
+      if (typeof step === "object" && step.text != null) {
+        return toString(step.text).trim();
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .map((text, i) => `${i + 1}. ${text}`);
+
+  return lines.length ? [COOKING, ...lines].join("\n") : "";
+}
+
+function metaTable(difficulty, time) {
+  const d = toString(difficulty);
+  const timeStr = toString(time);
+  if (!d && !timeStr) return "";
+  return [...META_TABLE, `${d || "-"} | ${timeStr || "-"}`].join("\n");
+}
+
+function composeRecipeMarkdown(data, content) {
+  const title = toString(data.title);
+  const ingredients = normalizeIngredients(data.ingredients);
+  const steps = stepsMarkdown(data);
+
+  return [
+    title && `${H1}${title}`,
+    metaTable(data.difficulty, data.time),
+    toString(data.description),
+    ingredients && ingredientsMarkdown(ingredients),
+    steps,
+    (content || "").trim(),
+  ]
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+}
+
+function hasRecipeFrontmatter(data) {
+  if (!data || !isObject(data) || isEmpty(data)) return false;
+  return [
+    "title",
+    "ingredients",
+    "steps",
+    "description",
+    "difficulty",
+    "time",
+  ].some((key) => data[key] != null && data[key] !== "");
+}
+
+/** Markdown for preview/render. YAML-only recipes are composed into markdown tables and sections. */
 export function getMarkdownBody(
   description,
   { stripFrontmatter = false } = {}
@@ -27,7 +162,11 @@ export function getMarkdownBody(
     return description.trim();
   }
 
-  const { content } = parseDescription(description);
-  const body = (content || description).trim();
-  return body;
+  const { data, content } = parseDescription(description);
+  if (hasRecipeFrontmatter(data)) {
+    const composed = composeRecipeMarkdown(data, content);
+    if (composed) return composed;
+  }
+
+  return (content || description).trim();
 }
