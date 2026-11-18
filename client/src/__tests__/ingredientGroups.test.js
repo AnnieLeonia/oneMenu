@@ -114,7 +114,7 @@ ingredients:
       (ing) => ing.id === getIngredientId("vitlöksklyfta")
     );
     expect(member).toBeDefined();
-    expect(member.isCollapsedMember).toBe(true);
+    expect(member.hiddenFromDefaultList).toBe(true);
     const vitlök = catalog.find((ing) => ing.id === "group:vitlök");
     expect(expandFindSelection([vitlök.id], catalog).length).toBe(3);
   });
@@ -154,7 +154,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:färs")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("nötfärs"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const färs = catalog.find((ing) => ing.id === "group:färs");
     expect(expandFindSelection([färs.id], catalog).length).toBe(3);
@@ -224,7 +224,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:fond")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("kycklingbuljong"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const buljong = catalog.find((ing) => ing.id === "group:buljong");
     expect(expandFindSelection([buljong.id], catalog).length).toBe(3);
@@ -267,7 +267,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:kycklingfilé")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("strimlad kycklingfilé"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const filé = catalog.find((ing) => ing.id === "group:kycklingfilé");
     expect(expandFindSelection([filé.id], catalog).length).toBe(2);
@@ -308,7 +308,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:sallad")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("blandad sallad"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const sallad = catalog.find((ing) => ing.id === "group:sallad");
     expect(expandFindSelection([sallad.id], catalog).length).toBe(2);
@@ -349,7 +349,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:parmesan")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("riven parmesan"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const parmesan = catalog.find((ing) => ing.id === "group:parmesan");
     expect(expandFindSelection([parmesan.id], catalog).length).toBe(2);
@@ -390,7 +390,7 @@ ingredients:
     expect(catalog.some((ing) => ing.id === "group:bacon")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("tärnat bacon"))
-        ?.isCollapsedMember
+        ?.hiddenFromDefaultList
     ).toBe(true);
     const bacon = catalog.find((ing) => ing.id === "group:bacon");
     expect(expandFindSelection([bacon.id], catalog).length).toBe(3);

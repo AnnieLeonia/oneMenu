@@ -15,15 +15,6 @@ export function cleanIngredientName(name) {
 }
 
 /**
- * Normalized text for an ingredient name (no canonical catalog).
- * @param {string} name
- * @returns {string|null}
- */
-export function normalizeIngredient(name) {
-  return cleanIngredientName(name) || null;
-}
-
-/**
  * Stable id for matching from recipe text.
  * @param {string} name
  * @returns {string|null}
@@ -50,10 +41,6 @@ export function getIngredientLabel(ingredientId) {
     return ingredientId.slice(4);
   }
   return ingredientId;
-}
-
-export function getIngredientCategory() {
-  return "other";
 }
 
 const FINDER_EXCLUDED_SUBSTRINGS = [

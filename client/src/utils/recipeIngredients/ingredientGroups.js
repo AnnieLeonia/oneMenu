@@ -58,10 +58,6 @@ export function isIngredientCoveredByGroups(canonicalId) {
   return getAssignedGroupDef(canonicalId) != null;
 }
 
-export function belongsToCollapsedGroup(canonicalId) {
-  return Boolean(getAssignedGroupDef(canonicalId)?.collapseToSingle);
-}
-
 /** e.g. köttfärs search → färs chip */
 export function collapsedGroupMatchesSearchQuery(groupId, query) {
   const def = getIngredientGroupDef(groupId);

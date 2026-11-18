@@ -31,8 +31,7 @@ export function finderChipSearchLabel(chipId, getLabel) {
   if (isFinderSearchSelectionId(chipId)) {
     return finderSearchSelectionQuery(chipId);
   }
-  const labelFor = getLabel || getIngredientLabel;
-  return labelFor(chipId) || getIngredientLabel(chipId);
+  return (getLabel || getIngredientLabel)(chipId);
 }
 
 /** "färs" must not match the separate staple word "färsk…". */

@@ -1,15 +1,12 @@
 export {
-  normalizeIngredient,
   cleanIngredientName,
   getIngredientId,
   formatFinderLabel,
   getIngredientLabel,
-  getIngredientCategory,
   isFinderExcludedIngredient,
 } from "./normalizeIngredient";
 export {
   parseDishIngredients,
-  buildIngredientCatalog,
   buildFindIngredientContext,
   expandFindSelection,
   isFinderChipVisibleByDefault,

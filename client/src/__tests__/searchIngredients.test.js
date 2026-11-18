@@ -68,7 +68,6 @@ describe("searchIngredients", () => {
       {
         id: getIngredientId("nötfärs"),
         label: "nötfärs",
-        isCollapsedMember: true,
         recipeCount: 5,
       },
     ];
@@ -97,7 +96,6 @@ describe("searchIngredients", () => {
       {
         id: getIngredientId("köttfärs"),
         label: "köttfärs",
-        isCollapsedMember: true,
         recipeCount: 5,
       },
       {

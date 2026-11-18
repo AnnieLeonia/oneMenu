@@ -15,7 +15,6 @@ import {
   isFinderSearchSelectionId,
 } from "./searchIngredients";
 import {
-  getIngredientCategory,
   getIngredientId,
   formatFinderLabel,
   getIngredientLabel,
@@ -80,22 +79,12 @@ export function parseDishIngredients(description) {
     }))
     .filter((item) => item.canonicalId);
 
-  const canonicalIds = [
-    ...new Set(displayIngredients.map((item) => item.canonicalId)),
-  ];
-
-  if (displayIngredients.length === 0) {
-    return {
-      source: raw ? source : null,
-      displayIngredients: [],
-      canonicalIds: null,
-    };
-  }
-
   return {
     source,
     displayIngredients,
-    canonicalIds,
+    canonicalIds: displayIngredients.length
+      ? [...new Set(displayIngredients.map((item) => item.canonicalId))]
+      : null,
   };
 }
 
@@ -149,18 +138,16 @@ export function buildFindIngredientContext(dishes) {
       const id = item.canonicalId;
       const name = (item.name || "").trim();
       if (!id || !name) return;
-      const group = getAssignedGroupDef(id);
-      const collapsedMember = Boolean(group?.collapseToSingle);
+      const collapsedMember = Boolean(
+        getAssignedGroupDef(id)?.collapseToSingle
+      );
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
       if (!byId[id]) {
         byId[id] = {
           id,
           label: name,
-          category: getIngredientCategory(id),
           recipeCount: 0,
-          isCollapsedMember: collapsedMember,
-          coveredByGroup: Boolean(group),
           hiddenFromDefaultList:
             isFinderExcludedIngredient(id) || collapsedMember,
         };
@@ -191,11 +178,9 @@ export function buildFindIngredientContext(dishes) {
     byId[def.id] = {
       id: def.id,
       label: formatFinderLabel(def.label),
-      category: getIngredientCategory(def.id),
       recipeCount,
       memberIds,
       isCollapsedGroup: true,
-      coveredByGroup: false,
     };
   });
 
@@ -221,16 +206,6 @@ export function isFinderChipVisibleByDefault(ing) {
   return ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT;
 }
 
-/**
- * @param {string[]} selectedIds
- * @param {Array<{ id: string, memberIds?: string[] }>} catalog
- */
-function appendExpandedIds(expanded, ids) {
-  (ids || []).forEach((variantId) => {
-    if (variantId && !expanded.includes(variantId)) expanded.push(variantId);
-  });
-}
-
 export function expandFindSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const expanded = [];
@@ -246,23 +221,14 @@ export function expandFindSelection(selectedIds, catalog) {
       return;
     }
     const entry = byId.get(id);
+    const add = (variantId) => {
+      if (variantId && !expanded.includes(variantId)) expanded.push(variantId);
+    };
     if (entry?.memberIds?.length) {
-      appendExpandedIds(expanded, entry.memberIds);
+      entry.memberIds.forEach(add);
     } else if (id) {
-      appendExpandedIds(expanded, expandIngredientLabelVariantIds(id, catalog));
+      expandIngredientLabelVariantIds(id, catalog).forEach(add);
     }
   });
   return expanded;
-}
-
-/**
- * @deprecated Use buildFindIngredientContext
- */
-export function buildIngredientCatalog(dishes, getLabel) {
-  const ctx = buildFindIngredientContext(dishes);
-  if (!getLabel) return ctx.catalog;
-  return ctx.catalog.map((ing) => ({
-    ...ing,
-    label: getLabel(ing.id),
-  }));
 }
