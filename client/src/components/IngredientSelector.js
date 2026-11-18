@@ -27,11 +27,11 @@ class IngredientSelector extends Component {
 
   onToggleIngredient(id) {
     const { selectedIds, onChange } = this.props;
-    if (selectedIds.includes(id)) {
-      onChange(selectedIds.filter((s) => s !== id));
-    } else {
-      onChange([...selectedIds, id]);
-    }
+    onChange(
+      selectedIds.includes(id)
+        ? selectedIds.filter((s) => s !== id)
+        : [...selectedIds, id]
+    );
     this.setState({ search: "" });
   }
 
@@ -68,17 +68,17 @@ class IngredientSelector extends Component {
       .filter(Boolean);
   }
 
-  renderChip(ing, isSelected, onClick) {
+  renderChip(ing, selected) {
     return (
       <button
         key={ing.id}
         type="button"
         className={
-          isSelected
+          selected
             ? "ingredient-chip ingredient-chip--selected"
             : "ingredient-chip"
         }
-        onClick={onClick}
+        onClick={() => this.onToggleIngredient(ing.id)}
       >
         {ing.label}
       </button>
@@ -117,9 +117,7 @@ class IngredientSelector extends Component {
         ) : (
           <div className="ingredient-chip-row ingredient-chip-row--clamped">
             {ingredients.map((ing) =>
-              this.renderChip(ing, selectedIds.includes(ing.id), () =>
-                this.onToggleIngredient(ing.id)
-              )
+              this.renderChip(ing, selectedIds.includes(ing.id))
             )}
           </div>
         )}
@@ -137,11 +135,7 @@ class IngredientSelector extends Component {
               </button>
             </div>
             <div className="ingredient-chip-row ingredient-chip-row--clamped">
-              {selected.map((ing) =>
-                this.renderChip(ing, true, () =>
-                  this.onToggleIngredient(ing.id)
-                )
-              )}
+              {selected.map((ing) => this.renderChip(ing, true))}
             </div>
           </div>
         )}

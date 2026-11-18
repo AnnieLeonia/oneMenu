@@ -1,7 +1,7 @@
 import {
+  canonicalIdAssignedGroupId,
   groupMatchesCanonicalId,
   getIngredientGroupDef,
-  isIngredientCoveredByGroups,
 } from "../utils/recipeIngredients/ingredientGroups";
 import {
   getIngredientId,
@@ -403,8 +403,8 @@ describe("ingredientGroups", () => {
     expect(
       groupMatchesCanonicalId(filé, getIngredientId("strimlad kycklingfilé"))
     ).toBe(true);
-    expect(isIngredientCoveredByGroups(getIngredientId("kycklingvingar"))).toBe(
-      false
+    expect(canonicalIdAssignedGroupId(getIngredientId("kycklingvingar"))).toBe(
+      null
     );
   });
 

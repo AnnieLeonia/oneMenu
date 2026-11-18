@@ -2,11 +2,11 @@ export {
   formatFinderLabel,
   isFinderExcludedIngredient,
 } from "./normalizeIngredient";
-export { sortFinderCatalogEntries } from "./finderCatalogSort";
 export {
   buildFindIngredientContext,
   expandFindSelection,
   isFinderChipVisibleByDefault,
+  sortFinderCatalogEntries,
 } from "./parseDishIngredients";
 export { matchDishes } from "./matchDishes";
 export {

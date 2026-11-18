@@ -11,15 +11,12 @@ import { formatFinderLabel } from "./normalizeIngredient";
 import {
   canonicalIdAssignedGroupId,
   collapsedGroupMatchesSearchQuery,
-  getIngredientGroupDef,
 } from "./ingredientGroups";
 
 export const FINDER_SEARCH_SELECTION_PREFIX = "search:";
 
 export function makeFinderSearchSelectionId(query) {
-  const q = String(query || "")
-    .trim()
-    .toLowerCase();
+  const q = flow(trim, toLower)(String(query || ""));
   if (!q) return null;
   return `${FINDER_SEARCH_SELECTION_PREFIX}${q}`;
 }
@@ -101,18 +98,14 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
 
 function omitCollapsedMembersWhenGroupShown(results) {
   const groupIds = new Set(
-    flow(
-      filterFp((ing) => ing.isCollapsedGroup),
-      map((ing) => ing.id)
-    )(results)
+    results.filter((ing) => ing.isCollapsedGroup).map((ing) => ing.id)
   );
-  if (groupIds.size === 0) return results;
-  return filterFp((ing) => {
+  if (!groupIds.size) return results;
+  return results.filter((ing) => {
     if (ing.isCollapsedGroup || !ing.id?.startsWith("raw:")) return true;
     const groupId = canonicalIdAssignedGroupId(ing.id);
-    if (!groupId || !groupIds.has(groupId)) return true;
-    return !getIngredientGroupDef(groupId)?.collapseToSingle;
-  })(results);
+    return !groupId || !groupIds.has(groupId);
+  });
 }
 
 export function filterIngredientsByLooseSearch(ingredients, query) {

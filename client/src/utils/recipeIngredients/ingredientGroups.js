@@ -1,10 +1,8 @@
-import { find } from "lodash/fp";
+import { deburr, find, upperFirst } from "lodash/fp";
 
-import {
-  cleanIngredientName,
-  foldIngredientAccents,
-  getIngredientLabel,
-} from "./normalizeIngredient";
+import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
+
+const foldAccents = (text) => (text ? deburr(String(text)) : "");
 
 function isFarsName(cleaned) {
   if (!cleaned || /\bfärsk/.test(cleaned)) return false;
@@ -12,17 +10,11 @@ function isFarsName(cleaned) {
 }
 
 function collapsedGroup(slug, match = slug) {
-  const label = slug.charAt(0).toUpperCase() + slug.slice(1);
   const matchesCleaned =
     typeof match === "function"
       ? match
-      : (t) => foldIngredientAccents(t).includes(foldIngredientAccents(match));
-  return {
-    id: `group:${slug}`,
-    label,
-    collapseToSingle: true,
-    matchesCleaned,
-  };
+      : (t) => foldAccents(t).includes(foldAccents(match));
+  return { id: `group:${slug}`, label: upperFirst(slug), matchesCleaned };
 }
 
 /** First matching entry wins (e.g. buljong before kycklingfile). */
@@ -53,20 +45,13 @@ export function canonicalIdAssignedGroupId(canonicalId) {
   return def?.id ?? null;
 }
 
-export function groupMatchesCanonicalId(groupDef, canonicalId) {
-  return (
-    Boolean(groupDef) && canonicalIdAssignedGroupId(canonicalId) === groupDef.id
-  );
-}
-
-export function isIngredientCoveredByGroups(canonicalId) {
-  return canonicalIdAssignedGroupId(canonicalId) != null;
-}
+export const groupMatchesCanonicalId = (groupDef, canonicalId) =>
+  Boolean(groupDef) && canonicalIdAssignedGroupId(canonicalId) === groupDef.id;
 
 /** e.g. köttfärs search → färs chip */
 export function collapsedGroupMatchesSearchQuery(groupId, query) {
   const def = getIngredientGroupDef(groupId);
-  if (!def?.collapseToSingle) return false;
+  if (!def) return false;
   const cleaned = cleanIngredientName(query);
   return !!cleaned && def.matchesCleaned(cleaned);
 }

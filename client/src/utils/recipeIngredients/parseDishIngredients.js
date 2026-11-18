@@ -9,15 +9,11 @@ import {
 } from "lodash/fp";
 
 import { parseFrontMatter } from "../../components/markdown/parseFrontMatter";
-import { sortFinderCatalogEntries } from "./finderCatalogSort";
 import { parseIngredientsFromFrontmatter } from "./parseIngredientsFromFrontmatter";
 import { parseIngredientsFromTable } from "./parseIngredientsFromTable";
 import {
   INGREDIENT_GROUP_DEFS,
   canonicalIdAssignedGroupId,
-  getIngredientGroupDef,
-  groupMatchesCanonicalId,
-  isIngredientCoveredByGroups,
 } from "./ingredientGroups";
 import {
   expandIngredientLabelVariantIds,
@@ -89,18 +85,17 @@ export function parseDishIngredients(description) {
 }
 
 function pickMostCommonName(counts) {
-  return Object.keys(counts || {}).reduce((best, name) => {
+  const names = Object.keys(counts || {});
+  if (!names.length) return "";
+  return names.reduce((best, name) => {
     const n = counts[name];
-    const bestCount = counts[best] || -1;
-    if (
-      n > bestCount ||
-      (n === bestCount &&
+    const bestN = counts[best];
+    return n > bestN ||
+      (n === bestN &&
         name.localeCompare(best, "sv", { sensitivity: "base" }) < 0)
-    ) {
-      return name;
-    }
-    return best;
-  }, "");
+      ? name
+      : best;
+  });
 }
 
 /**
@@ -139,9 +134,7 @@ export function buildFindIngredientContext(dishes) {
       const name = (item.name || "").trim();
       if (!id || !name) return;
       const groupId = canonicalIdAssignedGroupId(id);
-      const collapsedMember = Boolean(
-        getIngredientGroupDef(groupId)?.collapseToSingle
-      );
+      const collapsedMember = Boolean(groupId);
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
       if (!byId[id]) {
@@ -161,10 +154,11 @@ export function buildFindIngredientContext(dishes) {
     byId[id].recipeCount = recipeCountById[id] || 0;
   });
 
-  INGREDIENT_GROUP_DEFS.filter((def) => def.collapseToSingle).forEach((def) => {
+  INGREDIENT_GROUP_DEFS.forEach((def) => {
     const memberIds = Object.keys(recipeCountById).filter(
       (id) =>
-        groupMatchesCanonicalId(def, id) && !isFinderExcludedIngredient(id)
+        canonicalIdAssignedGroupId(id) === def.id &&
+        !isFinderExcludedIngredient(id)
     );
     if (memberIds.length === 0) return;
     const recipeCount = groupRecipeCount[def.id] || 0;
@@ -193,7 +187,7 @@ export function buildFindIngredientContext(dishes) {
 export function isFinderChipVisibleByDefault(ing) {
   if (!ing || ing.hiddenFromDefaultList) return false;
   if (ing.isCollapsedGroup) return true;
-  if (isIngredientCoveredByGroups(ing.id)) return false;
+  if (canonicalIdAssignedGroupId(ing.id)) return false;
   return ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT;
 }
 
@@ -226,4 +220,12 @@ export function expandFindSelection(selectedIds, catalog) {
     expandOneSelectionId(id, catalog, byId, add)
   );
   return expanded;
+}
+
+export function sortFinderCatalogEntries(items) {
+  return [...(items || [])].sort((a, b) =>
+    a.recipeCount !== b.recipeCount
+      ? b.recipeCount - a.recipeCount
+      : a.label.localeCompare(b.label, "sv", { sensitivity: "base" })
+  );
 }

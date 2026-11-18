@@ -13,16 +13,6 @@ const sortMatchResults = orderBy(
   ["desc", "asc"]
 );
 
-function dishIngredientMatchesSelection(dishCanonicalId, chipLabels) {
-  const dishLabel = getIngredientLabel(dishCanonicalId);
-  return (
-    Boolean(dishLabel) &&
-    chipLabels.some((chipLabel) =>
-      ingredientLabelMatchesSearch(dishLabel, chipLabel)
-    )
-  );
-}
-
 function dishIndexForDishes(dishes) {
   const index = new Map();
   (dishes || []).forEach((dish) => {
@@ -45,22 +35,20 @@ export function matchDishes(
   dishes,
   selectedIds,
   index,
-  getLabel,
+  getLabel = getIngredientLabel,
   selectionChipIds = selectedIds
 ) {
   const selected = new Set(selectedIds || []);
   if (selected.size === 0) return [];
 
-  const labelFor = getLabel || getIngredientLabel;
-  const chipIds = selectionChipIds || selectedIds || [];
   const chipLabels = flow(
     map((id) =>
       isFinderSearchSelectionId(id)
         ? finderSearchSelectionQuery(id)
-        : labelFor(id)
+        : getLabel(id)
     ),
     compact
-  )(chipIds);
+  )(selectionChipIds || []);
   const dishIndex = index || dishIndexForDishes(dishes);
 
   return sortMatchResults(
@@ -68,10 +56,14 @@ export function matchDishes(
       map((dish) => {
         const dishIds = dishIndex.get(dish.id);
         if (!dishIds?.length) return null;
-        const matched = dishIds.filter(
-          (id) =>
-            selected.has(id) || dishIngredientMatchesSelection(id, chipLabels)
-        ).length;
+        const matched = dishIds.filter((id) => {
+          if (selected.has(id)) return true;
+          const label = getIngredientLabel(id);
+          return (
+            label &&
+            chipLabels.some((q) => ingredientLabelMatchesSearch(label, q))
+          );
+        }).length;
         return matched > 0 ? { dish, matched, total: dishIds.length } : null;
       })(dishes || [])
     )
