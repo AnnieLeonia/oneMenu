@@ -2,7 +2,7 @@ FROM --platform=$BUILDPLATFORM node:22-alpine AS build-client
 
 WORKDIR /app/client
 
-COPY client/package.json client/package-lock.json ./
+COPY client/package.json client/package-lock.json client/.npmrc ./
 RUN npm ci
 
 COPY client/ ./
