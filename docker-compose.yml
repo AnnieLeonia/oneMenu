@@ -3,12 +3,12 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "8080:8080"
     env_file:
       - .env
     environment:
       DATABASE_URL: postgres://postgres:password@host.docker.internal:5432/onemenu
-      PORT: "3000"
+      PORT: "8080"
       NODE_ENV: production
     extra_hosts:
       - "host.docker.internal:host-gateway"
