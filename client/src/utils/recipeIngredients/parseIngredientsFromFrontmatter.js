@@ -1,41 +1,46 @@
+import {
+  compact,
+  isArray,
+  map,
+  pipe,
+  size,
+  trim,
+  toString as toStr,
+} from "lodash/fp";
+
+function parseFrontmatterItem(item) {
+  if (!item) return null;
+  if (typeof item === "string") {
+    const name = trim(item);
+    return name ? { name } : null;
+  }
+  if (typeof item !== "object" || !item.name) return null;
+  const name = trim(toStr(item.name));
+  if (!name) return null;
+  const entry = { name };
+  if (item.quantity != null && item.quantity !== "") {
+    entry.quantity = item.quantity;
+  }
+  const unit = item.unit != null ? trim(toStr(item.unit)) : "";
+  if (unit) entry.unit = unit;
+  const group = item.group != null ? trim(toStr(item.group)) : "";
+  if (group) entry.group = group;
+  return entry;
+}
+
 /**
  * Read structured ingredients from frontmatter data.
  * @param {object} data
  * @returns {Array<{ name: string, quantity?: *, unit?: string, group?: string }>|null}
  */
 export function parseIngredientsFromFrontmatter(data) {
-  if (
-    !data ||
-    !Array.isArray(data.ingredients) ||
-    data.ingredients.length === 0
-  ) {
+  if (!data || !isArray(data.ingredients) || !size(data.ingredients)) {
     return null;
   }
 
-  const ingredients = data.ingredients
-    .map((item) => {
-      if (!item) return null;
-      if (typeof item === "string") {
-        const name = item.trim();
-        return name ? { name } : null;
-      }
-      if (typeof item !== "object" || !item.name) return null;
-      const name = String(item.name).trim();
-      if (!name) return null;
-      return {
-        name,
-        ...(item.quantity != null && item.quantity !== ""
-          ? { quantity: item.quantity }
-          : null),
-        ...(item.unit != null && String(item.unit).trim()
-          ? { unit: String(item.unit).trim() }
-          : null),
-        ...(item.group != null && String(item.group).trim()
-          ? { group: String(item.group).trim() }
-          : null),
-      };
-    })
-    .filter(Boolean);
-
-  return ingredients.length > 0 ? ingredients : null;
+  const ingredients = pipe(
+    map(parseFrontmatterItem),
+    compact
+  )(data.ingredients);
+  return size(ingredients) ? ingredients : null;
 }

@@ -2,6 +2,7 @@ export {
   formatFinderLabel,
   isFinderExcludedIngredient,
 } from "./normalizeIngredient";
+export { sortFinderCatalogEntries } from "./finderCatalogSort";
 export {
   buildFindIngredientContext,
   expandFindSelection,

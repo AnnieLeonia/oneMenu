@@ -1,3 +1,5 @@
+import { find } from "lodash/fp";
+
 import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
 
 function isFarsName(cleaned) {
@@ -40,7 +42,7 @@ export function canonicalIdAssignedGroupId(canonicalId) {
   if (!canonicalId?.startsWith("raw:")) return null;
   const cleaned = getIngredientLabel(canonicalId);
   if (!cleaned) return null;
-  const def = INGREDIENT_GROUP_DEFS.find((d) => d.matchesCleaned(cleaned));
+  const def = find((d) => d.matchesCleaned(cleaned))(INGREDIENT_GROUP_DEFS);
   return def?.id ?? null;
 }
 

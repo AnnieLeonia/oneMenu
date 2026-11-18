@@ -7,6 +7,7 @@ import {
   isFinderChipVisibleByDefault,
   isFinderSearchSelectionId,
   makeFinderSearchSelectionId,
+  sortFinderCatalogEntries,
 } from "../utils/recipeIngredients";
 
 class IngredientSelector extends Component {
@@ -21,12 +22,7 @@ class IngredientSelector extends Component {
     const items = q
       ? filterIngredientsByLooseSearch(catalog, q)
       : catalog.filter((ing) => isFinderChipVisibleByDefault(ing));
-    return [...items].sort((a, b) => {
-      if (a.recipeCount !== b.recipeCount) {
-        return b.recipeCount - a.recipeCount;
-      }
-      return a.label.localeCompare(b.label, "sv", { sensitivity: "base" });
-    });
+    return sortFinderCatalogEntries(items);
   }
 
   onToggleIngredient(id) {

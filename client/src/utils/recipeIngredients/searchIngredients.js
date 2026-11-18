@@ -1,3 +1,12 @@
+import {
+  compact,
+  filter as filterFp,
+  flow,
+  map,
+  trim,
+  toLower,
+} from "lodash/fp";
+
 import { formatFinderLabel, getIngredientLabel } from "./normalizeIngredient";
 import {
   canonicalIdAssignedGroupId,
@@ -68,7 +77,7 @@ export function ingredientLabelMatchesSearch(label, query) {
   const text = formatFinderLabel(label);
   const q = String(query).trim().toLowerCase();
   if (q.includes(" ") && text.includes(q)) return true;
-  const words = text.split(/\s+/).filter(Boolean);
+  const words = compact(text.split(/\s+/));
   return words.some((word) => wordMatchesQuery(word, q));
 }
 
@@ -106,26 +115,26 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
 
 function omitCollapsedMembersWhenGroupShown(results) {
   const groupIds = new Set(
-    results.filter((ing) => ing.isCollapsedGroup).map((ing) => ing.id)
+    flow(
+      filterFp((ing) => ing.isCollapsedGroup),
+      map((ing) => ing.id)
+    )(results)
   );
   if (groupIds.size === 0) return results;
-  return results.filter((ing) => {
+  return filterFp((ing) => {
     if (ing.isCollapsedGroup || !ing.id?.startsWith("raw:")) return true;
     const groupId = canonicalIdAssignedGroupId(ing.id);
     if (!groupId || !groupIds.has(groupId)) return true;
     return !getIngredientGroupDef(groupId)?.collapseToSingle;
-  });
+  })(results);
 }
 
 export function filterIngredientsByLooseSearch(ingredients, query) {
-  const q = String(query || "")
-    .trim()
-    .toLowerCase();
+  const q = flow(trim, toLower)(String(query || ""));
   if (!q) return ingredients;
 
-  const results = (ingredients || []).filter((ing) =>
-    catalogEntryMatchesQuery(ing, q)
-  );
-
-  return omitCollapsedMembersWhenGroupShown(results);
+  return flow(
+    filterFp((ing) => catalogEntryMatchesQuery(ing, q)),
+    omitCollapsedMembersWhenGroupShown
+  )(ingredients || []);
 }

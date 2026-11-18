@@ -1,3 +1,5 @@
+import { compact, flow, map, orderBy, some, toLower } from "lodash/fp";
+
 import { getIngredientLabel } from "./normalizeIngredient";
 import { parseDishIngredients } from "./parseDishIngredients";
 import {
@@ -5,12 +7,17 @@ import {
   ingredientLabelMatchesSearch,
 } from "./searchIngredients";
 
+const sortMatchResults = orderBy(
+  [(r) => r.matched, (r) => toLower(r.dish.name || "")],
+  ["desc", "asc"]
+);
+
 function dishIngredientMatchesSelection(dishCanonicalId, chipLabels) {
   const dishLabel = getIngredientLabel(dishCanonicalId);
   if (!dishLabel) return false;
-  return chipLabels.some((chipLabel) =>
+  return some((chipLabel) =>
     ingredientLabelMatchesSearch(dishLabel, chipLabel)
-  );
+  )(chipLabels);
 }
 
 function dishIndexForDishes(dishes) {
@@ -43,9 +50,10 @@ export function matchDishes(
 
   const labelFor = getLabel || getIngredientLabel;
   const chipIds = selectionChipIds || selectedIds || [];
-  const chipLabels = chipIds
-    .map((id) => finderChipSearchLabel(id, labelFor))
-    .filter(Boolean);
+  const chipLabels = flow(
+    map((id) => finderChipSearchLabel(id, labelFor)),
+    compact
+  )(chipIds);
   const dishIndex = index || dishIndexForDishes(dishes);
   const results = [];
 
@@ -69,12 +77,5 @@ export function matchDishes(
     });
   });
 
-  results.sort((a, b) => {
-    if (b.matched !== a.matched) return b.matched - a.matched;
-    const nameA = (a.dish.name || "").toLowerCase();
-    const nameB = (b.dish.name || "").toLowerCase();
-    return nameA.localeCompare(nameB);
-  });
-
-  return results;
+  return sortMatchResults(results);
 }

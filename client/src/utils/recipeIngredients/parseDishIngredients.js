@@ -1,4 +1,7 @@
+import { filter as filterFp, flow, map, uniq, values } from "lodash/fp";
+
 import { parseFrontMatter } from "../../components/markdown/parseFrontMatter";
+import { sortFinderCatalogEntries } from "./finderCatalogSort";
 import { parseIngredientsFromFrontmatter } from "./parseIngredientsFromFrontmatter";
 import { parseIngredientsFromTable } from "./parseIngredientsFromTable";
 import {
@@ -62,17 +65,21 @@ export function parseDishIngredients(description) {
     };
   }
 
-  const displayIngredients = raw
-    .map((item) => ({
+  const displayIngredients = flow(
+    map((item) => ({
       ...item,
       canonicalId: getIngredientId(item.name),
-    }))
-    .filter((item) => item.canonicalId);
+    })),
+    filterFp((item) => item.canonicalId)
+  )(raw);
 
   return {
     displayIngredients,
     canonicalIds: displayIngredients.length
-      ? [...new Set(displayIngredients.map((item) => item.canonicalId))]
+      ? flow(
+          map((item) => item.canonicalId),
+          uniq
+        )(displayIngredients)
       : null,
   };
 }
@@ -149,13 +156,6 @@ export function buildFindIngredientContext(dishes) {
     byId[id].recipeCount = recipeCountById[id] || 0;
   });
 
-  const sortByPopularityDesc = (a, b) => {
-    if (a.recipeCount !== b.recipeCount) {
-      return b.recipeCount - a.recipeCount;
-    }
-    return a.label.localeCompare(b.label, "sv", { sensitivity: "base" });
-  };
-
   INGREDIENT_GROUP_DEFS.filter((def) => def.collapseToSingle).forEach((def) => {
     const memberIds = Object.keys(recipeCountById).filter(
       (id) =>
@@ -173,7 +173,7 @@ export function buildFindIngredientContext(dishes) {
     };
   });
 
-  const catalog = Object.values(byId).sort(sortByPopularityDesc);
+  const catalog = sortFinderCatalogEntries(values(byId));
   const labelById = new Map(catalog.map((ing) => [ing.id, ing.label]));
 
   return {
