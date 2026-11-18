@@ -20,8 +20,7 @@ export function cleanIngredientName(name) {
  * @returns {string|null}
  */
 export function normalizeIngredient(name) {
-  const cleaned = cleanIngredientName(name);
-  return cleaned || null;
+  return cleanIngredientName(name) || null;
 }
 
 /**
@@ -33,6 +32,12 @@ export function getIngredientId(name) {
   const cleaned = cleanIngredientName(name);
   if (!cleaned) return null;
   return `raw:${cleaned}`;
+}
+
+/** Display text for the Find ingredient UI (always lowercase). */
+export function formatFinderLabel(text) {
+  if (text == null || text === "") return "";
+  return String(text).toLocaleLowerCase("sv");
 }
 
 /**
@@ -47,10 +52,33 @@ export function getIngredientLabel(ingredientId) {
   return ingredientId;
 }
 
-/**
- * @param {string} ingredientId
- * @returns {string}
- */
 export function getIngredientCategory() {
   return "other";
+}
+
+const FINDER_EXCLUDED_SUBSTRINGS = [
+  "salt",
+  "peppar",
+  "olja",
+  "smör",
+  "vatten",
+  "mjöl",
+  "mjölk",
+  "ris",
+  "vinäger",
+  "socker",
+  "soja",
+  "pasta",
+  "vodka",
+  "gin",
+];
+
+/** Hide pantry staples from the Find ingredient picker. */
+export function isFinderExcludedIngredient(ingredientId) {
+  const cleaned = getIngredientLabel(ingredientId);
+  return (
+    !!cleaned &&
+    (FINDER_EXCLUDED_SUBSTRINGS.some((part) => cleaned.includes(part)) ||
+      /\bis\b/.test(cleaned))
+  );
 }

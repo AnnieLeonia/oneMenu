@@ -7,6 +7,7 @@ import RecipeMatchList from "../../components/RecipeMatchList";
 import {
   buildFindIngredientContext,
   buildDishIngredientIndex,
+  expandFindSelection,
   matchDishes,
 } from "../../utils/recipeIngredients";
 
@@ -31,25 +32,24 @@ class FindRecipes extends Component {
     const { selectedIds } = this.state;
     const { catalog, getLabel } = buildFindIngredientContext(dishes);
     const index = buildDishIngredientIndex(dishes);
+    const matchIds =
+      selectedIds.length > 0 ? expandFindSelection(selectedIds, catalog) : [];
     const matches =
-      selectedIds.length > 0
-        ? matchDishes(dishes, selectedIds, index, getLabel)
+      matchIds.length > 0
+        ? matchDishes(dishes, matchIds, index, getLabel, selectedIds)
         : [];
+    const hasFilter = selectedIds.length > 0;
 
     return (
       <div className="find-page">
         <IngredientSelector
-          ingredients={catalog}
+          catalog={catalog}
           selectedIds={selectedIds}
           onChange={(ids) => this.setState({ selectedIds: ids })}
           translate={translate}
         />
 
-        {selectedIds.length === 0 && (
-          <p className="find-hint">{translate("find.hint")}</p>
-        )}
-
-        {selectedIds.length > 0 && matches.length === 0 && (
+        {hasFilter && matches.length === 0 && (
           <p className="find-empty">{translate("find.noMatches")}</p>
         )}
 

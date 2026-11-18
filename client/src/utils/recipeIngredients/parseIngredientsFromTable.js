@@ -51,8 +51,12 @@ function isTillagningHeading(title) {
   return TILLAGNING_H2.test((title || "").trim());
 }
 
+function normalizeSectionTitle(title) {
+  return (title || "").trim().replace(/^[^A-Za-zÅÄÖåäö]+/u, "");
+}
+
 function isIngredienserHeading(title) {
-  return INGREDIENSER_H2.test((title || "").trim());
+  return INGREDIENSER_H2.test(normalizeSectionTitle(title));
 }
 
 function pushTableRow(cells, ingredients, group) {
@@ -371,7 +375,6 @@ export function removeIngredientsSection(markdownBody) {
 
   const lines = markdownBody.split(/\r?\n/);
   const drop = new Set();
-  let componentGroup = null;
   let inIngredienserSection = false;
   let ingredienserStart = -1;
   let stopped = false;
@@ -399,11 +402,9 @@ export function removeIngredientsSection(markdownBody) {
       if (isIngredienserHeading(h2Title)) {
         inIngredienserSection = true;
         ingredienserStart = i;
-        componentGroup = null;
         continue;
       }
 
-      componentGroup = h2Title;
       let j = i + 1;
       while (j < lines.length && !lines[j].trim()) {
         j += 1;
@@ -419,7 +420,6 @@ export function removeIngredientsSection(markdownBody) {
           j += 1;
         }
         i = j - 1;
-        componentGroup = null;
       }
       continue;
     }

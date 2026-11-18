@@ -8,15 +8,11 @@ module.exports = {
     find: ["Find", "Hitta", "Buscar"],
   },
   find: {
-    title: [
-      "Find something to cook",
-      "Hitta något att laga",
-      "Encuentra algo para cocinar",
-    ],
+    title: ["Let him cook", "Låt honom laga", "Déjalo cocinar"],
     subtitle: [
-      "Select ingredients you have:",
-      "Välj ingredienser du har:",
-      "Selecciona los ingredientes que tienes:",
+      "Pick ingredients. He'll find the dish.",
+      "Välj ingredienser. Han hittar rätten.",
+      "Elige ingredientes. Él encuentra el plato.",
     ],
     search: [
       "Search ingredients...",
@@ -25,11 +21,6 @@ module.exports = {
     ],
     selected: ["Selected", "Valda", "Seleccionados"],
     clearAll: ["Clear all", "Rensa alla", "Borrar todo"],
-    hint: [
-      "Pick ingredients above to see matching recipes.",
-      "Välj ingredienser ovan för att se matchande recept.",
-      "Elige ingredientes arriba para ver recetas coincidentes.",
-    ],
     noIngredients: [
       "No ingredients found in your recipes yet. Add a YAML ingredients list in the recipe description.",
       "Inga ingredienser hittades i dina recept än. Lägg till en YAML-ingredienslista i receptbeskrivningen.",
@@ -46,20 +37,6 @@ module.exports = {
       "${ matched }/${ total } ingredienser",
       "${ matched }/${ total } ingredientes",
     ],
-    missing: [
-      "Missing: ${ names }",
-      "Saknas: ${ names }",
-      "Faltan: ${ names }",
-    ],
-    categories: {
-      meat: ["Meat and poultry", "Kött och fågel", "Carne y aves"],
-      fish: ["Fish and seafood", "Fisk och skaldjur", "Pescado y mariscos"],
-      vegetables: ["Vegetables", "Grönsaker", "Verduras"],
-      fruits: ["Fruits", "Frukt", "Frutas"],
-      dairy: ["Dairy", "Mejeri", "Lácteos"],
-      pantry: ["Pantry", "Skafferi", "Despensa"],
-      other: ["Other", "Övrigt", "Otros"],
-    },
   },
   edit: {
     edit: ["Edit", "Redigera", "Editar"],

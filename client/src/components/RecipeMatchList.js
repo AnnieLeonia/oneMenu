@@ -11,7 +11,7 @@ const RecipeMatchList = ({ matches, translate, onSelect }) => {
     <div className="recipe-match-list">
       <h3 className="recipe-match-heading">{translate("find.results")}</h3>
       <ul className="recipe-match-items">
-        {matches.map(({ dish, matched, total, missing, missingNames }) => (
+        {matches.map(({ dish, matched, total }) => (
           <li key={dish.id}>
             <button
               type="button"
@@ -30,15 +30,6 @@ const RecipeMatchList = ({ matches, translate, onSelect }) => {
                     matched: String(matched),
                     total: String(total),
                   })}
-                  {missing > 0 && (
-                    <span className="recipe-match-missing">
-                      {" "}
-                      ·{" "}
-                      {translate("find.missing", {
-                        names: missingNames.slice(0, 4).join(", "),
-                      })}
-                    </span>
-                  )}
                 </div>
               </div>
             </button>
@@ -59,8 +50,6 @@ RecipeMatchList.propTypes = {
       }).isRequired,
       matched: PropTypes.number.isRequired,
       total: PropTypes.number.isRequired,
-      missing: PropTypes.number.isRequired,
-      missingNames: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ).isRequired,
   translate: PropTypes.func.isRequired,

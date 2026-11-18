@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "PORT=8080 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom --coverage",
-    "test:watch": "react-scripts test --env=jsdom",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider PORT=8080 react-scripts start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "test": "NODE_OPTIONS=--openssl-legacy-provider react-scripts test --env=jsdom --coverage",
+    "test:watch": "NODE_OPTIONS=--openssl-legacy-provider react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "env:pull": "scp git@192.168.0.100:www/onemenu/.env .env",
     "db:pull": "pg_dump --format=c -h 192.168.0.100 -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"

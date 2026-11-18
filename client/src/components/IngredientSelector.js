@@ -1,6 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-const CATEGORY_ORDER = ["other"];
+import {
+  filterIngredientsByLooseSearch,
+  formatFinderLabel,
+  finderSearchSelectionQuery,
+  isFinderChipVisibleByDefault,
+  isFinderSearchSelectionId,
+  makeFinderSearchSelectionId,
+} from "../utils/recipeIngredients";
 
 class IngredientSelector extends Component {
   constructor(props) {
@@ -8,46 +15,91 @@ class IngredientSelector extends Component {
     this.state = { search: "" };
   }
 
-  onToggle(id) {
+  sortChips(items) {
+    return [...items].sort((a, b) => {
+      if (a.recipeCount !== b.recipeCount) {
+        return b.recipeCount - a.recipeCount;
+      }
+      return a.label.localeCompare(b.label, "sv", { sensitivity: "base" });
+    });
+  }
+
+  visibleIngredients() {
+    const { catalog } = this.props;
+    const q = this.state.search.trim().toLowerCase();
+    if (q) {
+      return this.sortChips(filterIngredientsByLooseSearch(catalog, q));
+    }
+    return this.sortChips(
+      catalog.filter((ing) => isFinderChipVisibleByDefault(ing))
+    );
+  }
+
+  onToggleIngredient(id) {
     const { selectedIds, onChange } = this.props;
     if (selectedIds.includes(id)) {
       onChange(selectedIds.filter((s) => s !== id));
     } else {
       onChange([...selectedIds, id]);
     }
+    this.setState({ search: "" });
   }
 
   onClear() {
     this.props.onChange([]);
   }
 
-  filteredIngredients() {
-    const { ingredients } = this.props;
-    const q = this.state.search.trim().toLowerCase();
-    if (!q) return ingredients;
-    return ingredients.filter((ing) => ing.label.toLowerCase().includes(q));
+  commitSearch() {
+    const q = this.state.search.trim();
+    if (!q) return;
+    const id = makeFinderSearchSelectionId(q);
+    if (!id) return;
+    const { selectedIds, onChange } = this.props;
+    if (!selectedIds.includes(id)) {
+      onChange([...selectedIds, id]);
+    }
+    this.setState({ search: "" });
   }
 
-  groupedIngredients() {
-    const filtered = this.filteredIngredients();
-    const groups = {};
-    CATEGORY_ORDER.forEach((key) => {
-      groups[key] = [];
-    });
-    filtered.forEach((ing) => {
-      const cat = groups[ing.category] ? ing.category : "other";
-      groups[cat].push(ing);
-    });
-    return CATEGORY_ORDER.map((key) => ({
-      key,
-      items: groups[key] || [],
-    })).filter((g) => g.items.length > 0);
+  selectedChips() {
+    const { catalog, selectedIds } = this.props;
+    return selectedIds
+      .map((id) => {
+        if (isFinderSearchSelectionId(id)) {
+          return {
+            id,
+            label: formatFinderLabel(finderSearchSelectionQuery(id)),
+            isSearchQuery: true,
+          };
+        }
+        const ing = catalog.find((item) => item.id === id);
+        return ing || null;
+      })
+      .filter(Boolean);
+  }
+
+  renderChip(ing, isSelected, onClick) {
+    return (
+      <button
+        key={ing.id}
+        type="button"
+        className={
+          isSelected
+            ? "ingredient-chip ingredient-chip--selected"
+            : "ingredient-chip"
+        }
+        onClick={onClick}
+      >
+        {ing.label}
+      </button>
+    );
   }
 
   render() {
-    const { selectedIds, ingredients, translate } = this.props;
-    const selected = ingredients.filter((ing) => selectedIds.includes(ing.id));
-    const groups = this.groupedIngredients();
+    const { selectedIds, translate } = this.props;
+    const ingredients = this.visibleIngredients();
+    const selected = this.selectedChips();
+    const hasSelection = selected.length > 0;
 
     return (
       <div className="ingredient-finder">
@@ -61,10 +113,28 @@ class IngredientSelector extends Component {
             autoComplete="off"
             placeholder={translate("find.search")}
             onChange={({ target }) => this.setState({ search: target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                this.commitSearch();
+              }
+            }}
           />
         </div>
 
-        {selected.length > 0 && (
+        {ingredients.length === 0 ? (
+          <p className="find-empty">{translate("find.noIngredients")}</p>
+        ) : (
+          <div className="ingredient-chip-row ingredient-chip-row--clamped">
+            {ingredients.map((ing) =>
+              this.renderChip(ing, selectedIds.includes(ing.id), () =>
+                this.onToggleIngredient(ing.id)
+              )
+            )}
+          </div>
+        )}
+
+        {hasSelection && (
           <div className="selected-ingredients">
             <div className="selected-ingredients-header">
               <span>{translate("find.selected")}</span>
@@ -76,53 +146,14 @@ class IngredientSelector extends Component {
                 {translate("find.clearAll")}
               </button>
             </div>
-            <div className="ingredient-chip-row">
-              {selected.map((ing) => (
-                <button
-                  key={ing.id}
-                  type="button"
-                  className="ingredient-chip ingredient-chip--selected"
-                  onClick={() => this.onToggle(ing.id)}
-                >
-                  {ing.label}
-                  <span className="ingredient-chip-remove" aria-hidden="true">
-                    ×
-                  </span>
-                </button>
-              ))}
+            <div className="ingredient-chip-row ingredient-chip-row--clamped">
+              {selected.map((ing) =>
+                this.renderChip(ing, true, () =>
+                  this.onToggleIngredient(ing.id)
+                )
+              )}
             </div>
           </div>
-        )}
-
-        {groups.length === 0 ? (
-          <p className="find-empty">{translate("find.noIngredients")}</p>
-        ) : (
-          groups.map((group) => (
-            <div key={group.key} className="ingredient-group">
-              <h3 className="ingredient-group-title">
-                {translate(`find.categories.${group.key}`)}
-              </h3>
-              <div className="ingredient-chip-row">
-                {group.items.map((ing) => {
-                  const isSelected = selectedIds.includes(ing.id);
-                  return (
-                    <button
-                      key={ing.id}
-                      type="button"
-                      className={
-                        isSelected
-                          ? "ingredient-chip ingredient-chip--selected"
-                          : "ingredient-chip"
-                      }
-                      onClick={() => this.onToggle(ing.id)}
-                    >
-                      {ing.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))
         )}
       </div>
     );
@@ -130,11 +161,11 @@ class IngredientSelector extends Component {
 }
 
 IngredientSelector.propTypes = {
-  ingredients: PropTypes.arrayOf(
+  catalog: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      category: PropTypes.string.isRequired,
+      recipeCount: PropTypes.number,
     })
   ).isRequired,
   selectedIds: PropTypes.arrayOf(PropTypes.string).isRequired,

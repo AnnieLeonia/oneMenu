@@ -661,7 +661,7 @@ nav .nav-find a.active .nav-search-icon {
 }
 
 .selected-ingredients {
-  margin-bottom: 1em;
+  margin-top: 1em;
 }
 
 .selected-ingredients-header {
@@ -683,23 +683,24 @@ nav .nav-find a.active .nav-search-icon {
   padding: 0.2em 0.4em;
 }
 
-.ingredient-group {
-  margin-bottom: 1em;
-}
-
-.ingredient-group-title {
-  font-size: 0.85em;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #777;
-  margin: 0 0 0.4em;
-  font-weight: 600;
-}
-
 .ingredient-chip-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4em;
+}
+
+/* ~3 rows of chips; scroll when there are more */
+.ingredient-chip-row--clamped {
+  max-height: 7.1em;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  align-content: flex-start;
+  padding-right: 0.15em;
+}
+
+.ingredient-finder .ingredient-chip {
+  text-transform: lowercase;
 }
 
 .ingredient-chip {
@@ -724,7 +725,6 @@ nav .nav-find a.active .nav-search-icon {
   font-weight: bold;
 }
 
-.find-hint,
 .find-empty {
   color: #777;
   font-size: 0.95em;
@@ -786,10 +786,6 @@ nav .nav-find a.active .nav-search-icon {
   font-size: 0.85em;
   color: #666;
   margin-top: 0.15em;
-}
-
-.recipe-match-missing {
-  color: #999;
 }
 
 /* FONT: AmaticSC */
