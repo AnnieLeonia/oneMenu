@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
+import { renderToStaticMarkup } from "react-dom/server";
 import { initialize, addTranslation } from "react-localize-redux";
 
 import reducers from "./reducers";
@@ -11,7 +12,12 @@ const store = createStore(
   reducers,
   composeWithDevTools(applyMiddleware(thunk))
 );
-store.dispatch(initialize(["en", "sv", "es"]));
+store.dispatch(
+  initialize({
+    languages: ["en", "sv", "es"],
+    options: { renderToStaticMarkup },
+  })
+);
 store.dispatch(addTranslation(translation));
 store.dispatch(fetchUser());
 
