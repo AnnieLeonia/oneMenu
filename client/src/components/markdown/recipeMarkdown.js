@@ -1,5 +1,6 @@
-import matter from "gray-matter";
 import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
+
+import { parseFrontMatter } from "./parseFrontMatter";
 
 const H1 = "# ";
 const H3 = "### ";
@@ -12,12 +13,12 @@ const META_TABLE = [
 ];
 const EMPTY_AMOUNT = "&nbsp;";
 
-export function parseDescription(description) {
+export function parseRecipe(description) {
   if (!isString(description) || isEmpty(description)) {
     return { data: {}, content: "" };
   }
   try {
-    const { data, content } = matter(description);
+    const { data, content } = parseFrontMatter(description);
     return {
       data: isObject(data) ? data : {},
       content: content || "",
@@ -141,9 +142,9 @@ function composeRecipeMarkdown(data, content) {
     .trim();
 }
 
-export function getMarkdownBody(description) {
+export function getMarkdown(description) {
   if (!isString(description) || isEmpty(description)) return "";
-  const { data, content } = parseDescription(description);
+  const { data, content } = parseRecipe(description);
   const composed = composeRecipeMarkdown(data, content);
   return composed || content || "";
 }

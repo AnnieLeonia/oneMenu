@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
-import { getMarkdownBody } from "../utils/recipeMarkdown";
+
+import { getMarkdown } from "./recipeMarkdown";
 
 function createMarkup(description) {
   if (!description) return;
-  const markdown = getMarkdownBody(description);
+  const markdown = getMarkdown(description);
   if (!markdown) return;
   const html = micromark(markdown, {
     extensions: [gfm()],

@@ -10,7 +10,7 @@ import {
   removeDish,
   resetDish,
 } from "../../actions/dishes";
-import MarkdownRenderer from "../../components/MarkdownRenderer";
+import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import CategorySelect from "./CategorySelect";
 import DaySelect from "./DaySelect";
