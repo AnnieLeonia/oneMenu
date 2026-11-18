@@ -16,11 +16,7 @@ const MigrationCompareColumn = ({ variant, title, markdown, empty }) => {
           <p className="migration-column-empty">{empty}</p>
         ) : (
           <div className="migration-column-rendered">
-            <MarkdownRenderer
-              markdown={markdown}
-              className="markdown-body"
-              stripFrontmatter
-            />
+            <MarkdownRenderer markdown={markdown} className="markdown-body" />
           </div>
         )}
       </div>

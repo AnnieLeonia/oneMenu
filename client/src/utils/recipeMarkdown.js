@@ -94,7 +94,9 @@ function stepsMarkdown(data) {
   if (steps == null) return "";
 
   if (typeof steps === "string") {
-    return steps.trim();
+    const trimmed = steps.trim();
+    if (!trimmed) return "";
+    return [COOKING, trimmed].join("\n");
   }
 
   if (!Array.isArray(steps) || !steps.length) return "";
@@ -139,34 +141,9 @@ function composeRecipeMarkdown(data, content) {
     .trim();
 }
 
-function hasRecipeFrontmatter(data) {
-  if (!data || !isObject(data) || isEmpty(data)) return false;
-  return [
-    "title",
-    "ingredients",
-    "steps",
-    "description",
-    "difficulty",
-    "time",
-  ].some((key) => data[key] != null && data[key] !== "");
-}
-
-/** Markdown for preview/render. YAML-only recipes are composed into markdown tables and sections. */
-export function getMarkdownBody(
-  description,
-  { stripFrontmatter = false } = {}
-) {
+export function getMarkdownBody(description) {
   if (!isString(description) || isEmpty(description)) return "";
-
-  if (!stripFrontmatter) {
-    return description.trim();
-  }
-
   const { data, content } = parseDescription(description);
-  if (hasRecipeFrontmatter(data)) {
-    const composed = composeRecipeMarkdown(data, content);
-    if (composed) return composed;
-  }
-
-  return (content || description).trim();
+  const composed = composeRecipeMarkdown(data, content);
+  return composed || content || "";
 }

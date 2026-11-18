@@ -41,12 +41,7 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          <MarkdownRenderer
-            markdown={description}
-            className="markdown-body"
-            stripFrontmatter
-            includeTitle={false}
-          />
+          <MarkdownRenderer markdown={description} className="markdown-body" />
         </div>
         <br />
         <br />
