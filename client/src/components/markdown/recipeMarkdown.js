@@ -4,16 +4,56 @@ import { parseFrontMatter } from "./parseFrontMatter";
 
 const H1 = "# ";
 const H3 = "### ";
-export const INGREDIENTS_HEADING = "🧂 Ingredienser";
+const INGREDIENTS_HEADING = "🧂 Ingredienser";
 const INGREDIENTS = `## ${INGREDIENTS_HEADING}`;
 const COOKING = "## 👩‍🍳 Tillagning";
-const ING_TABLE = ["Mängd | 🥕 Ingrediens", "----- | ----------"];
+
+export const RECIPE_LABELS = {
+  difficultyHeader: "💪 Svårighetsgrad",
+  timeHeader: "⏱️ Tid",
+  servingsHeader: "👥 Personer",
+  servingsUnit: "pers",
+  ingredientsHeading: INGREDIENTS_HEADING,
+  cookingHeading: "👩‍🍳 Tillagning",
+  ingredientsTableAmount: "Mängd",
+  ingredientsTableName: "🥕 Ingrediens",
+};
+const DEFAULT_INGREDIENTS_TABLE = [
+  "Mängd | 🥕 Ingrediens",
+  "----- | ----------",
+];
+
+function buildIngredientsTable({ amount, name } = {}) {
+  if (!amount && !name) return DEFAULT_INGREDIENTS_TABLE;
+  return [
+    `${amount ?? "Mängd"} | ${name ?? "🥕 Ingrediens"}`,
+    "----- | ----------",
+  ];
+}
+
+export function splitRecipeBodyMarkdown(markdown) {
+  if (!isString(markdown) || !markdown.trim()) {
+    return { preamble: "", cooking: "" };
+  }
+  const lines = markdown.split("\n");
+  const cookingIndex = lines.findIndex((line) => line.trim() === COOKING);
+  if (cookingIndex === -1) {
+    return { preamble: markdown.trim(), cooking: "" };
+  }
+  return {
+    preamble: lines.slice(0, cookingIndex).join("\n").trim(),
+    cooking: lines
+      .slice(cookingIndex + 1)
+      .join("\n")
+      .trim(),
+  };
+}
 const META_TABLE = [
   "💪 Svårighetsgrad   | ⏱️ Tid | 👥 Personer",
   "---------------- | ------------- | --------",
 ];
 
-export const SERVING_PRESETS = [2, 4, 8, 12];
+export const SERVING_PRESETS = [2, 4, 8, 12, 14, 16];
 const DEFAULT_SERVINGS = 4;
 const EMPTY_AMOUNT = "&nbsp;";
 
@@ -124,6 +164,10 @@ function normalizeIngredients(raw, ingredientMultiplier = 1) {
   return items.length ? items : null;
 }
 
+function hasExplicitRecipeServings(data) {
+  return data.servings != null || data.persons != null || data.personer != null;
+}
+
 function parseRecipeServings(data) {
   const raw = data.servings ?? data.persons ?? data.personer;
   if (typeof raw === "number" && raw > 0) return raw;
@@ -160,12 +204,24 @@ export function recipeHasIngredientQuantities(description) {
   return items.some((item) => !isNil(item.quantity) && item.quantity !== "");
 }
 
-function ingredientsMarkdown(items) {
+export function recipeHasRecipeMeta(description) {
+  const { data } = parseRecipe(description);
+  return !!(
+    toString(data.difficulty) ||
+    toString(data.time) ||
+    hasExplicitRecipeServings(data)
+  );
+}
+
+function ingredientsMarkdown(
+  items,
+  ingredientsTable = DEFAULT_INGREDIENTS_TABLE
+) {
   if (!items?.length) return "";
 
   const lines = [INGREDIENTS];
   const allGrouped = items.every((i) => toString(i.group));
-  if (!allGrouped) lines.push(...ING_TABLE);
+  if (!allGrouped) lines.push(...ingredientsTable);
 
   let currentGroup = null;
   for (const item of items) {
@@ -174,7 +230,7 @@ function ingredientsMarkdown(items) {
       const isFirst = currentGroup == null;
       currentGroup = group;
       if (!isFirst || !allGrouped) lines.push("");
-      lines.push(`${H3}${group}`, ...ING_TABLE);
+      lines.push(`${H3}${group}`, ...ingredientsTable);
     }
 
     const name = toString(item.name);
@@ -225,10 +281,17 @@ function formatServingsLabel(count) {
   return `${count} pers`;
 }
 
-function metaTable(difficulty, time, servings = DEFAULT_SERVINGS) {
+function metaTable(
+  difficulty,
+  time,
+  servings = DEFAULT_SERVINGS,
+  options = {}
+) {
+  const { includeServingsColumn = true } = options;
   const d = toString(difficulty);
   const timeStr = toString(time);
-  if (!d && !timeStr) return "";
+  const hasMeta = d || timeStr || includeServingsColumn;
+  if (!hasMeta) return "";
   return [
     ...META_TABLE,
     `${d || "-"} | ${timeStr || "-"} | ${formatServingsLabel(servings)}`,
@@ -248,10 +311,17 @@ function composeRecipeMarkdown(
   );
   const steps = stepsMarkdown(data);
   const servings = parseRecipeServings(data);
+  const includeServingsColumn =
+    hasExplicitRecipeServings(data) ||
+    !!toString(data.difficulty) ||
+    !!toString(data.time);
 
   return [
     title && `${H1}${title}`,
-    !excludeMeta && metaTable(data.difficulty, data.time, servings),
+    !excludeMeta &&
+      metaTable(data.difficulty, data.time, servings, {
+        includeServingsColumn,
+      }),
     toString(data.description),
     !excludeIngredients && ingredients && ingredientsMarkdown(ingredients),
     steps,
@@ -264,7 +334,8 @@ function composeRecipeMarkdown(
 
 export function getIngredientsTableMarkdown(description, options = {}) {
   if (!isString(description) || isEmpty(description)) return "";
-  const { ingredientMultiplier = 1 } = options;
+  const { ingredientMultiplier = 1, ingredientsTableLabels } = options;
+  const ingredientsTable = buildIngredientsTable(ingredientsTableLabels);
   const { data } = parseRecipe(description);
   const ingredients = normalizeIngredients(
     data.ingredients,
@@ -272,7 +343,7 @@ export function getIngredientsTableMarkdown(description, options = {}) {
   );
   if (!ingredients) return "";
 
-  const full = ingredientsMarkdown(ingredients);
+  const full = ingredientsMarkdown(ingredients, ingredientsTable);
   return full.split("\n").slice(1).join("\n").trim();
 }
 

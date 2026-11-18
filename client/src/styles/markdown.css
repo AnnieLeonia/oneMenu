@@ -958,13 +958,6 @@
   white-space: nowrap;
 }
 
-.markdown-body .recipe-meta-table .recipe-servings-label {
-  display: inline-block;
-  margin-right: 0.5em;
-  font-weight: 500;
-  min-width: 3.5em;
-}
-
 .markdown-body .recipe-meta-table .recipe-servings-select {
   float: none;
   width: auto;

@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
+import { handleCrossOutClick } from "./crossOutClick";
 import markdownToHtml from "./markdownToHtml";
 import RecipeMetaTable from "./RecipeMetaTable";
 import {
   getIngredientsTableMarkdown,
   getMarkdown,
   getRecipeMeta,
-  INGREDIENTS_HEADING,
+  RECIPE_LABELS,
+  splitRecipeBodyMarkdown,
 } from "./recipeMarkdown";
 
 class RecipeMarkdownView extends Component {
@@ -24,29 +26,18 @@ class RecipeMarkdownView extends Component {
     this.ref.current.removeEventListener("click", this.handleClick);
   }
 
-  handleClick = (event) => {
-    const crossableTags = ["li", "tr"];
-    let target = event.target;
-
-    while (target && target.tagName) {
-      const tagName = target.tagName.toLowerCase();
-      if (crossableTags.includes(tagName)) {
-        target.classList.toggle("crossed-out");
-        break;
-      }
-      target = target.parentElement;
-    }
-  };
+  handleClick = handleCrossOutClick;
 
   render() {
     const {
       markdown,
       className,
       ingredientMultiplier = 1,
+      baseServings,
       selectedServings,
       servingOptions,
+      canScalePortions,
       onServingsChange,
-      translate,
     } = this.props;
 
     const meta = getRecipeMeta(markdown);
@@ -55,10 +46,18 @@ class RecipeMarkdownView extends Component {
       excludeIngredients: true,
       excludeMeta: true,
     });
+    const { preamble, cooking } = splitRecipeBodyMarkdown(bodyMarkdown);
     const ingredientsMarkdown = getIngredientsTableMarkdown(markdown, {
       ingredientMultiplier,
+      ingredientsTableLabels: {
+        amount: RECIPE_LABELS.ingredientsTableAmount,
+        name: RECIPE_LABELS.ingredientsTableName,
+      },
     });
-    const bodyHtml = markdownToHtml(bodyMarkdown);
+    const preambleHtml = markdownToHtml(preamble);
+    const cookingHtml = markdownToHtml(cooking);
+    const fallbackBodyHtml =
+      !cooking && bodyMarkdown ? markdownToHtml(bodyMarkdown) : null;
     const ingredientsHtml = markdownToHtml(ingredientsMarkdown);
 
     return (
@@ -66,15 +65,23 @@ class RecipeMarkdownView extends Component {
         <RecipeMetaTable
           difficulty={meta.difficulty}
           time={meta.time}
+          baseServings={baseServings}
           selectedServings={selectedServings}
           servingOptions={servingOptions}
+          canScalePortions={canScalePortions}
           onServingsChange={onServingsChange}
-          translate={translate}
         />
-        {bodyHtml && <div dangerouslySetInnerHTML={bodyHtml} />}
+        {preambleHtml && <div dangerouslySetInnerHTML={preambleHtml} />}
+        {cookingHtml && (
+          <section className="recipe-cooking">
+            <h2>{RECIPE_LABELS.cookingHeading}</h2>
+            <div dangerouslySetInnerHTML={cookingHtml} />
+          </section>
+        )}
+        {fallbackBodyHtml && <div dangerouslySetInnerHTML={fallbackBodyHtml} />}
         {ingredientsHtml && (
           <section className="recipe-ingredients">
-            <h2>{INGREDIENTS_HEADING}</h2>
+            <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
             <div dangerouslySetInnerHTML={ingredientsHtml} />
           </section>
         )}
@@ -87,10 +94,11 @@ RecipeMarkdownView.propTypes = {
   markdown: PropTypes.string.isRequired,
   className: PropTypes.string,
   ingredientMultiplier: PropTypes.number,
+  baseServings: PropTypes.number.isRequired,
   selectedServings: PropTypes.number.isRequired,
   servingOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
+  canScalePortions: PropTypes.bool.isRequired,
   onServingsChange: PropTypes.func.isRequired,
-  translate: PropTypes.func.isRequired,
 };
 
 export default RecipeMarkdownView;

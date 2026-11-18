@@ -46,10 +46,6 @@ module.exports = {
     remove: ["Done", "Klar", "Listo"],
     input: ["New dish...", "Ny vara...", "Nuevo plato..."],
     back: ["Back", "Tillbaka", "Atrás"],
-    difficultyHeader: ["💪 Difficulty", "💪 Svårighetsgrad", "💪 Dificultad"],
-    timeHeader: ["⏱️ Time", "⏱️ Tid", "⏱️ Tiempo"],
-    servingsHeader: ["👥 Servings", "👥 Personer", "👥 Porciones"],
-    servingsUnit: ["pers", "pers", "pers"],
   },
   settings: {
     title: ["Settings", "Inställningar", "Configuración"],

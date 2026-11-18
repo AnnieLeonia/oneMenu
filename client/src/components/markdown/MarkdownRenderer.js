@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { handleCrossOutClick } from "./crossOutClick";
 import { getMarkdown } from "./recipeMarkdown";
 import markdownToHtml from "./markdownToHtml";
 
@@ -23,19 +24,7 @@ class MarkdownRenderer extends Component {
     this.ref.current.removeEventListener("click", this.handleClick);
   }
 
-  handleClick = (event) => {
-    const crossableTags = ["li", "tr"];
-    let target = event.target;
-
-    while (target && target.tagName) {
-      const tagName = target.tagName.toLowerCase();
-      if (crossableTags.includes(tagName)) {
-        target.classList.toggle("crossed-out");
-        break;
-      }
-      target = target.parentElement;
-    }
-  };
+  handleClick = handleCrossOutClick;
 
   render() {
     const { markdown, className, ingredientMultiplier = 1 } = this.props;

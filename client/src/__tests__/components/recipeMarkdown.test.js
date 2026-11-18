@@ -1,5 +1,6 @@
 import {
   getMarkdown,
+  getRecipeBaseServings,
   scaleQuantity,
 } from "../../components/markdown/recipeMarkdown";
 
@@ -54,5 +55,32 @@ ingredients:
 `);
     expect(md).toContain("👥 Personer");
     expect(md).toContain("4 pers");
+  });
+
+  it("defaults base servings to 4 when omitted", () => {
+    expect(
+      getRecipeBaseServings(`---
+title: Test
+difficulty: Enkel
+time: 20 min
+---
+`)
+    ).toBe(4);
+  });
+
+  it("uses servings from dish front matter", () => {
+    expect(
+      getRecipeBaseServings(`---
+title: Test
+servings: 6
+---
+`)
+    ).toBe(6);
+    const md = getMarkdown(`---
+title: Test
+servings: 6
+---
+`);
+    expect(md).toContain("6 pers");
   });
 });

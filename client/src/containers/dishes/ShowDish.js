@@ -12,6 +12,7 @@ import {
   getRecipeBaseServings,
   getServingOptions,
   recipeHasIngredientQuantities,
+  recipeHasRecipeMeta,
 } from "../../components/markdown/recipeMarkdown";
 
 const redirect = (history, location) =>
@@ -55,7 +56,8 @@ class ShowDish extends Component {
       isLoggedIn,
     } = this.props;
     const { selectedServings } = this.state;
-    const showPortionScale = recipeHasIngredientQuantities(description);
+    const canScalePortions = recipeHasIngredientQuantities(description);
+    const showRecipeView = canScalePortions || recipeHasRecipeMeta(description);
     const baseServings = getRecipeBaseServings(description);
     const servingOptions = getServingOptions(baseServings);
     const ingredientMultiplier = selectedServings / baseServings;
@@ -69,17 +71,18 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          {showPortionScale ? (
+          {showRecipeView ? (
             <RecipeMarkdownView
               markdown={description}
               className="markdown-body"
               ingredientMultiplier={ingredientMultiplier}
+              baseServings={baseServings}
               selectedServings={selectedServings}
               servingOptions={servingOptions}
+              canScalePortions={canScalePortions}
               onServingsChange={(count) =>
                 this.setState({ selectedServings: count })
               }
-              translate={translate}
             />
           ) : (
             <MarkdownRenderer
