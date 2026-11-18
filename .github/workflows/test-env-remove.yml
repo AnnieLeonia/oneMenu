@@ -5,7 +5,6 @@ on:
     types: [closed]
     branches:
       - master
-      - feat/structured-recipe-markdown
 
 jobs:
   remove:
