@@ -3,11 +3,11 @@ import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
 
 const H1 = "# ";
 const H3 = "### ";
-const INGREDIENTS = "## Ingredienser";
-const COOKING = "## Tillagning";
-const ING_TABLE = ["Mängd | Ingrediens", "----- | ----------"];
+const INGREDIENTS = "## 🧂 Ingredienser";
+const COOKING = "## 👩‍🍳 Tillagning";
+const ING_TABLE = ["Mängd | 🥕 Ingrediens", "----- | ----------"];
 const META_TABLE = [
-  "Svårighetsgrad   | Tid",
+  "💪 Svårighetsgrad   | ⏱️ Tid",
   "---------------- | -------------",
 ];
 const EMPTY_AMOUNT = "&nbsp;";
