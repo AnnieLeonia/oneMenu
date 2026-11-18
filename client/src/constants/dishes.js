@@ -4,8 +4,8 @@ export const FETCH_DISHES = "FETCH_DISHES";
 
 export const DEFAULT_DESCRIPTION = (dish) => `---
 title: ${dish.name}
-difficulty: Medel
-time: 30 min
+difficulty: Enkel/Medel/Svår
+time: 15/30/45 min
 description: En kort beskrivning av rätten.
 ingredients:
   - name: Kärlek

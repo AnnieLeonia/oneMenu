@@ -151,6 +151,11 @@ function formatIngredientsSection(ingredients) {
   return `${lines.join("\n")}\n`;
 }
 
+function formatTitleHeading(title) {
+  const t = str(title);
+  return t ? `${MD_TITLE_PREFIX}${t}` : "";
+}
+
 function formatMetaTable(difficulty, time) {
   const d = str(difficulty);
   const t = str(time);
@@ -182,14 +187,12 @@ function formatStepsSection(steps) {
  * Build markdown for rendering: optional YAML fields, then body markdown unchanged.
  * @param {object} data
  * @param {string} content
- * @param {{ includeTitle?: boolean }} [options]
  * @returns {string}
  */
-export function composeRecipeMarkdown(data, content, options = {}) {
+export function composeRecipeMarkdown(data, content) {
   if (!hasStructuredRecipeMeta(data)) return "";
 
-  const { includeTitle = true } = options;
-  const title = str(data.title);
+  const titleHeading = formatTitleHeading(data.title);
   const summary = str(data.description ?? data.summary);
   const ingredients = parseIngredientsFromFrontmatter(data);
   const steps = parseStepsFromFrontmatter(data);
@@ -197,7 +200,7 @@ export function composeRecipeMarkdown(data, content, options = {}) {
   const body = (content || "").trim();
 
   return [
-    includeTitle && title && `${MD_TITLE_PREFIX}${title}`,
+    titleHeading,
     metaTable,
     summary,
     ingredients && formatIngredientsSection(ingredients).trim(),
@@ -212,11 +215,10 @@ export function composeRecipeMarkdown(data, content, options = {}) {
 /**
  * Markdown for display: compose structured frontmatter (when present), otherwise body only.
  * @param {string|null|undefined} description
- * @param {{ includeTitle?: boolean }} [options]
  * @returns {string}
  */
-export function getMarkdownBody(description, options) {
+export function getMarkdownBody(description) {
   const { data, content } = parseDescription(description);
-  const composed = composeRecipeMarkdown(data, content, options);
+  const composed = composeRecipeMarkdown(data, content);
   return composed || content || "";
 }
