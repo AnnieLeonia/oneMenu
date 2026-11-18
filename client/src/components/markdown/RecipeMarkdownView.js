@@ -1,30 +1,41 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { micromark } from "micromark";
+import { gfm, gfmHtml } from "micromark-extension-gfm";
 
-import markdownToHtml from "./markdownToHtml";
-import { toggleCrossOut } from "./toggleCrossOut";
-import { getRecipeViewParts, RECIPE_LABELS } from "./recipeMarkdown";
+import {
+  getRecipeShowInfo,
+  getRecipeViewParts,
+  RECIPE_LABELS,
+} from "./recipeMarkdown";
 
 const recipeHtml = (markdown) => {
-  const html = markdownToHtml(markdown);
-  return html ? <div dangerouslySetInnerHTML={html} /> : null;
+  if (!markdown) return null;
+  const html = micromark(markdown, {
+    extensions: [gfm()],
+    htmlExtensions: [gfmHtml()],
+  });
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+};
+
+const crossableParent = (el) => {
+  while (el instanceof Element) {
+    const tag = el.tagName.toLowerCase();
+    if (tag === "li" || tag === "tr") return el;
+    el = el.parentElement;
+  }
 };
 
 function RecipeMarkdownView({
   markdown,
   className,
-  ingredientMultiplier = 1,
-  difficulty,
-  time,
   selectedServings,
-  servingOptions,
-  showMetaTable,
   onServingsChange,
 }) {
-  const { preamble, cooking, ingredientsMarkdown } = getRecipeViewParts(
-    markdown,
-    ingredientMultiplier
-  );
+  const { baseServings, servingOptions, showMetaTable, difficulty, time } =
+    getRecipeShowInfo(markdown);
+  const { preamble, ingredientsMarkdown, cooking, trailing } =
+    getRecipeViewParts(markdown, selectedServings / baseServings);
 
   return (
     <div className={className}>
@@ -59,20 +70,26 @@ function RecipeMarkdownView({
           </tbody>
         </table>
       )}
-      <div onClick={toggleCrossOut}>
+      <div
+        onClick={(e) => {
+          const row = crossableParent(e.target);
+          if (row) row.classList.toggle("crossed-out");
+        }}
+      >
         {recipeHtml(preamble)}
-        {cooking && (
-          <section className="recipe-cooking">
-            <h2>{RECIPE_LABELS.cookingHeading}</h2>
-            {recipeHtml(cooking)}
-          </section>
-        )}
         {ingredientsMarkdown && (
           <section className="recipe-ingredients">
             <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
             {recipeHtml(ingredientsMarkdown)}
           </section>
         )}
+        {cooking && (
+          <section className="recipe-cooking">
+            <h2>{RECIPE_LABELS.cookingHeading}</h2>
+            {recipeHtml(cooking)}
+          </section>
+        )}
+        {trailing && recipeHtml(trailing)}
       </div>
     </div>
   );
@@ -81,12 +98,7 @@ function RecipeMarkdownView({
 RecipeMarkdownView.propTypes = {
   markdown: PropTypes.string.isRequired,
   className: PropTypes.string,
-  ingredientMultiplier: PropTypes.number,
-  difficulty: PropTypes.string,
-  time: PropTypes.string,
   selectedServings: PropTypes.number.isRequired,
-  servingOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
-  showMetaTable: PropTypes.bool.isRequired,
   onServingsChange: PropTypes.func,
 };
 

@@ -50,9 +50,6 @@ class EditDish extends Component {
     const { dish, translate, history, location } = this.props;
     const { onRemove, onSubmit } = this.props;
     const { selectedServings } = this.state;
-    const { baseServings, servingOptions, showMetaTable, difficulty, time } =
-      getRecipeShowInfo(this.state.description);
-    const ingredientMultiplier = selectedServings / baseServings;
 
     if (!dish.name) {
       return null;
@@ -130,12 +127,7 @@ class EditDish extends Component {
           <RecipeMarkdownView
             markdown={this.state.description}
             className="flex flex-col markdown-body markdown-preview"
-            ingredientMultiplier={ingredientMultiplier}
-            difficulty={difficulty}
-            time={time}
             selectedServings={selectedServings}
-            servingOptions={servingOptions}
-            showMetaTable={showMetaTable}
             onServingsChange={(count) =>
               this.setState({ selectedServings: count })
             }

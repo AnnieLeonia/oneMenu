@@ -48,9 +48,6 @@ class ShowDish extends Component {
       isLoggedIn,
     } = this.props;
     const { selectedServings } = this.state;
-    const { baseServings, servingOptions, showMetaTable, difficulty, time } =
-      getRecipeShowInfo(description);
-    const ingredientMultiplier = selectedServings / baseServings;
 
     if (!name) {
       return null;
@@ -64,12 +61,7 @@ class ShowDish extends Component {
           <RecipeMarkdownView
             markdown={description}
             className="markdown-body"
-            ingredientMultiplier={ingredientMultiplier}
-            difficulty={difficulty}
-            time={time}
             selectedServings={selectedServings}
-            servingOptions={servingOptions}
-            showMetaTable={showMetaTable}
             onServingsChange={(count) =>
               this.setState({ selectedServings: count })
             }

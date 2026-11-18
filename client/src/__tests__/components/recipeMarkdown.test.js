@@ -1,6 +1,7 @@
 import {
   getMarkdown,
   getRecipeShowInfo,
+  getRecipeViewParts,
   scaleQuantity,
 } from "../../components/markdown/recipeMarkdown";
 
@@ -43,6 +44,20 @@ describe("recipeMarkdown", () => {
     [recipe("servings: 6\n"), 6],
   ])("getRecipeShowInfo baseServings", (yaml, servings) => {
     expect(getRecipeShowInfo(yaml).baseServings).toBe(servings);
+  });
+
+  it("getRecipeViewParts keeps trailing body after cooking", () => {
+    const yaml = `${recipe(`steps:
+  - Fry
+ingredients:
+  - name: Flour
+`)}
+Extra notes here.`;
+    const parts = getRecipeViewParts(yaml);
+    expect(parts.ingredientsMarkdown).toContain("Flour");
+    expect(parts.cooking).toMatch(/^1\. Fry/);
+    expect(parts.trailing).toBe("Extra notes here.");
+    expect(parts.cooking).not.toContain("Extra notes");
   });
 
   it.each([

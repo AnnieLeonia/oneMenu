@@ -1,13 +1,4 @@
-import {
-  identity,
-  isEmpty,
-  isNil,
-  isObject,
-  isString,
-  sortBy,
-  toString,
-  union,
-} from "lodash/fp";
+import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
 
 import { parseFrontMatter } from "./parseFrontMatter";
 
@@ -15,7 +6,6 @@ const H1 = "# ";
 const H3 = "### ";
 const INGREDIENTS_HEADING = "🧂 Ingredienser";
 const INGREDIENTS = `## ${INGREDIENTS_HEADING}`;
-const COOKING = "## 👩‍🍳 Tillagning";
 
 export const RECIPE_LABELS = {
   difficultyHeader: "💪 Nivå",
@@ -33,23 +23,20 @@ const INGREDIENTS_TABLE = [
   "----- | ----------",
 ];
 
-export function splitRecipeBodyMarkdown(markdown) {
-  if (!isString(markdown) || !markdown.trim()) {
-    return { preamble: "", cooking: "" };
-  }
-  const lines = markdown.split("\n");
-  const cookingIndex = lines.findIndex((line) => line.trim() === COOKING);
-  if (cookingIndex === -1) {
-    return { preamble: markdown.trim(), cooking: "" };
-  }
-  return {
-    preamble: lines.slice(0, cookingIndex).join("\n").trim(),
-    cooking: lines
-      .slice(cookingIndex + 1)
-      .join("\n")
-      .trim(),
-  };
+const COOKING_HEADING = `## ${RECIPE_LABELS.cookingHeading}`;
+
+function preambleMarkdown(data) {
+  const title = toString(data.title);
+  return [title && `${H1}${title}`, toString(data.description)]
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
 }
+
+function trailingRecipeMarkdown(content) {
+  return (content || "").trim();
+}
+
 const META_TABLE = [
   `${RECIPE_LABELS.difficultyHeader}   | ${RECIPE_LABELS.timeHeader} | ${RECIPE_LABELS.servingsHeader}`,
   "---------------- | ------------- | --------",
@@ -178,11 +165,12 @@ export function getRecipeShowInfo(description) {
   const baseServings = parseRecipeServings(data);
   const difficulty = toString(data.difficulty);
   const time = toString(data.time);
-  const servings = toString(data.servings);
   return {
     baseServings,
-    servingOptions: sortBy(identity, union(SERVING_PRESETS, [baseServings])),
-    showMetaTable: !!(difficulty || time || servings),
+    servingOptions: [...new Set([...SERVING_PRESETS, baseServings])].sort(
+      (a, b) => a - b
+    ),
+    showMetaTable: !!(difficulty || time || data.servings != null),
     difficulty,
     time,
   };
@@ -226,14 +214,16 @@ function ingredientsMarkdown(
   return lines.join("\n");
 }
 
-function stepsMarkdown(data) {
+function stepsMarkdown(data, { includeSectionHeading = true } = {}) {
   const { steps } = data;
   if (steps == null) return "";
 
   if (typeof steps === "string") {
     const trimmed = steps.trim();
     if (!trimmed) return "";
-    return [COOKING, trimmed].join("\n");
+    return includeSectionHeading
+      ? [COOKING_HEADING, trimmed].join("\n")
+      : trimmed;
   }
 
   if (!Array.isArray(steps) || !steps.length) return "";
@@ -250,7 +240,23 @@ function stepsMarkdown(data) {
     .filter(Boolean)
     .map((text, i) => `${i + 1}. ${text}`);
 
-  return lines.length ? [COOKING, ...lines].join("\n") : "";
+  if (!lines.length) return "";
+
+  return includeSectionHeading
+    ? [COOKING_HEADING, ...lines].join("\n")
+    : lines.join("\n");
+}
+
+function recipeContentBlocks(data, content, ingredientMultiplier = 1) {
+  const ingredients = normalizeIngredients(
+    data.ingredients,
+    ingredientMultiplier
+  );
+  return {
+    ingredientsMarkdown: ingredients ? ingredientsMarkdown(ingredients) : "",
+    cookingMarkdown: stepsMarkdown(data),
+    trailingMarkdown: trailingRecipeMarkdown(content),
+  };
 }
 
 function metaTable(
@@ -272,33 +278,23 @@ function metaTable(
   ].join("\n");
 }
 
-function composeRecipeMarkdown(
-  data,
-  content,
-  ingredientMultiplier = 1,
-  { excludeIngredients = false, excludeMeta = false } = {}
-) {
+function composeRecipeMarkdown(data, content, ingredientMultiplier = 1) {
   const title = toString(data.title);
-  const ingredients = excludeIngredients
-    ? null
-    : normalizeIngredients(data.ingredients, ingredientMultiplier);
-  const steps = stepsMarkdown(data);
   const servings = parseRecipeServings(data);
   const includeServingsColumn =
     data.servings != null ||
     !!toString(data.difficulty) ||
     !!toString(data.time);
+  const { ingredientsMarkdown, cookingMarkdown, trailingMarkdown } =
+    recipeContentBlocks(data, content, ingredientMultiplier);
 
   return [
     title && `${H1}${title}`,
-    !excludeMeta &&
-      metaTable(data.difficulty, data.time, servings, {
-        includeServingsColumn,
-      }),
+    metaTable(data.difficulty, data.time, servings, { includeServingsColumn }),
     toString(data.description),
-    !excludeIngredients && ingredients && ingredientsMarkdown(ingredients),
-    steps,
-    (content || "").trim(),
+    ingredientsMarkdown,
+    cookingMarkdown,
+    trailingMarkdown,
   ]
     .filter(Boolean)
     .join("\n\n")
@@ -306,42 +302,36 @@ function composeRecipeMarkdown(
 }
 
 export function getRecipeViewParts(description, ingredientMultiplier = 1) {
-  const empty = { preamble: "", cooking: "", ingredientsMarkdown: "" };
+  const empty = {
+    preamble: "",
+    ingredientsMarkdown: "",
+    cooking: "",
+    trailing: "",
+  };
   if (!isString(description) || isEmpty(description)) return empty;
   const { data, content } = parseRecipe(description);
   const ingredients = normalizeIngredients(
     data.ingredients,
     ingredientMultiplier
   );
-  const bodyMarkdown = composeRecipeMarkdown(
-    data,
-    content,
-    ingredientMultiplier,
-    { excludeIngredients: true, excludeMeta: true }
-  );
   return {
-    ...splitRecipeBodyMarkdown(bodyMarkdown),
+    preamble: preambleMarkdown(data),
     ingredientsMarkdown: ingredients
       ? ingredientsMarkdown(ingredients, INGREDIENTS_TABLE, {
           includeSectionHeading: false,
         })
       : "",
+    cooking: stepsMarkdown(data, { includeSectionHeading: false }),
+    trailing: trailingRecipeMarkdown(content),
   };
 }
 
-export function getMarkdown(description, options = {}) {
+export function getMarkdown(description, { ingredientMultiplier = 1 } = {}) {
   if (!isString(description) || isEmpty(description)) return "";
-  const {
-    ingredientMultiplier = 1,
-    excludeIngredients = false,
-    excludeMeta = false,
-  } = options;
   const { data, content } = parseRecipe(description);
-  const composed = composeRecipeMarkdown(data, content, ingredientMultiplier, {
-    excludeIngredients,
-    excludeMeta,
-  });
-  return composed || content || "";
+  return (
+    composeRecipeMarkdown(data, content, ingredientMultiplier) || content || ""
+  );
 }
 
-export { parseQuantity, scaleQuantity, formatQuantity };
+export { scaleQuantity };
