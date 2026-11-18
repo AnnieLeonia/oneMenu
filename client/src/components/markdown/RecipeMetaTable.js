@@ -42,7 +42,7 @@ function RecipeMetaTable({
               >
                 {servingOptions.map((count) => (
                   <option key={count} value={String(count)}>
-                    {count} {RECIPE_LABELS.servingsUnit}
+                    {count} {RECIPE_LABELS.servingsUnitShort}
                   </option>
                 ))}
               </select>

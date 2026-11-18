@@ -11,8 +11,9 @@ const COOKING = "## 👩‍🍳 Tillagning";
 export const RECIPE_LABELS = {
   difficultyHeader: "💪 Svårighetsgrad",
   timeHeader: "⏱️ Tid",
-  servingsHeader: "👥 Personer",
-  servingsUnit: "pers",
+  servingsHeader: "🥘 Portioner",
+  servingsUnit: "portioner",
+  servingsUnitShort: "st",
   ingredientsHeading: INGREDIENTS_HEADING,
   cookingHeading: "👩‍🍳 Tillagning",
   ingredientsTableAmount: "Mängd",
@@ -49,7 +50,7 @@ export function splitRecipeBodyMarkdown(markdown) {
   };
 }
 const META_TABLE = [
-  "💪 Svårighetsgrad   | ⏱️ Tid | 👥 Personer",
+  "💪 Svårighetsgrad   | ⏱️ Tid | 🥘 Portioner",
   "---------------- | ------------- | --------",
 ];
 
@@ -278,7 +279,7 @@ function stepsMarkdown(data) {
 }
 
 function formatServingsLabel(count) {
-  return `${count} pers`;
+  return `${count} portioner`;
 }
 
 function metaTable(

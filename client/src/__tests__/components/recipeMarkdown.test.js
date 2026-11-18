@@ -53,8 +53,8 @@ ingredients:
     unit: g
 ---
 `);
-    expect(md).toContain("👥 Personer");
-    expect(md).toContain("4 pers");
+    expect(md).toContain("🥘 Portioner");
+    expect(md).toContain("4 portioner");
   });
 
   it("defaults base servings to 4 when omitted", () => {
@@ -81,6 +81,6 @@ title: Test
 servings: 6
 ---
 `);
-    expect(md).toContain("6 pers");
+    expect(md).toContain("6 portioner");
   });
 });
