@@ -34,13 +34,8 @@ function parseFrontmatterItem(item) {
  * @returns {Array<{ name: string, quantity?: *, unit?: string, group?: string }>|null}
  */
 export function parseIngredientsFromFrontmatter(data) {
-  if (!data || !isArray(data.ingredients) || !size(data.ingredients)) {
-    return null;
-  }
-
-  const ingredients = pipe(
-    map(parseFrontmatterItem),
-    compact
-  )(data.ingredients);
+  const raw = data?.ingredients;
+  if (!isArray(raw) || !size(raw)) return null;
+  const ingredients = pipe(map(parseFrontmatterItem), compact)(raw);
   return size(ingredients) ? ingredients : null;
 }

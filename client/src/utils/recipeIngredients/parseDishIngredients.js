@@ -3,6 +3,7 @@ import {
   flatMap,
   flow,
   map,
+  orderBy,
   uniq,
   uniqBy,
   values,
@@ -85,17 +86,16 @@ export function parseDishIngredients(description) {
 }
 
 function pickMostCommonName(counts) {
-  const names = Object.keys(counts || {});
-  if (!names.length) return "";
-  return names.reduce((best, name) => {
+  return Object.keys(counts || {}).reduce((best, name) => {
     const n = counts[name];
-    const bestN = counts[best];
-    return n > bestN ||
+    const bestN = best ? counts[best] : 0;
+    return !best ||
+      n > bestN ||
       (n === bestN &&
         name.localeCompare(best, "sv", { sensitivity: "base" }) < 0)
       ? name
       : best;
-  });
+  }, "");
 }
 
 /**
@@ -185,47 +185,46 @@ export function buildFindIngredientContext(dishes) {
 
 /** Default finder chip list (no search): family chips, listable singles, not staples. */
 export function isFinderChipVisibleByDefault(ing) {
-  if (!ing || ing.hiddenFromDefaultList) return false;
-  if (ing.isCollapsedGroup) return true;
-  if (canonicalIdAssignedGroupId(ing.id)) return false;
-  return ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT;
-}
-
-function expandOneSelectionId(id, catalog, byId, add) {
-  if (isFinderSearchSelectionId(id)) {
-    filterIngredientsByLooseSearch(
-      catalog,
-      finderSearchSelectionQuery(id)
-    ).forEach((hit) => expandOneSelectionId(hit.id, catalog, byId, add));
-    return;
-  }
-  const entry = byId.get(id);
-  if (entry?.memberIds?.length) {
-    entry.memberIds.forEach(add);
-  } else if (id) {
-    expandIngredientLabelVariantIds(id, catalog).forEach(add);
-  }
+  return (
+    !!ing &&
+    !ing.hiddenFromDefaultList &&
+    (ing.isCollapsedGroup ||
+      (!canonicalIdAssignedGroupId(ing.id) &&
+        ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT))
+  );
 }
 
 export function expandFindSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const seen = new Set();
   const expanded = [];
-  const add = (variantId) => {
-    if (!variantId || seen.has(variantId)) return;
-    seen.add(variantId);
-    expanded.push(variantId);
+  const add = (id) => {
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      expanded.push(id);
+    }
   };
-  (selectedIds || []).forEach((id) =>
-    expandOneSelectionId(id, catalog, byId, add)
-  );
+  const expandOne = (id) => {
+    if (isFinderSearchSelectionId(id)) {
+      filterIngredientsByLooseSearch(
+        catalog,
+        finderSearchSelectionQuery(id)
+      ).forEach((hit) => expandOne(hit.id));
+      return;
+    }
+    const entry = byId.get(id);
+    if (entry?.memberIds?.length) entry.memberIds.forEach(add);
+    else if (id) expandIngredientLabelVariantIds(id, catalog).forEach(add);
+  };
+  (selectedIds || []).forEach(expandOne);
   return expanded;
 }
 
+const byRecipeCountThenLabel = orderBy(
+  ["recipeCount", "label"],
+  ["desc", "asc"]
+);
+
 export function sortFinderCatalogEntries(items) {
-  return [...(items || [])].sort((a, b) =>
-    a.recipeCount !== b.recipeCount
-      ? b.recipeCount - a.recipeCount
-      : a.label.localeCompare(b.label, "sv", { sensitivity: "base" })
-  );
+  return byRecipeCountThenLabel(items || []);
 }

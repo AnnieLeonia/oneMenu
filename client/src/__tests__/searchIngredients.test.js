@@ -28,6 +28,27 @@ describe("searchIngredients", () => {
     expect(ingredientLabelMatchesSearch("nötfärs", "färs")).toBe(true);
   });
 
+  it("ignores färsk as a search term but matches other words in the name", () => {
+    expect(ingredientLabelMatchesSearch("färsk timjan", "färsk")).toBe(false);
+    expect(ingredientLabelMatchesSearch("färsk lax", "färsk")).toBe(false);
+    expect(ingredientLabelMatchesSearch("färsk timjan", "timjan")).toBe(true);
+    expect(ingredientLabelMatchesSearch("färsk lax", "lax")).toBe(true);
+    const catalog = [
+      { id: getIngredientId("färsk timjan"), label: "färsk timjan" },
+      { id: getIngredientId("timjan"), label: "timjan" },
+      {
+        id: "group:färs",
+        label: "färs",
+        isCollapsedGroup: true,
+        recipeCount: 1,
+      },
+    ];
+    expect(filterIngredientsByLooseSearch(catalog, "färsk")).toEqual([]);
+    expect(
+      filterIngredientsByLooseSearch(catalog, "timjan").map((h) => h.id)
+    ).toEqual([getIngredientId("färsk timjan"), getIngredientId("timjan")]);
+  });
+
   it("does not match plain kyckling when searching kycklingfilé", () => {
     expect(
       ingredientLabelMatchesSearch(

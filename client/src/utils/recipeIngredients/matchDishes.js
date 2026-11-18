@@ -56,14 +56,13 @@ export function matchDishes(
       map((dish) => {
         const dishIds = dishIndex.get(dish.id);
         if (!dishIds?.length) return null;
-        const matched = dishIds.filter((id) => {
-          if (selected.has(id)) return true;
-          const label = getIngredientLabel(id);
-          return (
-            label &&
-            chipLabels.some((q) => ingredientLabelMatchesSearch(label, q))
-          );
-        }).length;
+        const matched = dishIds.filter(
+          (id) =>
+            selected.has(id) ||
+            chipLabels.some((q) =>
+              ingredientLabelMatchesSearch(getIngredientLabel(id), q)
+            )
+        ).length;
         return matched > 0 ? { dish, matched, total: dishIds.length } : null;
       })(dishes || [])
     )

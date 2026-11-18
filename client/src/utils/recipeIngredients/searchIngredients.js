@@ -1,11 +1,4 @@
-import {
-  compact,
-  filter as filterFp,
-  flow,
-  map,
-  trim,
-  toLower,
-} from "lodash/fp";
+import { compact, flow, trim, toLower } from "lodash/fp";
 
 import { formatFinderLabel } from "./normalizeIngredient";
 import {
@@ -15,8 +8,10 @@ import {
 
 export const FINDER_SEARCH_SELECTION_PREFIX = "search:";
 
+const normalizeQuery = flow((q) => String(q || ""), trim, toLower);
+
 export function makeFinderSearchSelectionId(query) {
-  const q = flow(trim, toLower)(String(query || ""));
+  const q = normalizeQuery(query);
   if (!q) return null;
   return `${FINDER_SEARCH_SELECTION_PREFIX}${q}`;
 }
@@ -30,6 +25,21 @@ export function isFinderSearchSelectionId(id) {
 export function finderSearchSelectionQuery(id) {
   if (!isFinderSearchSelectionId(id)) return "";
   return id.slice(FINDER_SEARCH_SELECTION_PREFIX.length);
+}
+
+/** Modifiers like "färsk" are not meaningful Find search terms on their own. */
+const FINDER_SEARCH_IGNORED_WORDS = new Set(["färsk"]);
+
+function searchableQueryWords(q) {
+  return compact(String(q).split(/\s+/)).filter(
+    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
+  );
+}
+
+function labelWordsForSearch(text) {
+  return compact(formatFinderLabel(text).split(/\s+/)).filter(
+    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
+  );
 }
 
 /** "färs" must not match the separate staple word "färsk…". */
@@ -62,19 +72,12 @@ function wordMatchesQuery(word, query) {
  * @param {string} query lowercased, trimmed
  */
 export function ingredientLabelMatchesSearch(label, query) {
-  if (!query) return true;
+  const q = normalizeQuery(query);
+  if (!q) return true;
+  if (!searchableQueryWords(q).length) return false;
   const text = formatFinderLabel(label);
-  const q = String(query).trim().toLowerCase();
   if (q.includes(" ") && text.includes(q)) return true;
-  const words = compact(text.split(/\s+/));
-  return words.some((word) => wordMatchesQuery(word, q));
-}
-
-function catalogEntryMatchesQuery(ing, query) {
-  if (ingredientLabelMatchesSearch(ing.label, query)) return true;
-  return Boolean(
-    ing.isCollapsedGroup && collapsedGroupMatchesSearchQuery(ing.id, query)
-  );
+  return labelWordsForSearch(label).some((word) => wordMatchesQuery(word, q));
 }
 
 /** Same naming family: exact match or "laxfilé …" detail lines. */
@@ -82,18 +85,17 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
   if (!selectedId?.startsWith("raw:")) return selectedId ? [selectedId] : [];
   const selected = (catalog || []).find((ing) => ing.id === selectedId);
   if (!selected) return [selectedId];
-
   const stem = formatFinderLabel(selected.label);
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
-  const variantIds = (catalog || [])
+  const variants = (catalog || [])
     .filter((ing) => {
       if (!ing.id.startsWith("raw:") || ing.id === selectedId) return false;
       const text = formatFinderLabel(ing.label);
       return text === stem || text.startsWith(prefix);
     })
     .map((ing) => ing.id);
-  return [selectedId, ...variantIds];
+  return [selectedId, ...variants];
 }
 
 function omitCollapsedMembersWhenGroupShown(results) {
@@ -109,11 +111,14 @@ function omitCollapsedMembersWhenGroupShown(results) {
 }
 
 export function filterIngredientsByLooseSearch(ingredients, query) {
-  const q = flow(trim, toLower)(String(query || ""));
+  const q = normalizeQuery(query);
   if (!q) return ingredients;
-
-  return flow(
-    filterFp((ing) => catalogEntryMatchesQuery(ing, q)),
-    omitCollapsedMembersWhenGroupShown
-  )(ingredients || []);
+  if (!searchableQueryWords(q).length) return [];
+  return omitCollapsedMembersWhenGroupShown(
+    (ingredients || []).filter(
+      (ing) =>
+        ingredientLabelMatchesSearch(ing.label, q) ||
+        (ing.isCollapsedGroup && collapsedGroupMatchesSearchQuery(ing.id, q))
+    )
+  );
 }

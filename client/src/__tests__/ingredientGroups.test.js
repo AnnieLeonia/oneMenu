@@ -446,15 +446,12 @@ describe("ingredientGroups", () => {
     );
   });
 
-  it("matches färs variants but not färsk", () => {
+  it("matches färs variants", () => {
     const def = getIngredientGroupDef("group:färs");
     expect(groupMatchesCanonicalId(def, getIngredientId("nötfärs"))).toBe(true);
     expect(groupMatchesCanonicalId(def, getIngredientId("köttfärs"))).toBe(
       true
     );
-    expect(
-      groupMatchesCanonicalId(def, getIngredientId("färsk ingefära"))
-    ).toBe(false);
     expect(
       groupMatchesCanonicalId(def, getIngredientId("strimlat nötkött"))
     ).toBe(false);

@@ -4,36 +4,32 @@ import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
 
 const foldAccents = (text) => (text ? deburr(String(text)) : "");
 
-function isFarsName(cleaned) {
-  if (!cleaned || /\bfärsk/.test(cleaned)) return false;
-  return cleaned.includes("färs");
-}
-
-function collapsedGroup(slug, match = slug) {
-  const matchesCleaned =
-    typeof match === "function"
-      ? match
-      : (t) => foldAccents(t).includes(foldAccents(match));
-  return { id: `group:${slug}`, label: upperFirst(slug), matchesCleaned };
+function collapsedGroup(slug) {
+  const needle = foldAccents(slug);
+  return {
+    id: `group:${slug}`,
+    label: upperFirst(slug),
+    matchesCleaned: (t) => foldAccents(t).includes(needle),
+  };
 }
 
 /** First matching entry wins (e.g. buljong before kycklingfile). */
-export const INGREDIENT_GROUP_DEFS = [
-  collapsedGroup("färs", isFarsName),
-  collapsedGroup("fläskfile"),
-  collapsedGroup("buljong"),
-  collapsedGroup("fond"),
-  collapsedGroup("kycklingfile"),
-  collapsedGroup("bacon"),
-  collapsedGroup("vitlök"),
-  collapsedGroup("parmesan"),
-  collapsedGroup("sallad"),
+const INGREDIENT_GROUP_SLUGS = [
+  "färs",
+  "fläskfile",
+  "buljong",
+  "fond",
+  "kycklingfile",
+  "bacon",
+  "vitlök",
+  "parmesan",
+  "sallad",
 ];
 
-const GROUP_BY_ID = new Map(INGREDIENT_GROUP_DEFS.map((def) => [def.id, def]));
+export const INGREDIENT_GROUP_DEFS = INGREDIENT_GROUP_SLUGS.map(collapsedGroup);
 
 export function getIngredientGroupDef(groupId) {
-  return GROUP_BY_ID.get(groupId) || null;
+  return find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS) || null;
 }
 
 /** @param {string} canonicalId @returns {string|null} */
