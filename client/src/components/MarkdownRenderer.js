@@ -3,9 +3,9 @@ import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { getMarkdownBody } from "../utils/recipeMarkdown";
 
-function createMarkup(description, includeTitle) {
+function createMarkup(description) {
   if (!description) return;
-  const markdown = getMarkdownBody(description, { includeTitle });
+  const markdown = getMarkdownBody(description);
   if (!markdown) return;
   const html = micromark(markdown, {
     extensions: [gfm()],
@@ -44,20 +44,16 @@ class MarkdownRenderer extends Component {
   };
 
   render() {
-    const { markdown, className, includeTitle } = this.props;
+    const { markdown, className } = this.props;
 
     return (
       <div
         ref={this.ref}
-        dangerouslySetInnerHTML={createMarkup(markdown, includeTitle)}
+        dangerouslySetInnerHTML={createMarkup(markdown)}
         className={className}
       />
     );
   }
 }
-
-MarkdownRenderer.defaultProps = {
-  includeTitle: true,
-};
 
 export default MarkdownRenderer;

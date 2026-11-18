@@ -15,7 +15,8 @@
     "test-client": "cd client && npm test",
     "test-server": "cd server && npm test",
     "db:migrate": "./server/migrations/run.sh",
-    "db:pull": "pg_dump --format=c -h codies.se -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
+    "env:pull": "scp gha@codies.se:/opt/stacks/onemenu/.env .env",
+    "db:pull": "ssh dev@codies.se \"docker exec postgres pg_dump --format=c -U vicnie onemenu\" | docker exec -i private-postgres pg_restore --clean --no-owner -U postgres -d onemenu"
   },
   "dependencies": {
     "dotenv": "10.0.0",
