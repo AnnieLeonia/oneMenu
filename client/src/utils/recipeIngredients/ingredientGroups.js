@@ -2,19 +2,19 @@ import { deburr, find, upperFirst } from "lodash/fp";
 
 import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
 
-const foldAccents = (text) => (text ? deburr(String(text)) : "");
+const fold = (text) => deburr(String(text || ""));
 
-function collapsedGroup(slug) {
-  const needle = foldAccents(slug);
+const collapsedGroup = (slug) => {
+  const needle = fold(slug);
   return {
     id: `group:${slug}`,
     label: upperFirst(slug),
-    matchesCleaned: (t) => foldAccents(t).includes(needle),
+    matchesCleaned: (t) => fold(t).includes(needle),
   };
-}
+};
 
 /** First matching entry wins (e.g. buljong before kycklingfile). */
-const INGREDIENT_GROUP_SLUGS = [
+export const INGREDIENT_GROUP_DEFS = [
   "färs",
   "fläskfile",
   "buljong",
@@ -24,30 +24,22 @@ const INGREDIENT_GROUP_SLUGS = [
   "vitlök",
   "parmesan",
   "sallad",
-];
+].map(collapsedGroup);
 
-export const INGREDIENT_GROUP_DEFS = INGREDIENT_GROUP_SLUGS.map(collapsedGroup);
+export const getIngredientGroupDef = (groupId) =>
+  find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS) || null;
 
-export function getIngredientGroupDef(groupId) {
-  return find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS) || null;
-}
-
-/** @param {string} canonicalId @returns {string|null} */
-export function canonicalIdAssignedGroupId(canonicalId) {
-  if (!canonicalId?.startsWith("raw:")) return null;
-  const cleaned = getIngredientLabel(canonicalId);
+export function normalizedIngredientIdAssignedGroupId(normalizedIngredientId) {
+  if (!normalizedIngredientId?.startsWith("raw:")) return null;
+  const cleaned = getIngredientLabel(normalizedIngredientId);
   if (!cleaned) return null;
-  const def = find((d) => d.matchesCleaned(cleaned))(INGREDIENT_GROUP_DEFS);
-  return def?.id ?? null;
+  return (
+    find((d) => d.matchesCleaned(cleaned))(INGREDIENT_GROUP_DEFS)?.id ?? null
+  );
 }
 
-export const groupMatchesCanonicalId = (groupDef, canonicalId) =>
-  Boolean(groupDef) && canonicalIdAssignedGroupId(canonicalId) === groupDef.id;
-
-/** e.g. köttfärs search → färs chip */
 export function collapsedGroupMatchesSearchQuery(groupId, query) {
   const def = getIngredientGroupDef(groupId);
-  if (!def) return false;
   const cleaned = cleanIngredientName(query);
-  return !!cleaned && def.matchesCleaned(cleaned);
+  return !!def && !!cleaned && def.matchesCleaned(cleaned);
 }

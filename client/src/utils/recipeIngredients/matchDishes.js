@@ -1,4 +1,4 @@
-import { compact, flow, map, orderBy, toLower } from "lodash/fp";
+import { compact, filter, flow, map, orderBy, size, toLower } from "lodash/fp";
 
 import { getIngredientLabel } from "./normalizeIngredient";
 import { parseDishIngredients } from "./parseDishIngredients";
@@ -13,24 +13,16 @@ const sortMatchResults = orderBy(
   ["desc", "asc"]
 );
 
-function dishIndexForDishes(dishes) {
-  const index = new Map();
-  (dishes || []).forEach((dish) => {
-    const { canonicalIds } = parseDishIngredients(dish.description);
-    if (canonicalIds) index.set(dish.id, canonicalIds);
-  });
-  return index;
-}
+const dishIndexForDishes = (dishes) =>
+  (dishes || []).reduce((index, dish) => {
+    const { normalizedIngredientIds } = parseDishIngredients(dish.description);
+    if (normalizedIngredientIds) index.set(dish.id, normalizedIngredientIds);
+    return index;
+  }, new Map());
 
-/**
- * Match selected ingredients against indexed dishes.
- * Only dishes with at least one matching ingredient are returned.
- *
- * @param {Array<object>} dishes
- * @param {string[]} selectedIds
- * @param {Map} [index]
- * @returns {Array<{ dish: object, matched: number, total: number }>}
- */
+const chipLabel = (getLabel) => (id) =>
+  isFinderSearchSelectionId(id) ? finderSearchSelectionQuery(id) : getLabel(id);
+
 export function matchDishes(
   dishes,
   selectedIds,
@@ -39,31 +31,24 @@ export function matchDishes(
   selectionChipIds = selectedIds
 ) {
   const selected = new Set(selectedIds || []);
-  if (selected.size === 0) return [];
+  if (!size(selected)) return [];
 
   const chipLabels = flow(
-    map((id) =>
-      isFinderSearchSelectionId(id)
-        ? finderSearchSelectionQuery(id)
-        : getLabel(id)
-    ),
+    map(chipLabel(getLabel)),
     compact
   )(selectionChipIds || []);
   const dishIndex = index || dishIndexForDishes(dishes);
+  const matchesSelection = (id) =>
+    selected.has(id) ||
+    chipLabels.some((q) => ingredientLabelMatchesSearch(getLabel(id), q));
 
   return sortMatchResults(
     compact(
       map((dish) => {
         const dishIds = dishIndex.get(dish.id);
         if (!dishIds?.length) return null;
-        const matched = dishIds.filter(
-          (id) =>
-            selected.has(id) ||
-            chipLabels.some((q) =>
-              ingredientLabelMatchesSearch(getIngredientLabel(id), q)
-            )
-        ).length;
-        return matched > 0 ? { dish, matched, total: dishIds.length } : null;
+        const matched = filter(matchesSelection)(dishIds).length;
+        return matched ? { dish, matched, total: dishIds.length } : null;
       })(dishes || [])
     )
   );

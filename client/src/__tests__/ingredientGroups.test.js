@@ -1,6 +1,5 @@
 import {
-  canonicalIdAssignedGroupId,
-  groupMatchesCanonicalId,
+  normalizedIngredientIdAssignedGroupId,
   getIngredientGroupDef,
 } from "../utils/recipeIngredients/ingredientGroups";
 import {
@@ -401,11 +400,13 @@ describe("ingredientGroups", () => {
   it("assigns strimlad kycklingfilé to kycklingfilé group", () => {
     const filé = getIngredientGroupDef("group:kycklingfile");
     expect(
-      groupMatchesCanonicalId(filé, getIngredientId("strimlad kycklingfilé"))
-    ).toBe(true);
-    expect(canonicalIdAssignedGroupId(getIngredientId("kycklingvingar"))).toBe(
-      null
-    );
+      normalizedIngredientIdAssignedGroupId(
+        getIngredientId("strimlad kycklingfilé")
+      )
+    ).toBe(filé.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingvingar"))
+    ).toBe(null);
   });
 
   it("assigns buljong and fond before kycklingfilé", () => {
@@ -413,48 +414,47 @@ describe("ingredientGroups", () => {
     const fond = getIngredientGroupDef("group:fond");
     const filé = getIngredientGroupDef("group:kycklingfile");
     const cube = getIngredientId("kycklingbuljongtärning");
-    expect(groupMatchesCanonicalId(buljong, cube)).toBe(true);
-    expect(groupMatchesCanonicalId(filé, cube)).toBe(false);
-    expect(groupMatchesCanonicalId(fond, getIngredientId("kycklingfond"))).toBe(
-      true
-    );
-    expect(groupMatchesCanonicalId(filé, getIngredientId("kycklingfond"))).toBe(
-      false
-    );
-    expect(groupMatchesCanonicalId(filé, getIngredientId("kycklingfilé"))).toBe(
-      true
-    );
+    expect(normalizedIngredientIdAssignedGroupId(cube)).toBe(buljong.id);
+    expect(normalizedIngredientIdAssignedGroupId(cube)).not.toBe(filé.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingfond"))
+    ).toBe(fond.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingfilé"))
+    ).toBe(filé.id);
   });
 
   it("assigns fläskfilé to fläskfile only", () => {
     const file = getIngredientGroupDef("group:fläskfile");
-    expect(groupMatchesCanonicalId(file, getIngredientId("fläskfilé"))).toBe(
-      true
-    );
     expect(
-      groupMatchesCanonicalId(file, getIngredientId("fläskkarré i bit"))
-    ).toBe(false);
+      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfilé"))
+    ).toBe(file.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskkarré i bit"))
+    ).toBe(null);
   });
 
   it("assigns fläskfärs to färs", () => {
     const färs = getIngredientGroupDef("group:färs");
-    expect(groupMatchesCanonicalId(färs, getIngredientId("fläskfärs"))).toBe(
-      true
-    );
-    expect(groupMatchesCanonicalId(färs, getIngredientId("fläskkarré"))).toBe(
-      false
-    );
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfärs"))
+    ).toBe(färs.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskkarré"))
+    ).toBe(null);
   });
 
   it("matches färs variants", () => {
     const def = getIngredientGroupDef("group:färs");
-    expect(groupMatchesCanonicalId(def, getIngredientId("nötfärs"))).toBe(true);
-    expect(groupMatchesCanonicalId(def, getIngredientId("köttfärs"))).toBe(
-      true
-    );
     expect(
-      groupMatchesCanonicalId(def, getIngredientId("strimlat nötkött"))
-    ).toBe(false);
+      normalizedIngredientIdAssignedGroupId(getIngredientId("nötfärs"))
+    ).toBe(def.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("köttfärs"))
+    ).toBe(def.id);
+    expect(
+      normalizedIngredientIdAssignedGroupId(getIngredientId("strimlat nötkött"))
+    ).toBe(null);
   });
 
   it("matches dishes when all group member ids are passed", () => {

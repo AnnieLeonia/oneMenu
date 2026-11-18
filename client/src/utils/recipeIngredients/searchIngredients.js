@@ -1,86 +1,59 @@
-import { compact, flow, trim, toLower } from "lodash/fp";
+import { compact, filter, flow, get, map, trim, toLower } from "lodash/fp";
 
-import { formatFinderLabel } from "./normalizeIngredient";
 import {
-  canonicalIdAssignedGroupId,
+  FINDER_SEARCH_IGNORED_WORDS,
+  formatFinderLabel,
+} from "./normalizeIngredient";
+import {
+  normalizedIngredientIdAssignedGroupId,
   collapsedGroupMatchesSearchQuery,
 } from "./ingredientGroups";
 
 export const FINDER_SEARCH_SELECTION_PREFIX = "search:";
 
-const normalizeQuery = flow((q) => String(q || ""), trim, toLower);
+const normalizeQuery = flow(String, trim, toLower);
 
-export function makeFinderSearchSelectionId(query) {
+export const makeFinderSearchSelectionId = (query) => {
   const q = normalizeQuery(query);
-  if (!q) return null;
-  return `${FINDER_SEARCH_SELECTION_PREFIX}${q}`;
-}
+  return q ? `${FINDER_SEARCH_SELECTION_PREFIX}${q}` : null;
+};
 
-export function isFinderSearchSelectionId(id) {
+export const isFinderSearchSelectionId = (id) =>
+  typeof id === "string" && id.startsWith(FINDER_SEARCH_SELECTION_PREFIX);
+
+export const finderSearchSelectionQuery = (id) =>
+  isFinderSearchSelectionId(id)
+    ? id.slice(FINDER_SEARCH_SELECTION_PREFIX.length)
+    : "";
+
+const searchWords = (text) =>
+  compact(String(text).split(/\s+/)).filter(
+    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
+  );
+
+const MIN_QUERY_LENGTH = 3;
+const MAX_QUERY_LONGER_THAN_LABEL = 3;
+
+const includesMatch = (text, query) => {
+  const haystack = String(text || "");
+  if (!haystack || query.length < MIN_QUERY_LENGTH) return false;
+  if (query.includes("färs") && haystack.startsWith("färsk")) return false;
+  if (haystack.includes(query)) return true;
   return (
-    typeof id === "string" && id.startsWith(FINDER_SEARCH_SELECTION_PREFIX)
+    haystack.length >= 4 &&
+    query.startsWith(haystack) &&
+    query.length - haystack.length <= MAX_QUERY_LONGER_THAN_LABEL
   );
-}
+};
 
-export function finderSearchSelectionQuery(id) {
-  if (!isFinderSearchSelectionId(id)) return "";
-  return id.slice(FINDER_SEARCH_SELECTION_PREFIX.length);
-}
-
-/** Modifiers like "färsk" are not meaningful Find search terms on their own. */
-const FINDER_SEARCH_IGNORED_WORDS = new Set(["färsk"]);
-
-function searchableQueryWords(q) {
-  return compact(String(q).split(/\s+/)).filter(
-    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
-  );
-}
-
-function labelWordsForSearch(text) {
-  return compact(formatFinderLabel(text).split(/\s+/)).filter(
-    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
-  );
-}
-
-/** "färs" must not match the separate staple word "färsk…". */
-function isFarsFreshFalsePositive(word, query) {
-  return query.includes("färs") && word.startsWith("färsk");
-}
-
-/** Short suffix only (tomat → tomater), not kyckling → kycklingfilé. */
-const MAX_QUERY_LONGER_THAN_WORD = 3;
-
-function wordMatchesQuery(word, query) {
-  if (!word || !query) return false;
-  if (isFarsFreshFalsePositive(word, query)) return false;
-  if (word === query) return true;
-  if (word.startsWith(query)) return true;
-  if (
-    word.length >= 4 &&
-    query.startsWith(word) &&
-    query.length - word.length <= MAX_QUERY_LONGER_THAN_WORD
-  ) {
-    return true;
-  }
-  if (query.length >= 3 && word.endsWith(query)) return true;
-  return false;
-}
-
-/**
- * Loose match: any word in the ingredient name vs the search string.
- * @param {string} label
- * @param {string} query lowercased, trimmed
- */
 export function ingredientLabelMatchesSearch(label, query) {
   const q = normalizeQuery(query);
   if (!q) return true;
-  if (!searchableQueryWords(q).length) return false;
+  if (!searchWords(q).length) return false;
   const text = formatFinderLabel(label);
-  if (q.includes(" ") && text.includes(q)) return true;
-  return labelWordsForSearch(label).some((word) => wordMatchesQuery(word, q));
+  return [text, ...searchWords(text)].some((part) => includesMatch(part, q));
 }
 
-/** Same naming family: exact match or "laxfilé …" detail lines. */
 export function expandIngredientLabelVariantIds(selectedId, catalog) {
   if (!selectedId?.startsWith("raw:")) return selectedId ? [selectedId] : [];
   const selected = (catalog || []).find((ing) => ing.id === selectedId);
@@ -88,37 +61,42 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
   const stem = formatFinderLabel(selected.label);
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
-  const variants = (catalog || [])
-    .filter((ing) => {
-      if (!ing.id.startsWith("raw:") || ing.id === selectedId) return false;
-      const text = formatFinderLabel(ing.label);
-      return text === stem || text.startsWith(prefix);
-    })
-    .map((ing) => ing.id);
+  const variants = flow(
+    filter(
+      (ing) =>
+        ing.id.startsWith("raw:") &&
+        ing.id !== selectedId &&
+        (formatFinderLabel(ing.label) === stem ||
+          formatFinderLabel(ing.label).startsWith(prefix))
+    ),
+    map(get("id"))
+  )(catalog);
   return [selectedId, ...variants];
 }
 
-function omitCollapsedMembersWhenGroupShown(results) {
+const omitCollapsedMembersWhenGroupShown = (results) => {
   const groupIds = new Set(
     results.filter((ing) => ing.isCollapsedGroup).map((ing) => ing.id)
   );
   if (!groupIds.size) return results;
-  return results.filter((ing) => {
-    if (ing.isCollapsedGroup || !ing.id?.startsWith("raw:")) return true;
-    const groupId = canonicalIdAssignedGroupId(ing.id);
-    return !groupId || !groupIds.has(groupId);
-  });
-}
+  return filter(
+    (ing) =>
+      ing.isCollapsedGroup ||
+      !ing.id?.startsWith("raw:") ||
+      !groupIds.has(normalizedIngredientIdAssignedGroupId(ing.id))
+  )(results);
+};
+
+const matchesLooseSearch = (ing, q) =>
+  ingredientLabelMatchesSearch(ing.label, q) ||
+  (ing.isCollapsedGroup && collapsedGroupMatchesSearchQuery(ing.id, q));
 
 export function filterIngredientsByLooseSearch(ingredients, query) {
   const q = normalizeQuery(query);
   if (!q) return ingredients;
-  if (!searchableQueryWords(q).length) return [];
-  return omitCollapsedMembersWhenGroupShown(
-    (ingredients || []).filter(
-      (ing) =>
-        ingredientLabelMatchesSearch(ing.label, q) ||
-        (ing.isCollapsedGroup && collapsedGroupMatchesSearchQuery(ing.id, q))
-    )
-  );
+  if (!searchWords(q).length) return [];
+  return flow(
+    filter((ing) => matchesLooseSearch(ing, q)),
+    omitCollapsedMembersWhenGroupShown
+  )(ingredients || []);
 }

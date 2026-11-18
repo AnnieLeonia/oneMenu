@@ -25,27 +25,30 @@ export function getIngredientId(name) {
   return `raw:${cleaned}`;
 }
 
-/** Display text for the Find ingredient UI (always lowercase). */
-export function formatFinderLabel(text) {
-  if (text == null || text === "") return "";
-  return String(text).toLocaleLowerCase("sv");
-}
+export const formatFinderLabel = (text) =>
+  text == null || text === "" ? "" : String(text).toLocaleLowerCase("sv");
 
 /**
  * @param {string} ingredientId
  * @returns {string}
  */
-export function getIngredientLabel(ingredientId) {
-  if (!ingredientId) return "";
-  return ingredientId.startsWith("raw:") ? ingredientId.slice(4) : ingredientId;
-}
+export const getIngredientLabel = (ingredientId) =>
+  ingredientId?.startsWith("raw:") ? ingredientId.slice(4) : ingredientId || "";
 
-const FINDER_EXCLUDED_SUBSTRINGS = [
+const FINDER_SEARCH_STOP_WORDS = [
+  "färsk",
   "salt",
   "peppar",
   "olja",
   "smör",
   "vatten",
+];
+
+/** Whole words that must not be used as Find search terms on their own. */
+export const FINDER_SEARCH_IGNORED_WORDS = new Set(FINDER_SEARCH_STOP_WORDS);
+
+const FINDER_EXCLUDED_SUBSTRINGS = [
+  ...FINDER_SEARCH_STOP_WORDS.filter((w) => w !== "färsk"),
   "mjöl",
   "mjölk",
   "ris",

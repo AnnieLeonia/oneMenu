@@ -22,10 +22,29 @@ describe("searchIngredients", () => {
     expect(ingredientLabelMatchesSearch("laxfilé", "lax")).toBe(true);
   });
 
+  it("matches substring in compound words (grädd → vispgrädde)", () => {
+    expect(ingredientLabelMatchesSearch("vispgrädde", "grädd")).toBe(true);
+    expect(ingredientLabelMatchesSearch("vispgrädde", "grädde")).toBe(true);
+  });
+
   it("does not treat färsk as färs", () => {
     expect(ingredientLabelMatchesSearch("färsk lax", "färs")).toBe(false);
     expect(ingredientLabelMatchesSearch("färsk ingefära", "färs")).toBe(false);
     expect(ingredientLabelMatchesSearch("nötfärs", "färs")).toBe(true);
+  });
+
+  it("ignores pantry staple words as search terms", () => {
+    for (const q of ["salt", "peppar", "olja", "smör", "vatten"]) {
+      expect(ingredientLabelMatchesSearch("olivolja", q)).toBe(false);
+      expect(ingredientLabelMatchesSearch("flingsalt", q)).toBe(false);
+      expect(
+        filterIngredientsByLooseSearch(
+          [{ id: getIngredientId("olivolja"), label: "olivolja" }],
+          q
+        )
+      ).toEqual([]);
+    }
+    expect(ingredientLabelMatchesSearch("olivolja", "oliv")).toBe(true);
   });
 
   it("ignores färsk as a search term but matches other words in the name", () => {
