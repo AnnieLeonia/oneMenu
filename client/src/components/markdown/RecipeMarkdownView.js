@@ -16,10 +16,9 @@ function RecipeMarkdownView({
   ingredientMultiplier = 1,
   difficulty,
   time,
-  baseServings,
   selectedServings,
   servingOptions,
-  canScalePortions,
+  showMetaTable,
   onServingsChange,
 }) {
   const { preamble, cooking, ingredientsMarkdown } = getRecipeViewParts(
@@ -29,20 +28,20 @@ function RecipeMarkdownView({
 
   return (
     <div className={className}>
-      <table className="recipe-meta-table">
-        <thead>
-          <tr>
-            <th>{RECIPE_LABELS.difficultyHeader}</th>
-            <th>{RECIPE_LABELS.timeHeader}</th>
-            <th>{RECIPE_LABELS.servingsHeader}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{difficulty || "-"}</td>
-            <td>{time || "-"}</td>
-            <td className="recipe-servings-cell">
-              {canScalePortions ? (
+      {showMetaTable && (
+        <table className="recipe-meta-table">
+          <thead>
+            <tr>
+              <th>{RECIPE_LABELS.difficultyHeader}</th>
+              <th>{RECIPE_LABELS.timeHeader}</th>
+              <th>{RECIPE_LABELS.servingsHeader}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{difficulty || "-"}</td>
+              <td>{time || "-"}</td>
+              <td className="recipe-servings-cell">
                 <select
                   className="recipe-servings-select"
                   value={String(selectedServings)}
@@ -55,13 +54,11 @@ function RecipeMarkdownView({
                     </option>
                   ))}
                 </select>
-              ) : (
-                `${baseServings} ${RECIPE_LABELS.servingsUnit}`
-              )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      )}
       <div onClick={toggleCrossOut}>
         {recipeHtml(preamble)}
         {cooking && (
@@ -87,11 +84,14 @@ RecipeMarkdownView.propTypes = {
   ingredientMultiplier: PropTypes.number,
   difficulty: PropTypes.string,
   time: PropTypes.string,
-  baseServings: PropTypes.number.isRequired,
   selectedServings: PropTypes.number.isRequired,
   servingOptions: PropTypes.arrayOf(PropTypes.number).isRequired,
-  canScalePortions: PropTypes.bool.isRequired,
-  onServingsChange: PropTypes.func.isRequired,
+  showMetaTable: PropTypes.bool.isRequired,
+  onServingsChange: PropTypes.func,
+};
+
+RecipeMarkdownView.defaultProps = {
+  onServingsChange: () => {},
 };
 
 export default RecipeMarkdownView;

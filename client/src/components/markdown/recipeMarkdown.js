@@ -166,12 +166,8 @@ function normalizeIngredients(raw, ingredientMultiplier = 1) {
   return items.length ? items : null;
 }
 
-function hasExplicitRecipeServings(data) {
-  return data.servings != null || data.persons != null || data.personer != null;
-}
-
 function parseRecipeServings(data) {
-  const raw = data.servings ?? data.persons ?? data.personer;
+  const raw = data.servings;
   if (typeof raw === "number" && raw > 0) return raw;
   const parsed = parseInt(toString(raw), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
@@ -179,24 +175,16 @@ function parseRecipeServings(data) {
 
 export function getRecipeShowInfo(description) {
   const { data } = parseRecipe(description);
-  const items = normalizeIngredients(data.ingredients);
-  const canScalePortions =
-    !!items?.length &&
-    items.some((item) => !isNil(item.quantity) && item.quantity !== "");
   const baseServings = parseRecipeServings(data);
+  const difficulty = toString(data.difficulty);
+  const time = toString(data.time);
+  const servings = toString(data.servings);
   return {
     baseServings,
     servingOptions: sortBy(identity, union(SERVING_PRESETS, [baseServings])),
-    canScalePortions,
-    showRecipeView:
-      canScalePortions ||
-      !!(
-        toString(data.difficulty) ||
-        toString(data.time) ||
-        hasExplicitRecipeServings(data)
-      ),
-    difficulty: toString(data.difficulty),
-    time: toString(data.time),
+    showMetaTable: !!(difficulty || time || servings),
+    difficulty,
+    time,
   };
 }
 
@@ -297,7 +285,7 @@ function composeRecipeMarkdown(
   const steps = stepsMarkdown(data);
   const servings = parseRecipeServings(data);
   const includeServingsColumn =
-    hasExplicitRecipeServings(data) ||
+    data.servings != null ||
     !!toString(data.difficulty) ||
     !!toString(data.time);
 

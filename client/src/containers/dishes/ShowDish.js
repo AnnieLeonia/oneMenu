@@ -6,7 +6,6 @@ import { get, toInteger } from "lodash/fp";
 
 import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
-import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
 import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
 import { getRecipeShowInfo } from "../../components/markdown/recipeMarkdown";
 
@@ -49,14 +48,8 @@ class ShowDish extends Component {
       isLoggedIn,
     } = this.props;
     const { selectedServings } = this.state;
-    const {
-      baseServings,
-      servingOptions,
-      canScalePortions,
-      showRecipeView,
-      difficulty,
-      time,
-    } = getRecipeShowInfo(description);
+    const { baseServings, servingOptions, showMetaTable, difficulty, time } =
+      getRecipeShowInfo(description);
     const ingredientMultiplier = selectedServings / baseServings;
 
     if (!name) {
@@ -68,27 +61,19 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          {showRecipeView ? (
-            <RecipeMarkdownView
-              markdown={description}
-              className="markdown-body"
-              ingredientMultiplier={ingredientMultiplier}
-              difficulty={difficulty}
-              time={time}
-              baseServings={baseServings}
-              selectedServings={selectedServings}
-              servingOptions={servingOptions}
-              canScalePortions={canScalePortions}
-              onServingsChange={(count) =>
-                this.setState({ selectedServings: count })
-              }
-            />
-          ) : (
-            <MarkdownRenderer
-              markdown={description}
-              className="markdown-body"
-            />
-          )}
+          <RecipeMarkdownView
+            markdown={description}
+            className="markdown-body"
+            ingredientMultiplier={ingredientMultiplier}
+            difficulty={difficulty}
+            time={time}
+            selectedServings={selectedServings}
+            servingOptions={servingOptions}
+            showMetaTable={showMetaTable}
+            onServingsChange={(count) =>
+              this.setState({ selectedServings: count })
+            }
+          />
         </div>
         <br />
         <br />
