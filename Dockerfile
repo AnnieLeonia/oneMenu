@@ -9,13 +9,18 @@ COPY client/ ./
 ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build-server
+
+WORKDIR /app/server
+
+COPY server/package.json server/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
 FROM node:22-alpine
 
 WORKDIR /app
 
-COPY server/package.json server/package-lock.json ./server/
-RUN cd server && npm ci --omit=dev --ignore-scripts
-
+COPY --from=build-server /app/server/node_modules ./server/node_modules
 COPY server/ ./server/
 COPY --from=build-client /app/client/build ./client/build
 
