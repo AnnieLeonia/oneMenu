@@ -84,7 +84,7 @@ export function buildFindIngredientContext(dishes) {
     for (const item of displayIngredients) {
       const { normalizedIngredientId: id, name: rawName } = item;
       const name = (rawName || "").trim();
-      if (!id || !name) continue;
+      if (!id || !name || isFinderExcludedIngredient(id)) continue;
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
       if (!byId[id]) {

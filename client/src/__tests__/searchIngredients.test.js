@@ -20,6 +20,8 @@ describe("searchIngredients", () => {
 
   it("matches partial prefix on a word", () => {
     expect(ingredientLabelMatchesSearch("laxfilé", "lax")).toBe(true);
+    expect(ingredientLabelMatchesSearch("laxfilé", "l")).toBe(true);
+    expect(ingredientLabelMatchesSearch("laxfilé", "la")).toBe(true);
   });
 
   it("matches substring in compound words (grädd → vispgrädde)", () => {

@@ -44,7 +44,7 @@ describe("isFinderExcludedIngredient", () => {
     expect(isFinderExcludedIngredient(getIngredientId("fisk"))).toBe(false);
   });
 
-  it("keeps staples in catalog for search", () => {
+  it("omits staples from the finder catalog", () => {
     const dishes = [
       {
         id: 1,
@@ -69,9 +69,9 @@ ingredients:
       },
     ];
     const { catalog } = buildFindIngredientContext(dishes);
-    const salt = catalog.find((ing) => ing.id === getIngredientId("salt"));
-    expect(salt).toBeDefined();
-    expect(salt.hiddenFromDefaultList).toBe(true);
+    expect(catalog.find((ing) => ing.id === getIngredientId("salt"))).toBe(
+      undefined
+    );
   });
 });
 

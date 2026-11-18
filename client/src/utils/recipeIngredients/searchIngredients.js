@@ -3,6 +3,7 @@ import { compact, filter, flow, get, map, trim, toLower } from "lodash/fp";
 import {
   FINDER_SEARCH_IGNORED_WORDS,
   formatFinderLabel,
+  isFinderExcludedIngredient,
 } from "./normalizeIngredient";
 import {
   normalizedIngredientIdAssignedGroupId,
@@ -31,7 +32,7 @@ const searchWords = (text) =>
     (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
   );
 
-const MIN_QUERY_LENGTH = 3;
+const MIN_QUERY_LENGTH = 1;
 const MAX_QUERY_LONGER_THAN_LABEL = 3;
 
 const includesMatch = (text, query) => {
@@ -96,6 +97,7 @@ export function filterIngredientsByLooseSearch(ingredients, query) {
   if (!q) return ingredients;
   if (!searchWords(q).length) return [];
   return flow(
+    filter((ing) => !isFinderExcludedIngredient(ing.id)),
     filter((ing) => matchesLooseSearch(ing, q)),
     omitCollapsedMembersWhenGroupShown
   )(ingredients || []);
