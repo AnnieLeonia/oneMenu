@@ -27,19 +27,6 @@ export function parseDescription(description) {
   }
 }
 
-function hasRecipeMeta(data) {
-  if (!isObject(data)) return false;
-  return Boolean(
-    toString(data.title) ||
-      toString(data.description) ||
-      data.difficulty ||
-      data.time ||
-      data.ingredients?.length ||
-      (Array.isArray(data.steps) && data.steps.length) ||
-      (typeof data.steps === "string" && data.steps.trim())
-  );
-}
-
 function normalizeIngredients(raw) {
   if (!Array.isArray(raw) || !raw.length) return null;
 
@@ -134,9 +121,7 @@ function metaTable(difficulty, time) {
   return [...META_TABLE, `${d || "-"} | ${timeStr || "-"}`].join("\n");
 }
 
-function composeFromFrontmatter(data, content) {
-  if (!hasRecipeMeta(data)) return "";
-
+function composeRecipeMarkdown(data, content) {
   const title = toString(data.title);
   const ingredients = normalizeIngredients(data.ingredients);
   const steps = stepsMarkdown(data);
@@ -156,6 +141,6 @@ function composeFromFrontmatter(data, content) {
 
 export function getMarkdownBody(description) {
   const { data, content } = parseDescription(description);
-  const composed = composeFromFrontmatter(data, content);
+  const composed = composeRecipeMarkdown(data, content);
   return composed || content || "";
 }
