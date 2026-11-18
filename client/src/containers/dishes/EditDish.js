@@ -154,22 +154,25 @@ EditDish.propTypes = {
   }).isRequired,
 };
 
-const handleSubmit = (event, id, history, location) => (dispatch) => {
+const handleSubmit = (event, id, history, location) => async (dispatch) => {
+  event.preventDefault();
+
   const data = new FormData(event.target);
 
-  const edit = editDish({
-    id,
-    name: data.get("dishName"),
-    img: data.get("dishImg"),
-    description: data.get("dishDescription"),
-    categoryIds: data.getAll("categoryIds"),
-    menuDayId: data.get("menuDayId"),
-  });
+  const dish = await dispatch(
+    editDish({
+      id,
+      name: data.get("dishName"),
+      img: data.get("dishImg"),
+      description: data.get("dishDescription"),
+      categoryIds: data.getAll("categoryIds"),
+      menuDayId: data.get("menuDayId"),
+    })
+  );
 
-  dispatch(edit);
-
-  event.preventDefault();
-  redirect(history, location);
+  if (dish) {
+    redirect(history, location);
+  }
 };
 
 const mapStateToProps = (state, { match }) => ({
