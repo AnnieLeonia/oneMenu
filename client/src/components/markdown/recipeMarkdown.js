@@ -18,7 +18,7 @@ const INGREDIENTS = `## ${INGREDIENTS_HEADING}`;
 const COOKING = "## 👩‍🍳 Tillagning";
 
 export const RECIPE_LABELS = {
-  difficultyHeader: "💪 Svårighetsgrad",
+  difficultyHeader: "💪 Nivå",
   timeHeader: "⏱️ Tid",
   servingsHeader: "🥘 Portioner",
   servingsUnit: "portioner",
@@ -59,7 +59,7 @@ export const SERVING_PRESETS = [2, 4, 6, 8, 12, 14];
 const DEFAULT_SERVINGS = 4;
 const EMPTY_AMOUNT = "&nbsp;";
 
-export function parseRecipe(description) {
+function parseRecipe(description) {
   if (!isString(description) || isEmpty(description)) {
     return { data: {}, content: "" };
   }
@@ -177,40 +177,27 @@ function parseRecipeServings(data) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
 }
 
-export function getServingOptions(baseServings) {
-  return sortBy(identity, union(SERVING_PRESETS, [baseServings]));
-}
-
-function recipeHasMetaFields(data) {
-  return !!(
-    toString(data.difficulty) ||
-    toString(data.time) ||
-    hasExplicitRecipeServings(data)
-  );
-}
-
-function ingredientsHaveQuantities(items) {
-  return (
-    !!items?.length &&
-    items.some((item) => !isNil(item.quantity) && item.quantity !== "")
-  );
-}
-
 export function getRecipeShowInfo(description) {
   const { data } = parseRecipe(description);
   const items = normalizeIngredients(data.ingredients);
-  const canScalePortions = ingredientsHaveQuantities(items);
+  const canScalePortions =
+    !!items?.length &&
+    items.some((item) => !isNil(item.quantity) && item.quantity !== "");
+  const baseServings = parseRecipeServings(data);
   return {
-    baseServings: parseRecipeServings(data),
+    baseServings,
+    servingOptions: sortBy(identity, union(SERVING_PRESETS, [baseServings])),
     canScalePortions,
-    showRecipeView: canScalePortions || recipeHasMetaFields(data),
+    showRecipeView:
+      canScalePortions ||
+      !!(
+        toString(data.difficulty) ||
+        toString(data.time) ||
+        hasExplicitRecipeServings(data)
+      ),
     difficulty: toString(data.difficulty),
     time: toString(data.time),
   };
-}
-
-export function getRecipeBaseServings(description) {
-  return getRecipeShowInfo(description).baseServings;
 }
 
 function ingredientsMarkdown(
@@ -278,10 +265,6 @@ function stepsMarkdown(data) {
   return lines.length ? [COOKING, ...lines].join("\n") : "";
 }
 
-function formatServingsLabel(count) {
-  return `${count} ${RECIPE_LABELS.servingsUnit}`;
-}
-
 function metaTable(
   difficulty,
   time,
@@ -295,7 +278,9 @@ function metaTable(
   if (!hasMeta) return "";
   return [
     ...META_TABLE,
-    `${d || "-"} | ${timeStr || "-"} | ${formatServingsLabel(servings)}`,
+    `${d || "-"} | ${timeStr || "-"} | ${servings} ${
+      RECIPE_LABELS.servingsUnit
+    }`,
   ].join("\n");
 }
 
@@ -306,10 +291,9 @@ function composeRecipeMarkdown(
   { excludeIngredients = false, excludeMeta = false } = {}
 ) {
   const title = toString(data.title);
-  const ingredients = normalizeIngredients(
-    data.ingredients,
-    ingredientMultiplier
-  );
+  const ingredients = excludeIngredients
+    ? null
+    : normalizeIngredients(data.ingredients, ingredientMultiplier);
   const steps = stepsMarkdown(data);
   const servings = parseRecipeServings(data);
   const includeServingsColumn =
@@ -334,28 +318,21 @@ function composeRecipeMarkdown(
 }
 
 export function getRecipeViewParts(description, ingredientMultiplier = 1) {
-  if (!isString(description) || isEmpty(description)) {
-    return {
-      preamble: "",
-      cooking: "",
-      bodyMarkdown: "",
-      ingredientsMarkdown: "",
-    };
-  }
+  const empty = { preamble: "", cooking: "", ingredientsMarkdown: "" };
+  if (!isString(description) || isEmpty(description)) return empty;
   const { data, content } = parseRecipe(description);
+  const ingredients = normalizeIngredients(
+    data.ingredients,
+    ingredientMultiplier
+  );
   const bodyMarkdown = composeRecipeMarkdown(
     data,
     content,
     ingredientMultiplier,
     { excludeIngredients: true, excludeMeta: true }
   );
-  const ingredients = normalizeIngredients(
-    data.ingredients,
-    ingredientMultiplier
-  );
   return {
     ...splitRecipeBodyMarkdown(bodyMarkdown),
-    bodyMarkdown,
     ingredientsMarkdown: ingredients
       ? ingredientsMarkdown(ingredients, INGREDIENTS_TABLE, {
           includeSectionHeading: false,

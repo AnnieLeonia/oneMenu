@@ -8,11 +8,7 @@ import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
 import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
 import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
-import {
-  getRecipeBaseServings,
-  getRecipeShowInfo,
-  getServingOptions,
-} from "../../components/markdown/recipeMarkdown";
+import { getRecipeShowInfo } from "../../components/markdown/recipeMarkdown";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -20,7 +16,7 @@ const redirect = (history, location) =>
 class ShowDish extends Component {
   constructor(props) {
     super(props);
-    this.state = { selectedServings: getRecipeBaseServings("") };
+    this.state = { selectedServings: 4 };
   }
 
   componentDidMount() {
@@ -31,7 +27,8 @@ class ShowDish extends Component {
     const descriptionLoaded = !prevProps.description && this.props.description;
     if (prevProps.id !== this.props.id || descriptionLoaded) {
       this.setState({
-        selectedServings: getRecipeBaseServings(this.props.description),
+        selectedServings: getRecipeShowInfo(this.props.description)
+          .baseServings,
       });
     }
   }
@@ -52,9 +49,14 @@ class ShowDish extends Component {
       isLoggedIn,
     } = this.props;
     const { selectedServings } = this.state;
-    const { baseServings, canScalePortions, showRecipeView, difficulty, time } =
-      getRecipeShowInfo(description);
-    const servingOptions = getServingOptions(baseServings);
+    const {
+      baseServings,
+      servingOptions,
+      canScalePortions,
+      showRecipeView,
+      difficulty,
+      time,
+    } = getRecipeShowInfo(description);
     const ingredientMultiplier = selectedServings / baseServings;
 
     if (!name) {

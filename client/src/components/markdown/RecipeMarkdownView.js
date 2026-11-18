@@ -1,65 +1,84 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 
 import markdownToHtml from "./markdownToHtml";
-import RecipeMetaTable from "./RecipeMetaTable";
 import { toggleCrossOut } from "./toggleCrossOut";
 import { getRecipeViewParts, RECIPE_LABELS } from "./recipeMarkdown";
 
-function RecipeHtml({ markdown }) {
+const recipeHtml = (markdown) => {
   const html = markdownToHtml(markdown);
   return html ? <div dangerouslySetInnerHTML={html} /> : null;
-}
+};
 
-class RecipeMarkdownView extends Component {
-  render() {
-    const {
-      markdown,
-      className,
-      ingredientMultiplier = 1,
-      difficulty,
-      time,
-      baseServings,
-      selectedServings,
-      servingOptions,
-      canScalePortions,
-      onServingsChange,
-    } = this.props;
+function RecipeMarkdownView({
+  markdown,
+  className,
+  ingredientMultiplier = 1,
+  difficulty,
+  time,
+  baseServings,
+  selectedServings,
+  servingOptions,
+  canScalePortions,
+  onServingsChange,
+}) {
+  const { preamble, cooking, ingredientsMarkdown } = getRecipeViewParts(
+    markdown,
+    ingredientMultiplier
+  );
 
-    const { preamble, cooking, bodyMarkdown, ingredientsMarkdown } =
-      getRecipeViewParts(markdown, ingredientMultiplier);
-    const showFallbackBody = !cooking && bodyMarkdown;
-
-    return (
-      <div className={className}>
-        <RecipeMetaTable
-          difficulty={difficulty}
-          time={time}
-          baseServings={baseServings}
-          selectedServings={selectedServings}
-          servingOptions={servingOptions}
-          canScalePortions={canScalePortions}
-          onServingsChange={onServingsChange}
-        />
-        <div onClick={toggleCrossOut}>
-          <RecipeHtml markdown={preamble} />
-          {cooking && (
-            <section className="recipe-cooking">
-              <h2>{RECIPE_LABELS.cookingHeading}</h2>
-              <RecipeHtml markdown={cooking} />
-            </section>
-          )}
-          {showFallbackBody && <RecipeHtml markdown={bodyMarkdown} />}
-          {ingredientsMarkdown && (
-            <section className="recipe-ingredients">
-              <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
-              <RecipeHtml markdown={ingredientsMarkdown} />
-            </section>
-          )}
-        </div>
+  return (
+    <div className={className}>
+      <table className="recipe-meta-table">
+        <thead>
+          <tr>
+            <th>{RECIPE_LABELS.difficultyHeader}</th>
+            <th>{RECIPE_LABELS.timeHeader}</th>
+            <th>{RECIPE_LABELS.servingsHeader}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{difficulty || "-"}</td>
+            <td>{time || "-"}</td>
+            <td className="recipe-servings-cell">
+              {canScalePortions ? (
+                <select
+                  className="recipe-servings-select"
+                  value={String(selectedServings)}
+                  aria-label={RECIPE_LABELS.servingsHeader}
+                  onChange={(e) => onServingsChange(Number(e.target.value))}
+                >
+                  {servingOptions.map((count) => (
+                    <option key={count} value={String(count)}>
+                      {count} {RECIPE_LABELS.servingsUnitShort}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                `${baseServings} ${RECIPE_LABELS.servingsUnit}`
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div onClick={toggleCrossOut}>
+        {recipeHtml(preamble)}
+        {cooking && (
+          <section className="recipe-cooking">
+            <h2>{RECIPE_LABELS.cookingHeading}</h2>
+            {recipeHtml(cooking)}
+          </section>
+        )}
+        {ingredientsMarkdown && (
+          <section className="recipe-ingredients">
+            <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
+            {recipeHtml(ingredientsMarkdown)}
+          </section>
+        )}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 RecipeMarkdownView.propTypes = {

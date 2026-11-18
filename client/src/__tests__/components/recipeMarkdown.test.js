@@ -1,6 +1,6 @@
 import {
   getMarkdown,
-  getRecipeBaseServings,
+  getRecipeShowInfo,
   scaleQuantity,
 } from "../../components/markdown/recipeMarkdown";
 
@@ -41,8 +41,8 @@ describe("recipeMarkdown", () => {
   it.each([
     [recipe("difficulty: Enkel\ntime: 20 min\n"), 4],
     [recipe("servings: 6\n"), 6],
-  ])("getRecipeBaseServings", (yaml, servings) => {
-    expect(getRecipeBaseServings(yaml)).toBe(servings);
+  ])("getRecipeShowInfo baseServings", (yaml, servings) => {
+    expect(getRecipeShowInfo(yaml).baseServings).toBe(servings);
   });
 
   it.each([
