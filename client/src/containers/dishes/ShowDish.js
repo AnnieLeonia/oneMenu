@@ -44,7 +44,6 @@ class ShowDish extends Component {
           <MarkdownRenderer
             markdown={description}
             className="markdown-body"
-            stripFrontmatter
             includeTitle={false}
           />
         </div>
