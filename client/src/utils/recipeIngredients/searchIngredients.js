@@ -91,15 +91,17 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
   const stem = formatFinderLabel(selected.label);
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
-  const ids = [selectedId];
-  (catalog || []).forEach((ing) => {
-    if (!ing.id.startsWith("raw:") || ing.id === selectedId) return;
-    const text = formatFinderLabel(ing.label);
-    if (text === stem || text.startsWith(prefix)) {
-      if (!ids.includes(ing.id)) ids.push(ing.id);
-    }
-  });
-  return ids;
+  return (catalog || []).reduce(
+    (ids, ing) => {
+      if (!ing.id.startsWith("raw:") || ing.id === selectedId) return ids;
+      const text = formatFinderLabel(ing.label);
+      if ((text === stem || text.startsWith(prefix)) && !ids.includes(ing.id)) {
+        ids.push(ing.id);
+      }
+      return ids;
+    },
+    [selectedId]
+  );
 }
 
 function omitCollapsedMembersWhenGroupShown(results) {

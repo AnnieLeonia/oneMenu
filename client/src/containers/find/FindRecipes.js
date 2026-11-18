@@ -6,7 +6,6 @@ import IngredientSelector from "../../components/IngredientSelector";
 import RecipeMatchList from "../../components/RecipeMatchList";
 import {
   buildFindIngredientContext,
-  buildDishIngredientIndex,
   expandFindSelection,
   matchDishes,
 } from "../../utils/recipeIngredients";
@@ -30,13 +29,12 @@ class FindRecipes extends Component {
   render() {
     const { dishes, translate } = this.props;
     const { selectedIds } = this.state;
-    const { catalog, getLabel } = buildFindIngredientContext(dishes);
-    const index = buildDishIngredientIndex(dishes);
+    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
     const matchIds =
       selectedIds.length > 0 ? expandFindSelection(selectedIds, catalog) : [];
     const matches =
       matchIds.length > 0
-        ? matchDishes(dishes, matchIds, index, getLabel, selectedIds)
+        ? matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds)
         : [];
     const hasFilter = selectedIds.length > 0;
 

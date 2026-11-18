@@ -44,18 +44,13 @@ export function canonicalIdAssignedGroupId(canonicalId) {
   return def?.id ?? null;
 }
 
-export function getAssignedGroupDef(canonicalId) {
-  const groupId = canonicalIdAssignedGroupId(canonicalId);
-  return groupId ? getIngredientGroupDef(groupId) : null;
-}
-
 export function groupMatchesCanonicalId(groupDef, canonicalId) {
   if (!groupDef || !canonicalId?.startsWith("raw:")) return false;
   return canonicalIdAssignedGroupId(canonicalId) === groupDef.id;
 }
 
 export function isIngredientCoveredByGroups(canonicalId) {
-  return getAssignedGroupDef(canonicalId) != null;
+  return canonicalIdAssignedGroupId(canonicalId) != null;
 }
 
 /** e.g. köttfärs search → färs chip */

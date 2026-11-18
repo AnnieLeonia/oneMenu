@@ -15,24 +15,18 @@ class IngredientSelector extends Component {
     this.state = { search: "" };
   }
 
-  sortChips(items) {
+  visibleIngredients() {
+    const { catalog } = this.props;
+    const q = this.state.search.trim().toLowerCase();
+    const items = q
+      ? filterIngredientsByLooseSearch(catalog, q)
+      : catalog.filter((ing) => isFinderChipVisibleByDefault(ing));
     return [...items].sort((a, b) => {
       if (a.recipeCount !== b.recipeCount) {
         return b.recipeCount - a.recipeCount;
       }
       return a.label.localeCompare(b.label, "sv", { sensitivity: "base" });
     });
-  }
-
-  visibleIngredients() {
-    const { catalog } = this.props;
-    const q = this.state.search.trim().toLowerCase();
-    if (q) {
-      return this.sortChips(filterIngredientsByLooseSearch(catalog, q));
-    }
-    return this.sortChips(
-      catalog.filter((ing) => isFinderChipVisibleByDefault(ing))
-    );
   }
 
   onToggleIngredient(id) {

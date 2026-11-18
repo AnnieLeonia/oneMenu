@@ -19,22 +19,21 @@ export function parseIngredientsFromFrontmatter(data) {
         const name = item.trim();
         return name ? { name } : null;
       }
-      if (typeof item === "object" && item.name) {
-        const name = String(item.name).trim();
-        if (!name) return null;
-        const result = { name };
-        if (item.quantity != null && item.quantity !== "") {
-          result.quantity = item.quantity;
-        }
-        if (item.unit != null && String(item.unit).trim()) {
-          result.unit = String(item.unit).trim();
-        }
-        if (item.group != null && String(item.group).trim()) {
-          result.group = String(item.group).trim();
-        }
-        return result;
-      }
-      return null;
+      if (typeof item !== "object" || !item.name) return null;
+      const name = String(item.name).trim();
+      if (!name) return null;
+      return {
+        name,
+        ...(item.quantity != null && item.quantity !== ""
+          ? { quantity: item.quantity }
+          : null),
+        ...(item.unit != null && String(item.unit).trim()
+          ? { unit: String(item.unit).trim() }
+          : null),
+        ...(item.group != null && String(item.group).trim()
+          ? { group: String(item.group).trim() }
+          : null),
+      };
     })
     .filter(Boolean);
 

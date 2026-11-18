@@ -13,24 +13,12 @@ function dishIngredientMatchesSelection(dishCanonicalId, chipLabels) {
   );
 }
 
-/**
- * Index dishes for ingredient matching.
- * @param {Array<object>} dishes
- * @returns {Map<number, { canonicalIds: string[], displayIngredients: Array, source: string }>}
- */
-export function buildDishIngredientIndex(dishes) {
+function dishIndexForDishes(dishes) {
   const index = new Map();
-
   (dishes || []).forEach((dish) => {
-    const parsed = parseDishIngredients(dish.description);
-    if (!parsed.canonicalIds) return;
-    index.set(dish.id, {
-      canonicalIds: parsed.canonicalIds,
-      displayIngredients: parsed.displayIngredients,
-      source: parsed.source,
-    });
+    const { canonicalIds } = parseDishIngredients(dish.description);
+    if (canonicalIds) index.set(dish.id, canonicalIds);
   });
-
   return index;
 }
 
@@ -41,15 +29,7 @@ export function buildDishIngredientIndex(dishes) {
  * @param {Array<object>} dishes
  * @param {string[]} selectedIds
  * @param {Map} [index]
- * @returns {Array<{
- *   dish: object,
- *   matched: number,
- *   missing: number,
- *   total: number,
- *   missingIds: string[],
- *   missingNames: string[],
- *   score: number
- * }>}
+ * @returns {Array<{ dish: object, matched: number, total: number }>}
  */
 export function matchDishes(
   dishes,
@@ -66,39 +46,26 @@ export function matchDishes(
   const chipLabels = chipIds
     .map((id) => finderChipSearchLabel(id, labelFor))
     .filter(Boolean);
-  const dishIndex = index || buildDishIngredientIndex(dishes);
+  const dishIndex = index || dishIndexForDishes(dishes);
   const results = [];
 
   (dishes || []).forEach((dish) => {
-    const entry = dishIndex.get(dish.id);
-    if (!entry || !entry.canonicalIds.length) return;
-
-    const dishIds = entry.canonicalIds;
+    const dishIds = dishIndex.get(dish.id);
+    if (!dishIds?.length) return;
     let matched = 0;
-    const missingIds = [];
 
     dishIds.forEach((id) => {
       if (selected.has(id) || dishIngredientMatchesSelection(id, chipLabels)) {
         matched += 1;
-      } else {
-        missingIds.push(id);
       }
     });
 
     if (matched < 1) return;
 
-    const total = dishIds.length;
-    const missing = missingIds.length;
-    const score = total > 0 ? matched / total : 0;
-
     results.push({
       dish,
       matched,
-      missing,
-      total,
-      missingIds,
-      missingNames: missingIds.map(labelFor),
-      score,
+      total: dishIds.length,
     });
   });
 

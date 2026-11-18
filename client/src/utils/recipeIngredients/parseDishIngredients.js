@@ -4,7 +4,7 @@ import { parseIngredientsFromTable } from "./parseIngredientsFromTable";
 import {
   INGREDIENT_GROUP_DEFS,
   canonicalIdAssignedGroupId,
-  getAssignedGroupDef,
+  getIngredientGroupDef,
   groupMatchesCanonicalId,
   isIngredientCoveredByGroups,
 } from "./ingredientGroups";
@@ -43,7 +43,6 @@ function mergeIngredientLists(...lists) {
  *
  * @param {string|null|undefined} description
  * @returns {{
- *   source: 'frontmatter'|'table'|null,
  *   displayIngredients: Array<{ name: string, quantity?: *, unit?: string, group?: string, canonicalId: string|null }>,
  *   canonicalIds: string[]|null
  * }}
@@ -51,22 +50,13 @@ function mergeIngredientLists(...lists) {
 export function parseDishIngredients(description) {
   const { data, content } = parseFrontMatter(description);
 
-  const fromFrontmatter = parseIngredientsFromFrontmatter(data);
-  const fromTable = parseIngredientsFromTable(content);
-  const raw = mergeIngredientLists(fromFrontmatter, fromTable);
-
-  let source = null;
-  if (fromFrontmatter && fromTable) {
-    source = "both";
-  } else if (fromFrontmatter) {
-    source = "frontmatter";
-  } else if (fromTable) {
-    source = "table";
-  }
+  const raw = mergeIngredientLists(
+    parseIngredientsFromFrontmatter(data),
+    parseIngredientsFromTable(content)
+  );
 
   if (!raw) {
     return {
-      source: null,
       displayIngredients: [],
       canonicalIds: null,
     };
@@ -80,7 +70,6 @@ export function parseDishIngredients(description) {
     .filter((item) => item.canonicalId);
 
   return {
-    source,
     displayIngredients,
     canonicalIds: displayIngredients.length
       ? [...new Set(displayIngredients.map((item) => item.canonicalId))]
@@ -89,20 +78,18 @@ export function parseDishIngredients(description) {
 }
 
 function pickMostCommonName(counts) {
-  let best = "";
-  let bestCount = -1;
-  Object.keys(counts || {}).forEach((name) => {
+  return Object.keys(counts || {}).reduce((best, name) => {
     const n = counts[name];
+    const bestCount = counts[best] || -1;
     if (
       n > bestCount ||
       (n === bestCount &&
         name.localeCompare(best, "sv", { sensitivity: "base" }) < 0)
     ) {
-      best = name;
-      bestCount = n;
+      return name;
     }
-  });
-  return best;
+    return best;
+  }, "");
 }
 
 /**
@@ -110,21 +97,23 @@ function pickMostCommonName(counts) {
  * @param {Array<{ id: number, description?: string }>} dishes
  * @returns {{
  *   catalog: Array<{ id: string, label: string, category: string }>,
- *   getLabel: (id: string) => string
+ *   getLabel: (id: string) => string,
+ *   dishIndex: Map<number, string[]>
  * }}
  */
 export function buildFindIngredientContext(dishes) {
   const nameCounts = {};
   const recipeCountById = {};
   const byId = {};
-  const groupRecipeCount = {};
-  INGREDIENT_GROUP_DEFS.forEach((def) => {
-    groupRecipeCount[def.id] = 0;
-  });
+  const groupRecipeCount = Object.fromEntries(
+    INGREDIENT_GROUP_DEFS.map((def) => [def.id, 0])
+  );
+  const dishIndex = new Map();
 
   (dishes || []).forEach((dish) => {
     const parsed = parseDishIngredients(dish.description);
     if (!parsed.canonicalIds) return;
+    dishIndex.set(dish.id, parsed.canonicalIds);
     const groupsInDish = new Set();
     parsed.canonicalIds.forEach((id) => {
       recipeCountById[id] = (recipeCountById[id] || 0) + 1;
@@ -139,7 +128,7 @@ export function buildFindIngredientContext(dishes) {
       const name = (item.name || "").trim();
       if (!id || !name) return;
       const collapsedMember = Boolean(
-        getAssignedGroupDef(id)?.collapseToSingle
+        getIngredientGroupDef(canonicalIdAssignedGroupId(id))?.collapseToSingle
       );
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
@@ -185,16 +174,13 @@ export function buildFindIngredientContext(dishes) {
   });
 
   const catalog = Object.values(byId).sort(sortByPopularityDesc);
-
-  const labelById = {};
-  catalog.forEach((ing) => {
-    labelById[ing.id] = ing.label;
-  });
+  const labelById = new Map(catalog.map((ing) => [ing.id, ing.label]));
 
   return {
     catalog,
     getLabel: (id) =>
-      labelById[id] || formatFinderLabel(getIngredientLabel(id)),
+      labelById.get(id) || formatFinderLabel(getIngredientLabel(id)),
+    dishIndex,
   };
 }
 
@@ -208,22 +194,22 @@ export function isFinderChipVisibleByDefault(ing) {
 
 export function expandFindSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
+  const seen = new Set();
   const expanded = [];
+  const add = (variantId) => {
+    if (!variantId || seen.has(variantId)) return;
+    seen.add(variantId);
+    expanded.push(variantId);
+  };
   (selectedIds || []).forEach((id) => {
     if (isFinderSearchSelectionId(id)) {
-      const query = finderSearchSelectionQuery(id);
-      const hits = filterIngredientsByLooseSearch(catalog, query);
-      hits.forEach((hit) => {
-        expandFindSelection([hit.id], catalog).forEach((memberId) => {
-          if (!expanded.includes(memberId)) expanded.push(memberId);
-        });
-      });
+      filterIngredientsByLooseSearch(
+        catalog,
+        finderSearchSelectionQuery(id)
+      ).forEach((hit) => expandFindSelection([hit.id], catalog).forEach(add));
       return;
     }
     const entry = byId.get(id);
-    const add = (variantId) => {
-      if (variantId && !expanded.includes(variantId)) expanded.push(variantId);
-    };
     if (entry?.memberIds?.length) {
       entry.memberIds.forEach(add);
     } else if (id) {

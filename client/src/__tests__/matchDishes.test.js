@@ -3,7 +3,6 @@ import {
   buildFindIngredientContext,
   expandFindSelection,
   matchDishes,
-  buildDishIngredientIndex,
 } from "../utils/recipeIngredients";
 
 describe("matchDishes", () => {
@@ -21,15 +20,20 @@ ingredients:
 ---`,
       },
     ];
-    const { catalog, getLabel } = buildFindIngredientContext(dishes);
-    const index = buildDishIngredientIndex(dishes);
+    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
     const selectedIds = [
       getIngredientId("köttfärs"),
       getIngredientId("tomater"),
       getIngredientId("rödlök"),
     ];
     const matchIds = expandFindSelection(selectedIds, catalog);
-    const results = matchDishes(dishes, matchIds, index, getLabel, selectedIds);
+    const results = matchDishes(
+      dishes,
+      matchIds,
+      dishIndex,
+      getLabel,
+      selectedIds
+    );
     expect(results).toHaveLength(1);
     expect(results[0].matched).toBe(3);
     expect(results[0].total).toBe(4);
@@ -46,12 +50,17 @@ ingredients:
 ---`,
       },
     ];
-    const index = buildDishIngredientIndex(dishes);
-    const { catalog, getLabel } = buildFindIngredientContext(dishes);
+    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
     const tomaterId = getIngredientId("tomater");
     const selectedIds = [tomaterId];
     const matchIds = expandFindSelection(selectedIds, catalog);
-    const results = matchDishes(dishes, matchIds, index, getLabel, selectedIds);
+    const results = matchDishes(
+      dishes,
+      matchIds,
+      dishIndex,
+      getLabel,
+      selectedIds
+    );
     expect(results[0].matched).toBe(1);
   });
 });
