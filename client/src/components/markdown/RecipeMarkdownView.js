@@ -4,9 +4,10 @@ import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 
 import {
-  getRecipeContext,
-  getRecipeViewForContext,
+  buildRecipeView,
+  DEFAULT_SERVINGS,
   RECIPE_LABELS,
+  recipeContext,
 } from "./recipeMarkdown";
 
 const micromarkOpts = {
@@ -29,9 +30,9 @@ const crossableParent = (el) => {
 };
 
 function RecipeMarkdownView({ markdown, className }) {
-  const ctx = useMemo(() => getRecipeContext(markdown), [markdown]);
+  const ctx = useMemo(() => recipeContext(markdown), [markdown]);
   const [selectedServings, setSelectedServings] = useState(
-    () => ctx?.baseServings ?? 4
+    () => ctx?.baseServings ?? DEFAULT_SERVINGS
   );
 
   useEffect(() => {
@@ -40,7 +41,7 @@ function RecipeMarkdownView({ markdown, className }) {
 
   const multiplier = ctx ? selectedServings / ctx.baseServings : 1;
   const view = useMemo(
-    () => getRecipeViewForContext(ctx, multiplier),
+    () => buildRecipeView(ctx, multiplier),
     [ctx, multiplier]
   );
 
@@ -95,17 +96,21 @@ function RecipeMarkdownView({ markdown, className }) {
         }}
       >
         {recipeHtml(preamble)}
-        {ingredientsMarkdown && (
-          <section className="recipe-ingredients">
-            <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
-            {recipeHtml(ingredientsMarkdown)}
-          </section>
-        )}
-        {cooking && (
-          <section className="recipe-cooking">
-            <h2>{RECIPE_LABELS.cookingHeading}</h2>
-            {recipeHtml(cooking)}
-          </section>
+        {[
+          [
+            ingredientsMarkdown,
+            "recipe-ingredients",
+            RECIPE_LABELS.ingredientsHeading,
+          ],
+          [cooking, "recipe-cooking", RECIPE_LABELS.cookingHeading],
+        ].map(
+          ([md, sectionClass, heading]) =>
+            md && (
+              <section key={sectionClass} className={sectionClass}>
+                <h2>{heading}</h2>
+                {recipeHtml(md)}
+              </section>
+            )
         )}
         {trailing && recipeHtml(trailing)}
       </div>

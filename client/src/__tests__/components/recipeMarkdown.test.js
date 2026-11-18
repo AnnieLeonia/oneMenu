@@ -1,7 +1,6 @@
 import {
-  getMarkdown,
-  getRecipeShowInfo,
-  getRecipeViewParts,
+  buildRecipeView,
+  recipeContext,
 } from "../../components/markdown/recipeMarkdown";
 
 const recipe = (body) => `---
@@ -25,34 +24,19 @@ describe("recipeMarkdown", () => {
     [2, ["1000 g", "1 tsp"]],
     [0.5, ["250 g", "1/4 tsp"]],
   ])("scales ingredients at %sx", (multiplier, snippets) => {
-    const md = getMarkdown(SCALING_RECIPE, {
-      ingredientMultiplier: multiplier,
-    });
-    snippets.forEach((s) => expect(md).toContain(s));
+    const { ingredientsMarkdown } = buildRecipeView(
+      recipeContext(SCALING_RECIPE),
+      multiplier
+    );
+    snippets.forEach((s) => expect(ingredientsMarkdown).toContain(s));
   });
 
   it.each([
-    [recipe("difficulty: Enkel\ntime: 20 min\n"), 4],
-    [recipe("servings: 6\n"), 6],
-  ])("getRecipeShowInfo baseServings", (yaml, servings) => {
-    expect(getRecipeShowInfo(yaml).baseServings).toBe(servings);
-  });
-
-  it("getRecipeViewParts keeps trailing body after cooking", () => {
-    const yaml = `${recipe(`steps:
-  - Fry
-ingredients:
-  - name: Flour
-`)}
-Extra notes here.`;
-    const parts = getRecipeViewParts(yaml);
-    expect(parts.ingredientsMarkdown).toContain("Flour");
-    expect(parts.cooking).toMatch(/^1\. Fry/);
-    expect(parts.trailing).toBe("Extra notes here.");
-    expect(parts.cooking).not.toContain("Extra notes");
-  });
-
-  it.each([
+    [
+      recipe("difficulty: Enkel\ntime: 20 min\n"),
+      { baseServings: 4, showMetaTable: true },
+    ],
+    [recipe("servings: 6\n"), { baseServings: 6, showMetaTable: true }],
     [
       recipe(`difficulty: Medel
 time: 30 min
@@ -62,11 +46,25 @@ ingredients:
     quantity: 1
     unit: g
 `),
-      ["🥘 Portioner", "4 portioner"],
+      { baseServings: 4, showMetaTable: true },
     ],
-    [recipe("servings: 6\n"), ["6 portioner"]],
-  ])("includes servings in composed markdown", (yaml, snippets) => {
-    const md = getMarkdown(yaml);
-    snippets.forEach((s) => expect(md).toContain(s));
+  ])("recipeContext servings and meta", (yaml, expected) => {
+    const ctx = recipeContext(yaml);
+    expect(ctx.baseServings).toBe(expected.baseServings);
+    expect(ctx.showMetaTable).toBe(expected.showMetaTable);
+  });
+
+  it("buildRecipeView keeps trailing body after cooking", () => {
+    const yaml = `${recipe(`steps:
+  - Fry
+ingredients:
+  - name: Flour
+`)}
+Extra notes here.`;
+    const view = buildRecipeView(recipeContext(yaml));
+    expect(view.ingredientsMarkdown).toContain("Flour");
+    expect(view.cooking).toMatch(/^1\. Fry/);
+    expect(view.trailing).toBe("Extra notes here.");
+    expect(view.cooking).not.toContain("Extra notes");
   });
 });
