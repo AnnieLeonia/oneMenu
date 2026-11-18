@@ -118,7 +118,6 @@ class EditDish extends Component {
           <RecipeMarkdownView
             markdown={this.state.description}
             className="flex flex-col markdown-body markdown-preview"
-            stripFrontmatter
           />
         </div>
       </div>
