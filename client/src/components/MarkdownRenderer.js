@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
+import { getMarkdownBody } from "../utils/recipeIngredients";
 
-function createMarkup(description) {
+function createMarkup(description, stripFrontmatter, includeTitle) {
   if (!description) return;
-  const html = micromark(description, {
+  const markdown = stripFrontmatter
+    ? getMarkdownBody(description, { includeTitle })
+    : description;
+  if (!markdown) return;
+  const html = micromark(markdown, {
     extensions: [gfm()],
     htmlExtensions: [gfmHtml()],
   });
@@ -41,16 +46,25 @@ class MarkdownRenderer extends Component {
   };
 
   render() {
-    const { markdown, className } = this.props;
+    const { markdown, className, stripFrontmatter, includeTitle } = this.props;
 
     return (
       <div
         ref={this.ref}
-        dangerouslySetInnerHTML={createMarkup(markdown)}
+        dangerouslySetInnerHTML={createMarkup(
+          markdown,
+          stripFrontmatter,
+          includeTitle
+        )}
         className={className}
       />
     );
   }
 }
+
+MarkdownRenderer.defaultProps = {
+  stripFrontmatter: false,
+  includeTitle: true,
+};
 
 export default MarkdownRenderer;
