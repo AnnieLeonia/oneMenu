@@ -31,13 +31,14 @@ const crossableParent = (el) => {
 
 function RecipeMarkdownView({ markdown, className }) {
   const ctx = useMemo(() => recipeContext(markdown), [markdown]);
+  const baseServings = ctx?.baseServings;
   const [selectedServings, setSelectedServings] = useState(
-    () => ctx?.baseServings ?? DEFAULT_SERVINGS
+    () => baseServings ?? DEFAULT_SERVINGS
   );
 
   useEffect(() => {
-    if (ctx) setSelectedServings(ctx.baseServings);
-  }, [ctx?.baseServings]);
+    if (baseServings != null) setSelectedServings(baseServings);
+  }, [baseServings]);
 
   const multiplier = ctx ? selectedServings / ctx.baseServings : 1;
   const view = useMemo(
