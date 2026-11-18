@@ -6,7 +6,6 @@ COPY client/package.json client/package-lock.json client/.npmrc ./
 RUN npm ci
 
 COPY client/ ./
-ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
 FROM --platform=$BUILDPLATFORM node:22-alpine AS build-server

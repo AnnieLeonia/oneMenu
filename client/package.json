@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "PORT=8080 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom --coverage",
-    "test:watch": "react-scripts test --env=jsdom",
+    "start": "DISABLE_ESLINT_PLUGIN=true PORT=8080 craco start",
+    "build": "DISABLE_ESLINT_PLUGIN=true craco build",
+    "test": "craco test --watchAll=false --coverage",
+    "test:watch": "craco test",
     "eject": "react-scripts eject",
     "env:pull": "scp git@192.168.0.100:www/onemenu/.env .env",
     "db:pull": "pg_dump --format=c -h 192.168.0.100 -U vicnie onemenu | pg_restore --clean --no-owner -h localhost -d onemenu"
@@ -39,19 +39,25 @@
     "redux-thunk": "2.3.0"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.25.0",
+    "@craco/craco": "^7.1.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.6",
-    "eslint": "6.8.0",
-    "eslint-config-airbnb": "18.2.1",
-    "eslint-config-prettier": "6.15.0",
-    "eslint-plugin-import": "2.24.0",
-    "eslint-plugin-jsx-a11y": "6.4.1",
-    "eslint-plugin-react": "7.24.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.34.0",
+    "ajv": "^8.17.1",
+    "buffer": "^6.0.3",
     "jest-fetch-mock": "3.0.3",
-    "prettier-eslint": "13.0.0",
-    "react-scripts": "3.4.4",
+    "react-scripts": "5.0.1",
     "react-test-renderer": "16.14.0",
     "redux-mock-store": "1.5.4"
+  },
+  "overrides": {
+    "cheerio": "1.0.0-rc.12"
   },
   "jest": {
     "collectCoverageFrom": [
