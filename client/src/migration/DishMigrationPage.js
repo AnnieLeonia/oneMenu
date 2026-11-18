@@ -26,7 +26,7 @@ function dishMeta(dish) {
   };
 }
 
-class IngredientMigrationPage extends Component {
+class DishMigrationPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -262,7 +262,7 @@ class IngredientMigrationPage extends Component {
 
             {dish && preview && preview.changed && !verifyLoading && (
               <div className="migration-page-actions">
-                <p className="ingredient-migration-apply-hint">
+                <p className="migration-apply-hint">
                   {translate("settings.migration.applyHint")}
                 </p>
                 <button
@@ -291,7 +291,7 @@ class IngredientMigrationPage extends Component {
   }
 }
 
-IngredientMigrationPage.propTypes = {
+DishMigrationPage.propTypes = {
   translate: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
   dishes: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -310,7 +310,4 @@ const mapDispatchToProps = {
   applyMigration: editDish,
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(IngredientMigrationPage);
+export default connect(mapStateToProps, mapDispatchToProps)(DishMigrationPage);

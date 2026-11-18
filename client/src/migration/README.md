@@ -2,7 +2,7 @@
 
 Compare each dish’s database `description` with the matching file under `tmp/dish-verify/`. **Apply** writes the verify file’s raw markdown to PostgreSQL.
 
-Rendering uses `client/src/utils/recipeIngredients/` (YAML frontmatter + legacy markdown).
+Markdown preview strips optional YAML frontmatter only; migrated bodies live in `tmp/dish-verify/` as-is.
 
 When migration is finished:
 

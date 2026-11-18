@@ -10,7 +10,6 @@ import EditCategory from "./categories/EditCategory";
 import Dishes from "./dishes";
 import ShowDish from "./dishes/ShowDish";
 import EditDish from "./dishes/EditDish";
-import Find from "./find";
 import Menu from "./menu";
 import Settings from "./settings";
 import { MigrationRoute } from "../migration";
@@ -24,7 +23,6 @@ const App = () => (
   <div>
     <Route path="/" component={Header} />
     <Route exact path="/" component={Dishes} />
-    <Route exact path="/find" component={Find} />
     <Route exact path="/menu" component={Menu} />
     <Route exact path="/categories" component={Categories} />
     <Route exact path="/categories/:id" component={CategoryDishes} />

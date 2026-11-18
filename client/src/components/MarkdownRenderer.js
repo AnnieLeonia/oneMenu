@@ -1,13 +1,14 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 import { getMarkdownBody } from "../utils/recipeMarkdown";
 
-function createMarkup(description) {
-  if (!description) return;
-  const markdown = getMarkdownBody(description);
+function createMarkup(markdown, stripFrontmatter) {
   if (!markdown) return;
-  const html = micromark(markdown, {
+  const body = getMarkdownBody(markdown, { stripFrontmatter });
+  if (!body) return;
+  const html = micromark(body, {
     extensions: [gfm()],
     htmlExtensions: [gfmHtml()],
   });
@@ -44,16 +45,28 @@ class MarkdownRenderer extends Component {
   };
 
   render() {
-    const { markdown, className } = this.props;
+    const { markdown, className, stripFrontmatter } = this.props;
 
     return (
       <div
         ref={this.ref}
-        dangerouslySetInnerHTML={createMarkup(markdown)}
+        dangerouslySetInnerHTML={createMarkup(markdown, stripFrontmatter)}
         className={className}
       />
     );
   }
 }
+
+MarkdownRenderer.propTypes = {
+  markdown: PropTypes.string,
+  className: PropTypes.string,
+  stripFrontmatter: PropTypes.bool,
+};
+
+MarkdownRenderer.defaultProps = {
+  markdown: "",
+  className: "",
+  stripFrontmatter: false,
+};
 
 export default MarkdownRenderer;
