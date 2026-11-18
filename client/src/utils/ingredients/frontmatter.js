@@ -29,7 +29,7 @@ function parseFrontmatterItem(item) {
 }
 
 /** @param {object} data @returns {Array<{ name: string, quantity?: *, unit?: string, group?: string }>|null} */
-export function parseIngredientsFromFrontmatter(data) {
+export function parseFromFrontmatter(data) {
   const raw = data?.ingredients;
   if (!isArray(raw) || !size(raw)) return null;
   const ingredients = pipe(map(parseFrontmatterItem), compact)(raw);

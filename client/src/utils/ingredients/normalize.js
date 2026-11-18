@@ -25,7 +25,7 @@ export function getIngredientId(name) {
   return `raw:${cleaned}`;
 }
 
-export const formatFinderLabel = (text) =>
+export const formatLabel = (text) =>
   text == null || text === "" ? "" : String(text).toLocaleLowerCase("sv");
 
 /**
@@ -35,20 +35,13 @@ export const formatFinderLabel = (text) =>
 export const getIngredientLabel = (ingredientId) =>
   ingredientId?.startsWith("raw:") ? ingredientId.slice(4) : ingredientId || "";
 
-const FINDER_STAPLE_WORDS = [
-  "färsk",
-  "salt",
-  "peppar",
-  "olja",
-  "smör",
-  "vatten",
-];
+const STAPLE_WORDS = ["färsk", "salt", "peppar", "olja", "smör", "vatten"];
 
 /** Whole words that must not be used as Find search terms on their own. */
-export const FINDER_SEARCH_IGNORED_WORDS = new Set(FINDER_STAPLE_WORDS);
+export const SEARCH_STOP_WORDS = new Set(STAPLE_WORDS);
 
-const FINDER_EXCLUDED_SUBSTRINGS = [
-  ...FINDER_STAPLE_WORDS.filter((w) => w !== "färsk"),
+const EXCLUDED_SUBSTRINGS = [
+  ...STAPLE_WORDS.filter((w) => w !== "färsk"),
   "mjöl",
   "mjölk",
   "ris",
@@ -61,11 +54,11 @@ const FINDER_EXCLUDED_SUBSTRINGS = [
 ];
 
 /** Hide pantry staples from the Find ingredient picker. */
-export function isFinderExcludedIngredient(ingredientId) {
+export function isExcludedFromPicker(ingredientId) {
   const cleaned = getIngredientLabel(ingredientId);
   if (!cleaned) return false;
   return (
-    FINDER_EXCLUDED_SUBSTRINGS.some((part) => cleaned.includes(part)) ||
+    EXCLUDED_SUBSTRINGS.some((part) => cleaned.includes(part)) ||
     /\bis\b/.test(cleaned)
   );
 }

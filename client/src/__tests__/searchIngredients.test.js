@@ -1,11 +1,11 @@
+import { expandSelection } from "../utils/ingredients/catalog";
+import { getIngredientId } from "../utils/ingredients/normalize";
 import {
-  expandIngredientLabelVariantIds,
-  filterIngredientsByLooseSearch,
-  ingredientLabelMatchesSearch,
-  makeFinderSearchSelectionId,
-} from "../utils/recipeIngredients/searchIngredients";
-import { getIngredientId } from "../utils/recipeIngredients/normalizeIngredient";
-import { expandFindSelection } from "../utils/recipeIngredients/parseDishIngredients";
+  expandLabelVariants,
+  filterBySearch,
+  labelMatchesSearch,
+  makeSearchChipId,
+} from "../utils/ingredients/search";
 
 const rawIng = (name, extra = {}) => ({
   id: getIngredientId(name),
@@ -20,14 +20,14 @@ const groupChip = (slug, recipeCount = 10) => ({
   recipeCount,
 });
 
-describe("searchIngredients", () => {
+describe("ingredient search", () => {
   it("includes variant names that share the first word", () => {
     const catalog = [
       { id: "a", label: "laxfilé" },
       { id: "b", label: "laxfilé i bit med skinn" },
       { id: "c", label: "lax" },
     ];
-    const hits = filterIngredientsByLooseSearch(catalog, "laxfilé");
+    const hits = filterBySearch(catalog, "laxfilé");
     expect(hits.map((h) => h.id).sort()).toEqual(["a", "b"]);
   });
 
@@ -43,37 +43,35 @@ describe("searchIngredients", () => {
     ["tomat", "tomater", true],
     ["strimlad kalkon, kyckling eller skinka", "kycklingfilé", false],
     ["pizzabullar", "kycklingfilé", false],
-  ])(
-    'ingredientLabelMatchesSearch("%s", "%s") → %s',
-    (label, query, expected) => {
-      expect(ingredientLabelMatchesSearch(label, query)).toBe(expected);
-    }
-  );
+  ])('labelMatchesSearch("%s", "%s") → %s', (label, query, expected) => {
+    expect(labelMatchesSearch(label, query)).toBe(expected);
+  });
 
   it("ignores pantry staple words as search terms", () => {
     const olivolja = rawIng("olivolja");
     for (const q of ["salt", "peppar", "olja", "smör", "vatten"]) {
-      expect(ingredientLabelMatchesSearch("olivolja", q)).toBe(false);
-      expect(ingredientLabelMatchesSearch("flingsalt", q)).toBe(false);
-      expect(filterIngredientsByLooseSearch([olivolja], q)).toEqual([]);
+      expect(labelMatchesSearch("olivolja", q)).toBe(false);
+      expect(labelMatchesSearch("flingsalt", q)).toBe(false);
+      expect(filterBySearch([olivolja], q)).toEqual([]);
     }
-    expect(ingredientLabelMatchesSearch("olivolja", "oliv")).toBe(true);
+    expect(labelMatchesSearch("olivolja", "oliv")).toBe(true);
   });
 
   it("ignores färsk as a search term but matches other words in the name", () => {
-    expect(ingredientLabelMatchesSearch("färsk timjan", "färsk")).toBe(false);
-    expect(ingredientLabelMatchesSearch("färsk lax", "färsk")).toBe(false);
-    expect(ingredientLabelMatchesSearch("färsk timjan", "timjan")).toBe(true);
-    expect(ingredientLabelMatchesSearch("färsk lax", "lax")).toBe(true);
+    expect(labelMatchesSearch("färsk timjan", "färsk")).toBe(false);
+    expect(labelMatchesSearch("färsk lax", "färsk")).toBe(false);
+    expect(labelMatchesSearch("färsk timjan", "timjan")).toBe(true);
+    expect(labelMatchesSearch("färsk lax", "lax")).toBe(true);
     const catalog = [
       rawIng("färsk timjan"),
       rawIng("timjan"),
       groupChip("färs", 1),
     ];
-    expect(filterIngredientsByLooseSearch(catalog, "färsk")).toEqual([]);
-    expect(
-      filterIngredientsByLooseSearch(catalog, "timjan").map((h) => h.id)
-    ).toEqual([getIngredientId("färsk timjan"), getIngredientId("timjan")]);
+    expect(filterBySearch(catalog, "färsk")).toEqual([]);
+    expect(filterBySearch(catalog, "timjan").map((h) => h.id)).toEqual([
+      getIngredientId("färsk timjan"),
+      getIngredientId("timjan"),
+    ]);
   });
 
   it("searching färs does not pull in unrelated sallad family", () => {
@@ -84,9 +82,7 @@ describe("searchIngredients", () => {
       rawIng("sallad med köttfärs", { recipeCount: 1 }),
       rawIng("nötfärs", { recipeCount: 5 }),
     ];
-    const hitIds = filterIngredientsByLooseSearch(catalog, "färs").map(
-      (h) => h.id
-    );
+    const hitIds = filterBySearch(catalog, "färs").map((h) => h.id);
     expect(hitIds).toEqual(["group:färs"]);
     expect(hitIds).not.toContain("group:sallad");
     expect(hitIds).not.toContain(getIngredientId("blandad sallad"));
@@ -100,9 +96,9 @@ describe("searchIngredients", () => {
       "köttfärs",
     ],
   ])("finds collapsed färs chip (%s)", (_, catalog, query) => {
-    expect(
-      filterIngredientsByLooseSearch(catalog, query).map((h) => h.id)
-    ).toEqual(["group:färs"]);
+    expect(filterBySearch(catalog, query).map((h) => h.id)).toEqual([
+      "group:färs",
+    ]);
   });
 
   it("expands search: selection with loose search", () => {
@@ -113,8 +109,8 @@ describe("searchIngredients", () => {
       { id: longId, label: "laxfilé i bit med skinn" },
       rawIng("lax", { recipeCount: 1 }),
     ];
-    const searchId = makeFinderSearchSelectionId("laxfi");
-    expect(expandFindSelection([searchId], catalog).sort()).toEqual(
+    const searchId = makeSearchChipId("laxfi");
+    expect(expandSelection([searchId], catalog).sort()).toEqual(
       [shortId, longId].sort()
     );
   });
@@ -126,7 +122,7 @@ describe("searchIngredients", () => {
       { id: shortId, label: "laxfilé" },
       { id: longId, label: "laxfilé i bit med skinn" },
     ];
-    expect(expandIngredientLabelVariantIds(shortId, catalog).sort()).toEqual(
+    expect(expandLabelVariants(shortId, catalog).sort()).toEqual(
       [shortId, longId].sort()
     );
   });

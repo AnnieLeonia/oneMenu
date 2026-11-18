@@ -1,12 +1,8 @@
 import { compact, filter, flow, map, orderBy, size, toLower } from "lodash/fp";
 
-import { getIngredientLabel } from "./normalizeIngredient";
-import { parseDishIngredients } from "./parseDishIngredients";
-import {
-  finderSearchSelectionQuery,
-  ingredientLabelMatchesSearch,
-  isFinderSearchSelectionId,
-} from "./searchIngredients";
+import { getIngredientLabel } from "./normalize";
+import { parseDish } from "./catalog";
+import { isSearchChipId, labelMatchesSearch, searchChipQuery } from "./search";
 
 const sortMatchResults = orderBy(
   [(r) => r.matched, (r) => toLower(r.dish.name || "")],
@@ -15,13 +11,13 @@ const sortMatchResults = orderBy(
 
 const dishIndexForDishes = (dishes) =>
   (dishes || []).reduce((index, dish) => {
-    const { normalizedIngredientIds } = parseDishIngredients(dish.description);
+    const { normalizedIngredientIds } = parseDish(dish.description);
     if (normalizedIngredientIds) index.set(dish.id, normalizedIngredientIds);
     return index;
   }, new Map());
 
 const chipLabel = (getLabel) => (id) =>
-  isFinderSearchSelectionId(id) ? finderSearchSelectionQuery(id) : getLabel(id);
+  isSearchChipId(id) ? searchChipQuery(id) : getLabel(id);
 
 export function matchDishes(
   dishes,
@@ -40,7 +36,7 @@ export function matchDishes(
   const dishIndex = index || dishIndexForDishes(dishes);
   const matchesSelection = (id) =>
     selected.has(id) ||
-    chipLabels.some((q) => ingredientLabelMatchesSearch(getLabel(id), q));
+    chipLabels.some((q) => labelMatchesSearch(getLabel(id), q));
 
   return sortMatchResults(
     flow(

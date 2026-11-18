@@ -10,30 +10,25 @@ import {
 } from "lodash/fp";
 
 import { parseFrontMatter } from "../../components/markdown/parseFrontMatter";
-import { parseIngredientsFromFrontmatter } from "./parseIngredientsFromFrontmatter";
+import { parseFromFrontmatter } from "./frontmatter";
+import { INGREDIENT_GROUP_DEFS, groupIdFor } from "./groups";
 import {
-  INGREDIENT_GROUP_DEFS,
-  normalizedIngredientIdAssignedGroupId,
-} from "./ingredientGroups";
-import {
-  expandIngredientLabelVariantIds,
-  filterIngredientsByLooseSearch,
-  finderSearchSelectionQuery,
-  isFinderSearchSelectionId,
-} from "./searchIngredients";
+  expandLabelVariants,
+  filterBySearch,
+  isSearchChipId,
+  searchChipQuery,
+} from "./search";
 import {
   getIngredientId,
-  formatFinderLabel,
+  formatLabel,
   getIngredientLabel,
-  isFinderExcludedIngredient,
-} from "./normalizeIngredient";
+  isExcludedFromPicker,
+} from "./normalize";
 
-export const MIN_RECIPES_TO_LIST_INGREDIENT = 4;
+export const MIN_LIST_RECIPE_COUNT = 4;
 
-export function parseDishIngredients(description) {
-  const raw = parseIngredientsFromFrontmatter(
-    parseFrontMatter(description).data
-  );
+export function parseDish(description) {
+  const raw = parseFromFrontmatter(parseFrontMatter(description).data);
   const displayIngredients = flow(
     map((item) => ({
       ...item,
@@ -60,7 +55,7 @@ const pickMostCommonName = (counts) =>
     ["desc", "asc"]
   )(Object.keys(counts || {}))[0] || "";
 
-export function buildFindIngredientContext(dishes) {
+export function buildCatalog(dishes) {
   const nameCounts = {};
   const recipeCountById = {};
   const byId = {};
@@ -70,7 +65,7 @@ export function buildFindIngredientContext(dishes) {
   const dishIndex = new Map();
 
   (dishes || []).forEach((dish) => {
-    const parsed = parseDishIngredients(dish.description);
+    const parsed = parseDish(dish.description);
     const { normalizedIngredientIds, displayIngredients } = parsed;
     if (!normalizedIngredientIds) return;
 
@@ -79,16 +74,14 @@ export function buildFindIngredientContext(dishes) {
       recipeCountById[id] = (recipeCountById[id] || 0) + 1;
     }
     for (const groupId of new Set(
-      compact(
-        normalizedIngredientIds.map(normalizedIngredientIdAssignedGroupId)
-      )
+      compact(normalizedIngredientIds.map(groupIdFor))
     )) {
       groupRecipeCount[groupId] += 1;
     }
     for (const item of displayIngredients) {
       const { normalizedIngredientId: id, name: rawName } = item;
       const name = (rawName || "").trim();
-      if (!id || !name || isFinderExcludedIngredient(id)) continue;
+      if (!id || !name || isExcludedFromPicker(id)) continue;
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
       if (!byId[id]) {
@@ -96,77 +89,69 @@ export function buildFindIngredientContext(dishes) {
           id,
           label: name,
           recipeCount: 0,
-          hiddenFromDefaultList: Boolean(
-            normalizedIngredientIdAssignedGroupId(id)
-          ),
+          hiddenFromDefaultList: Boolean(groupIdFor(id)),
         };
       }
     }
   });
 
   for (const id of Object.keys(byId)) {
-    byId[id].label = formatFinderLabel(pickMostCommonName(nameCounts[id]));
+    byId[id].label = formatLabel(pickMostCommonName(nameCounts[id]));
     byId[id].recipeCount = recipeCountById[id] || 0;
   }
 
   for (const def of INGREDIENT_GROUP_DEFS) {
-    const memberIds = filterFp(
-      (id) => normalizedIngredientIdAssignedGroupId(id) === def.id
-    )(Object.keys(recipeCountById));
+    const memberIds = filterFp((id) => groupIdFor(id) === def.id)(
+      Object.keys(recipeCountById)
+    );
     const recipeCount = groupRecipeCount[def.id] || 0;
-    if (!memberIds.length || recipeCount < MIN_RECIPES_TO_LIST_INGREDIENT) {
+    if (!memberIds.length || recipeCount < MIN_LIST_RECIPE_COUNT) {
       continue;
     }
     byId[def.id] = {
       id: def.id,
-      label: formatFinderLabel(def.label),
+      label: formatLabel(def.label),
       recipeCount,
       memberIds,
       isCollapsedGroup: true,
     };
   }
 
-  const catalog = sortFinderCatalogEntries(values(byId));
+  const catalog = sortCatalog(values(byId));
   const labelById = new Map(catalog.map((ing) => [ing.id, ing.label]));
 
   return {
     catalog,
-    getLabel: (id) =>
-      labelById.get(id) || formatFinderLabel(getIngredientLabel(id)),
+    getLabel: (id) => labelById.get(id) || formatLabel(getIngredientLabel(id)),
     dishIndex,
   };
 }
 
-export const isFinderChipVisibleByDefault = (ing) =>
+export const isDefaultChip = (ing) =>
   !!ing &&
   !ing.hiddenFromDefaultList &&
   (ing.isCollapsedGroup ||
-    (!normalizedIngredientIdAssignedGroupId(ing.id) &&
-      ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT));
+    (!groupIdFor(ing.id) && ing.recipeCount >= MIN_LIST_RECIPE_COUNT));
 
-export function expandFindSelection(selectedIds, catalog) {
+export function expandSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const seen = new Set();
   const add = (id) => id && !seen.has(id) && seen.add(id);
   const expandOne = (id) => {
-    if (isFinderSearchSelectionId(id)) {
-      filterIngredientsByLooseSearch(
-        catalog,
-        finderSearchSelectionQuery(id)
-      ).forEach((hit) => expandOne(hit.id));
+    if (isSearchChipId(id)) {
+      filterBySearch(catalog, searchChipQuery(id)).forEach((hit) =>
+        expandOne(hit.id)
+      );
       return;
     }
     const entry = byId.get(id);
     const ids = entry?.memberIds?.length
       ? entry.memberIds
-      : expandIngredientLabelVariantIds(id, catalog);
+      : expandLabelVariants(id, catalog);
     ids.forEach(add);
   };
   (selectedIds || []).forEach(expandOne);
   return [...seen];
 }
 
-export const sortFinderCatalogEntries = orderBy(
-  ["recipeCount", "label"],
-  ["desc", "asc"]
-);
+export const sortCatalog = orderBy(["recipeCount", "label"], ["desc", "asc"]);

@@ -1,6 +1,6 @@
 import { deburr, find, upperFirst } from "lodash/fp";
 
-import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
+import { cleanIngredientName, getIngredientLabel } from "./normalize";
 
 const fold = (text) => deburr(String(text || ""));
 
@@ -26,7 +26,7 @@ export const INGREDIENT_GROUP_DEFS = [
   "sallad",
 ].map(collapsedGroup);
 
-export function normalizedIngredientIdAssignedGroupId(normalizedIngredientId) {
+export function groupIdFor(normalizedIngredientId) {
   if (!normalizedIngredientId?.startsWith("raw:")) return null;
   const cleaned = getIngredientLabel(normalizedIngredientId);
   if (!cleaned) return null;
@@ -35,7 +35,7 @@ export function normalizedIngredientIdAssignedGroupId(normalizedIngredientId) {
   );
 }
 
-export function collapsedGroupMatchesSearchQuery(groupId, query) {
+export function groupMatchesQuery(groupId, query) {
   const def = find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS);
   const cleaned = cleanIngredientName(query);
   return !!def && !!cleaned && def.matchesCleaned(cleaned);

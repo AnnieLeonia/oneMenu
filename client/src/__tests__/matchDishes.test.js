@@ -1,15 +1,12 @@
-import { getIngredientId } from "../utils/recipeIngredients/normalizeIngredient";
-import {
-  buildFindIngredientContext,
-  expandFindSelection,
-  matchDishes,
-} from "../utils/recipeIngredients";
-import { dishWithIngredients } from "./recipeIngredientsFixtures";
+import { buildCatalog, expandSelection } from "../utils/ingredients/catalog";
+import { getIngredientId } from "../utils/ingredients/normalize";
+import { matchDishes } from "../utils/ingredients/match";
+import { dishWithIngredients } from "../testHelpers/ingredientsFixtures";
 
 const matchRecipes = (dishes, selectedNames) => {
-  const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
+  const { catalog, getLabel, dishIndex } = buildCatalog(dishes);
   const selectedIds = selectedNames.map((name) => getIngredientId(name));
-  const matchIds = expandFindSelection(selectedIds, catalog);
+  const matchIds = expandSelection(selectedIds, catalog);
   return matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds);
 };
 

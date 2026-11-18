@@ -1,36 +1,29 @@
 import { compact, filter, flow, get, map, trim, toLower } from "lodash/fp";
 
 import {
-  FINDER_SEARCH_IGNORED_WORDS,
-  formatFinderLabel,
-  isFinderExcludedIngredient,
-} from "./normalizeIngredient";
-import {
-  normalizedIngredientIdAssignedGroupId,
-  collapsedGroupMatchesSearchQuery,
-} from "./ingredientGroups";
+  SEARCH_STOP_WORDS,
+  formatLabel,
+  isExcludedFromPicker,
+} from "./normalize";
+import { groupIdFor, groupMatchesQuery } from "./groups";
 
-export const FINDER_SEARCH_SELECTION_PREFIX = "search:";
+export const SEARCH_CHIP_PREFIX = "search:";
 
 const normalizeQuery = flow(String, trim, toLower);
 
-export const makeFinderSearchSelectionId = (query) => {
+export const makeSearchChipId = (query) => {
   const q = normalizeQuery(query);
-  return q ? `${FINDER_SEARCH_SELECTION_PREFIX}${q}` : null;
+  return q ? `${SEARCH_CHIP_PREFIX}${q}` : null;
 };
 
-export const isFinderSearchSelectionId = (id) =>
-  typeof id === "string" && id.startsWith(FINDER_SEARCH_SELECTION_PREFIX);
+export const isSearchChipId = (id) =>
+  typeof id === "string" && id.startsWith(SEARCH_CHIP_PREFIX);
 
-export const finderSearchSelectionQuery = (id) =>
-  isFinderSearchSelectionId(id)
-    ? id.slice(FINDER_SEARCH_SELECTION_PREFIX.length)
-    : "";
+export const searchChipQuery = (id) =>
+  isSearchChipId(id) ? id.slice(SEARCH_CHIP_PREFIX.length) : "";
 
 const searchWords = (text) =>
-  compact(String(text).split(/\s+/)).filter(
-    (w) => !FINDER_SEARCH_IGNORED_WORDS.has(w)
-  );
+  compact(String(text).split(/\s+/)).filter((w) => !SEARCH_STOP_WORDS.has(w));
 
 const MIN_QUERY_LENGTH = 1;
 const MAX_QUERY_LONGER_THAN_LABEL = 3;
@@ -47,26 +40,26 @@ const includesMatch = (text, query) => {
   );
 };
 
-export function ingredientLabelMatchesSearch(label, query) {
+export function labelMatchesSearch(label, query) {
   const q = normalizeQuery(query);
   const words = searchWords(q);
   if (!q) return true;
   if (!words.length) return false;
-  const text = formatFinderLabel(label);
+  const text = formatLabel(label);
   return [text, ...searchWords(text)].some((part) => includesMatch(part, q));
 }
 
-export function expandIngredientLabelVariantIds(selectedId, catalog) {
+export function expandLabelVariants(selectedId, catalog) {
   if (!selectedId?.startsWith("raw:")) return selectedId ? [selectedId] : [];
   const selected = (catalog || []).find((ing) => ing.id === selectedId);
   if (!selected) return [selectedId];
-  const stem = formatFinderLabel(selected.label);
+  const stem = formatLabel(selected.label);
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
   const variants = flow(
     filter((ing) => {
       if (!ing.id.startsWith("raw:") || ing.id === selectedId) return false;
-      const label = formatFinderLabel(ing.label);
+      const label = formatLabel(ing.label);
       return label === stem || label.startsWith(prefix);
     }),
     map(get("id"))
@@ -86,20 +79,20 @@ const omitCollapsedMembersWhenGroupShown = (results) => {
     (ing) =>
       ing.isCollapsedGroup ||
       !ing.id?.startsWith("raw:") ||
-      !groupIds.has(normalizedIngredientIdAssignedGroupId(ing.id))
+      !groupIds.has(groupIdFor(ing.id))
   )(results);
 };
 
 const matchesLooseSearch = (ing, q) =>
-  ingredientLabelMatchesSearch(ing.label, q) ||
-  (ing.isCollapsedGroup && collapsedGroupMatchesSearchQuery(ing.id, q));
+  labelMatchesSearch(ing.label, q) ||
+  (ing.isCollapsedGroup && groupMatchesQuery(ing.id, q));
 
-export function filterIngredientsByLooseSearch(ingredients, query) {
+export function filterBySearch(ingredients, query) {
   const q = normalizeQuery(query);
   if (!q) return ingredients;
   if (!searchWords(q).length) return [];
   return flow(
-    filter((ing) => !isFinderExcludedIngredient(ing.id)),
+    filter((ing) => !isExcludedFromPicker(ing.id)),
     filter((ing) => matchesLooseSearch(ing, q)),
     omitCollapsedMembersWhenGroupShown
   )(ingredients || []);

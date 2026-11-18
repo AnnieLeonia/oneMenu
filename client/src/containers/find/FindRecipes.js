@@ -4,11 +4,8 @@ import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
 import IngredientSelector from "../../components/IngredientSelector";
 import RecipeMatchList from "../../components/RecipeMatchList";
-import {
-  buildFindIngredientContext,
-  expandFindSelection,
-  matchDishes,
-} from "../../utils/recipeIngredients";
+import { buildCatalog, expandSelection } from "../../utils/ingredients/catalog";
+import { matchDishes } from "../../utils/ingredients/match";
 
 class FindRecipes extends Component {
   constructor(props) {
@@ -29,9 +26,9 @@ class FindRecipes extends Component {
   render() {
     const { dishes, translate } = this.props;
     const { selectedIds } = this.state;
-    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
+    const { catalog, getLabel, dishIndex } = buildCatalog(dishes);
     const matchIds =
-      selectedIds.length > 0 ? expandFindSelection(selectedIds, catalog) : [];
+      selectedIds.length > 0 ? expandSelection(selectedIds, catalog) : [];
     const matches =
       matchIds.length > 0
         ? matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds)

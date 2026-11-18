@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { isDefaultChip, sortCatalog } from "../utils/ingredients/catalog";
+import { formatLabel } from "../utils/ingredients/normalize";
 import {
-  filterIngredientsByLooseSearch,
-  formatFinderLabel,
-  finderSearchSelectionQuery,
-  isFinderChipVisibleByDefault,
-  isFinderSearchSelectionId,
-  makeFinderSearchSelectionId,
-  sortFinderCatalogEntries,
-} from "../utils/recipeIngredients";
+  filterBySearch,
+  isSearchChipId,
+  makeSearchChipId,
+  searchChipQuery,
+} from "../utils/ingredients/search";
 
 class IngredientSelector extends Component {
   constructor(props) {
@@ -20,9 +19,9 @@ class IngredientSelector extends Component {
     const { catalog } = this.props;
     const q = this.state.search.trim();
     const items = q
-      ? filterIngredientsByLooseSearch(catalog, q)
-      : catalog.filter(isFinderChipVisibleByDefault);
-    return sortFinderCatalogEntries(items);
+      ? filterBySearch(catalog, q)
+      : catalog.filter(isDefaultChip);
+    return sortCatalog(items);
   }
 
   onToggleIngredient(id) {
@@ -42,7 +41,7 @@ class IngredientSelector extends Component {
   commitSearch() {
     const q = this.state.search.trim();
     if (!q) return;
-    const id = makeFinderSearchSelectionId(q);
+    const id = makeSearchChipId(q);
     if (!id) return;
     const { selectedIds, onChange } = this.props;
     if (!selectedIds.includes(id)) {
@@ -55,10 +54,10 @@ class IngredientSelector extends Component {
     const { catalog, selectedIds } = this.props;
     return selectedIds
       .map((id) => {
-        if (isFinderSearchSelectionId(id)) {
+        if (isSearchChipId(id)) {
           return {
             id,
-            label: formatFinderLabel(finderSearchSelectionQuery(id)),
+            label: formatLabel(searchChipQuery(id)),
             isSearchQuery: true,
           };
         }
@@ -96,21 +95,19 @@ class IngredientSelector extends Component {
         <h2 className="find-title">{translate("find.title")}</h2>
         <p className="find-subtitle">{translate("find.subtitle")}</p>
 
-        <div className="find-search">
-          <input
-            type="text"
-            value={this.state.search}
-            autoComplete="off"
-            placeholder={translate("find.search")}
-            onChange={({ target }) => this.setState({ search: target.value })}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                this.commitSearch();
-              }
-            }}
-          />
-        </div>
+        <input
+          type="text"
+          value={this.state.search}
+          autoComplete="off"
+          placeholder={translate("find.search")}
+          onChange={({ target }) => this.setState({ search: target.value })}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              this.commitSearch();
+            }
+          }}
+        />
 
         {ingredients.length === 0 ? (
           <p className="find-empty">{translate("find.noIngredients")}</p>

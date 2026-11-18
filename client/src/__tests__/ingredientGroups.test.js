@@ -1,20 +1,14 @@
-import {
-  INGREDIENT_GROUP_DEFS,
-  normalizedIngredientIdAssignedGroupId,
-} from "../utils/recipeIngredients/ingredientGroups";
+import { buildCatalog, expandSelection } from "../utils/ingredients/catalog";
+import { INGREDIENT_GROUP_DEFS, groupIdFor } from "../utils/ingredients/groups";
+import { matchDishes } from "../utils/ingredients/match";
 import {
   getIngredientId,
-  isFinderExcludedIngredient,
-} from "../utils/recipeIngredients/normalizeIngredient";
-import { matchDishes } from "../utils/recipeIngredients/matchDishes";
-import {
-  buildFindIngredientContext,
-  expandFindSelection,
-} from "../utils/recipeIngredients/parseDishIngredients";
+  isExcludedFromPicker,
+} from "../utils/ingredients/normalize";
 import {
   dishWithIngredients,
   repeatIngredientDishes,
-} from "./recipeIngredientsFixtures";
+} from "../testHelpers/ingredientsFixtures";
 
 const groupDef = (id) => INGREDIENT_GROUP_DEFS.find((d) => d.id === id);
 
@@ -24,7 +18,7 @@ const expectCollapsedGroup = ({
   hiddenMemberName,
   expandCount,
 }) => {
-  const { catalog } = buildFindIngredientContext(dishes);
+  const { catalog } = buildCatalog(dishes);
   expect(catalog.some((ing) => ing.id === groupId)).toBe(true);
   if (hiddenMemberName) {
     expect(
@@ -33,10 +27,10 @@ const expectCollapsedGroup = ({
     ).toBe(true);
   }
   const group = catalog.find((ing) => ing.id === groupId);
-  expect(expandFindSelection([group.id], catalog).length).toBe(expandCount);
+  expect(expandSelection([group.id], catalog).length).toBe(expandCount);
 };
 
-describe("isFinderExcludedIngredient", () => {
+describe("isExcludedFromPicker", () => {
   test.each([
     ["salt", true],
     ["olivolja", true],
@@ -57,13 +51,11 @@ describe("isFinderExcludedIngredient", () => {
     ["kycklingfilé", false],
     ["fisk", false],
   ])("%s excluded=%s", (name, excluded) => {
-    expect(isFinderExcludedIngredient(getIngredientId(name))).toBe(excluded);
+    expect(isExcludedFromPicker(getIngredientId(name))).toBe(excluded);
   });
 
   it("omits staples from the finder catalog", () => {
-    const { catalog } = buildFindIngredientContext(
-      repeatIngredientDishes("salt", 3)
-    );
+    const { catalog } = buildCatalog(repeatIngredientDishes("salt", 3));
     expect(catalog.find((ing) => ing.id === getIngredientId("salt"))).toBe(
       undefined
     );
@@ -168,7 +160,7 @@ describe("collapsed group chips", () => {
       [7, "oxbuljong"],
       [8, "skaldjursfond"],
     ].map(([id, name]) => dishWithIngredients(id, name));
-    const { catalog } = buildFindIngredientContext(dishes);
+    const { catalog } = buildCatalog(dishes);
     expect(catalog.some((ing) => ing.id === "group:buljong")).toBe(true);
     expect(catalog.some((ing) => ing.id === "group:fond")).toBe(true);
     expect(
@@ -176,23 +168,17 @@ describe("collapsed group chips", () => {
         ?.hiddenFromDefaultList
     ).toBe(true);
     const buljong = catalog.find((ing) => ing.id === "group:buljong");
-    expect(expandFindSelection([buljong.id], catalog).length).toBe(3);
+    expect(expandSelection([buljong.id], catalog).length).toBe(3);
     const fond = catalog.find((ing) => ing.id === "group:fond");
-    expect(expandFindSelection([fond.id], catalog).length).toBe(3);
+    expect(expandSelection([fond.id], catalog).length).toBe(3);
   });
 });
 
 describe("ingredientGroups", () => {
   it("assigns strimlad kycklingfilé to kycklingfilé group", () => {
     const filé = groupDef("group:kycklingfile");
-    expect(
-      normalizedIngredientIdAssignedGroupId(
-        getIngredientId("strimlad kycklingfilé")
-      )
-    ).toBe(filé.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingvingar"))
-    ).toBe(null);
+    expect(groupIdFor(getIngredientId("strimlad kycklingfilé"))).toBe(filé.id);
+    expect(groupIdFor(getIngredientId("kycklingvingar"))).toBe(null);
   });
 
   it("assigns buljong and fond before kycklingfilé", () => {
@@ -200,14 +186,10 @@ describe("ingredientGroups", () => {
     const fond = groupDef("group:fond");
     const filé = groupDef("group:kycklingfile");
     const cube = getIngredientId("kycklingbuljongtärning");
-    expect(normalizedIngredientIdAssignedGroupId(cube)).toBe(buljong.id);
-    expect(normalizedIngredientIdAssignedGroupId(cube)).not.toBe(filé.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingfond"))
-    ).toBe(fond.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("kycklingfilé"))
-    ).toBe(filé.id);
+    expect(groupIdFor(cube)).toBe(buljong.id);
+    expect(groupIdFor(cube)).not.toBe(filé.id);
+    expect(groupIdFor(getIngredientId("kycklingfond"))).toBe(fond.id);
+    expect(groupIdFor(getIngredientId("kycklingfilé"))).toBe(filé.id);
   });
 
   test.each([
@@ -216,9 +198,7 @@ describe("ingredientGroups", () => {
     ["nötfärs", "group:färs"],
     ["köttfärs", "group:färs"],
   ])("assigns %s to %s", (name, groupId) => {
-    expect(normalizedIngredientIdAssignedGroupId(getIngredientId(name))).toBe(
-      groupDef(groupId).id
-    );
+    expect(groupIdFor(getIngredientId(name))).toBe(groupDef(groupId).id);
   });
 
   test.each([
@@ -227,9 +207,7 @@ describe("ingredientGroups", () => {
     "fläskkarré",
     "strimlat nötkött",
   ])("%s is not assigned to a collapsed group", (name) => {
-    expect(normalizedIngredientIdAssignedGroupId(getIngredientId(name))).toBe(
-      null
-    );
+    expect(groupIdFor(getIngredientId(name))).toBe(null);
   });
 
   it("matches dishes when all group member ids are passed", () => {
