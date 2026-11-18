@@ -6,6 +6,7 @@ export const DEFAULT_DESCRIPTION = (dish) => `---
 title: ${dish.name}
 difficulty: Enkel/Medel/Svår
 time: 15/30/45 min
+servings: 4
 description: En kort beskrivning av rätten.
 ingredients:
   - name: Kärlek

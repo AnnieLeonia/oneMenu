@@ -947,3 +947,37 @@
   text-decoration: line-through;
   color: gray;
 }
+
+.markdown-body .recipe-meta-table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Override .dish select form layout (float + calc width) inside meta table */
+.markdown-body .recipe-meta-table .recipe-servings-cell {
+  white-space: nowrap;
+}
+
+.markdown-body .recipe-meta-table .recipe-servings-label {
+  display: inline-block;
+  margin-right: 0.5em;
+  font-weight: 500;
+  min-width: 3.5em;
+}
+
+.markdown-body .recipe-meta-table .recipe-servings-select {
+  float: none;
+  width: auto;
+  min-width: 6.5em;
+  margin: 0;
+  border: black solid 1px;
+  box-shadow: 0px 1px 8px 0px #777;
+  background-color: white;
+  color: #24292f;
+  padding: 0.35em 0.5em;
+  font-size: 16px;
+  line-height: 1.25;
+  cursor: pointer;
+  -webkit-appearance: menulist;
+  appearance: menulist;
+}

@@ -7,13 +7,36 @@ import { get, toInteger } from "lodash/fp";
 import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
 import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
+import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
+import {
+  getRecipeBaseServings,
+  getServingOptions,
+  recipeHasIngredientQuantities,
+} from "../../components/markdown/recipeMarkdown";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
 
 class ShowDish extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { selectedServings: getRecipeBaseServings("") };
+  }
+
   componentDidMount() {
     this.props.getDish(this.props.id, this.props.history);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      this.setState({
+        selectedServings: getRecipeBaseServings(this.props.description),
+      });
+    } else if (!prevProps.description && this.props.description) {
+      this.setState({
+        selectedServings: getRecipeBaseServings(this.props.description),
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -31,6 +54,11 @@ class ShowDish extends Component {
       location,
       isLoggedIn,
     } = this.props;
+    const { selectedServings } = this.state;
+    const showPortionScale = recipeHasIngredientQuantities(description);
+    const baseServings = getRecipeBaseServings(description);
+    const servingOptions = getServingOptions(baseServings);
+    const ingredientMultiplier = selectedServings / baseServings;
 
     if (!name) {
       return null;
@@ -41,7 +69,24 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          <MarkdownRenderer markdown={description} className="markdown-body" />
+          {showPortionScale ? (
+            <RecipeMarkdownView
+              markdown={description}
+              className="markdown-body"
+              ingredientMultiplier={ingredientMultiplier}
+              selectedServings={selectedServings}
+              servingOptions={servingOptions}
+              onServingsChange={(count) =>
+                this.setState({ selectedServings: count })
+              }
+              translate={translate}
+            />
+          ) : (
+            <MarkdownRenderer
+              markdown={description}
+              className="markdown-body"
+            />
+          )}
         </div>
         <br />
         <br />
@@ -81,6 +126,7 @@ ShowDish.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string,
   img: PropTypes.string,
+  description: PropTypes.string,
   translate: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,

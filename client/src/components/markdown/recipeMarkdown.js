@@ -4,13 +4,17 @@ import { parseFrontMatter } from "./parseFrontMatter";
 
 const H1 = "# ";
 const H3 = "### ";
-const INGREDIENTS = "## 🧂 Ingredienser";
+export const INGREDIENTS_HEADING = "🧂 Ingredienser";
+const INGREDIENTS = `## ${INGREDIENTS_HEADING}`;
 const COOKING = "## 👩‍🍳 Tillagning";
 const ING_TABLE = ["Mängd | 🥕 Ingrediens", "----- | ----------"];
 const META_TABLE = [
-  "💪 Svårighetsgrad   | ⏱️ Tid",
-  "---------------- | -------------",
+  "💪 Svårighetsgrad   | ⏱️ Tid | 👥 Personer",
+  "---------------- | ------------- | --------",
 ];
+
+export const SERVING_PRESETS = [2, 4, 8, 12];
+const DEFAULT_SERVINGS = 4;
 const EMPTY_AMOUNT = "&nbsp;";
 
 export function parseRecipe(description) {
@@ -28,7 +32,65 @@ export function parseRecipe(description) {
   }
 }
 
-function normalizeIngredients(raw) {
+function parseQuantity(quantity) {
+  if (isNil(quantity) || quantity === "") return null;
+  if (typeof quantity === "number" && !Number.isNaN(quantity)) return quantity;
+
+  const s = toString(quantity).trim();
+  if (!s) return null;
+  if (/^\d+(\.\d+)?$/.test(s)) return parseFloat(s);
+
+  const fraction = /^(\d+)\s*\/\s*(\d+)$/.exec(s);
+  if (fraction) {
+    return parseInt(fraction[1], 10) / parseInt(fraction[2], 10);
+  }
+
+  const mixed = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/.exec(s);
+  if (mixed) {
+    return (
+      parseInt(mixed[1], 10) + parseInt(mixed[2], 10) / parseInt(mixed[3], 10)
+    );
+  }
+
+  return null;
+}
+
+function formatQuantity(value) {
+  if (!Number.isFinite(value)) return "";
+
+  const tolerance = 0.02;
+  const whole = Math.floor(value + tolerance);
+  const fracPart = value - whole;
+  const fracs = [
+    [1, 2],
+    [1, 3],
+    [2, 3],
+    [1, 4],
+    [3, 4],
+  ];
+
+  if (Math.abs(fracPart) < tolerance) return String(whole);
+
+  for (const [num, den] of fracs) {
+    const f = num / den;
+    if (Math.abs(fracPart - f) < tolerance) {
+      return whole ? `${whole} ${num}/${den}` : `${num}/${den}`;
+    }
+  }
+
+  const rounded = Math.round(value * 100) / 100;
+  if (Number.isInteger(rounded)) return String(rounded);
+  return String(rounded);
+}
+
+function scaleQuantity(quantity, multiplier) {
+  if (multiplier === 1) return quantity;
+  const parsed = parseQuantity(quantity);
+  if (parsed == null) return quantity;
+  return formatQuantity(parsed * multiplier);
+}
+
+function normalizeIngredients(raw, ingredientMultiplier = 1) {
   if (!Array.isArray(raw) || !raw.length) return null;
 
   const items = raw
@@ -41,12 +103,18 @@ function normalizeIngredients(raw) {
       if (typeof item !== "object" || !item.name) return null;
       const name = toString(item.name);
       if (!name) return null;
+
+      let quantity;
+      if (!isNil(item.quantity) && item.quantity !== "") {
+        quantity =
+          ingredientMultiplier === 1
+            ? item.quantity
+            : scaleQuantity(item.quantity, ingredientMultiplier);
+      }
+
       return {
         name,
-        quantity:
-          !isNil(item.quantity) && item.quantity !== ""
-            ? item.quantity
-            : undefined,
+        quantity,
         unit: toString(item.unit) || undefined,
         group: toString(item.group) || undefined,
       };
@@ -54,6 +122,42 @@ function normalizeIngredients(raw) {
     .filter(Boolean);
 
   return items.length ? items : null;
+}
+
+function parseRecipeServings(data) {
+  const raw = data.servings ?? data.persons ?? data.personer;
+  if (typeof raw === "number" && raw > 0) return raw;
+  const parsed = parseInt(toString(raw), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
+}
+
+export function getRecipeBaseServings(description) {
+  const { data } = parseRecipe(description);
+  return parseRecipeServings(data);
+}
+
+export function getServingOptions(baseServings) {
+  const options = [...SERVING_PRESETS];
+  if (!options.includes(baseServings)) {
+    options.push(baseServings);
+  }
+  return options.sort((a, b) => a - b);
+}
+
+export function getRecipeMeta(description) {
+  const { data } = parseRecipe(description);
+  return {
+    difficulty: toString(data.difficulty),
+    time: toString(data.time),
+    baseServings: parseRecipeServings(data),
+  };
+}
+
+export function recipeHasIngredientQuantities(description) {
+  const { data } = parseRecipe(description);
+  const items = normalizeIngredients(data.ingredients);
+  if (!items) return false;
+  return items.some((item) => !isNil(item.quantity) && item.quantity !== "");
 }
 
 function ingredientsMarkdown(items) {
@@ -117,23 +221,39 @@ function stepsMarkdown(data) {
   return lines.length ? [COOKING, ...lines].join("\n") : "";
 }
 
-function metaTable(difficulty, time) {
+function formatServingsLabel(count) {
+  return `${count} pers`;
+}
+
+function metaTable(difficulty, time, servings = DEFAULT_SERVINGS) {
   const d = toString(difficulty);
   const timeStr = toString(time);
   if (!d && !timeStr) return "";
-  return [...META_TABLE, `${d || "-"} | ${timeStr || "-"}`].join("\n");
+  return [
+    ...META_TABLE,
+    `${d || "-"} | ${timeStr || "-"} | ${formatServingsLabel(servings)}`,
+  ].join("\n");
 }
 
-function composeRecipeMarkdown(data, content) {
+function composeRecipeMarkdown(
+  data,
+  content,
+  ingredientMultiplier = 1,
+  { excludeIngredients = false, excludeMeta = false } = {}
+) {
   const title = toString(data.title);
-  const ingredients = normalizeIngredients(data.ingredients);
+  const ingredients = normalizeIngredients(
+    data.ingredients,
+    ingredientMultiplier
+  );
   const steps = stepsMarkdown(data);
+  const servings = parseRecipeServings(data);
 
   return [
     title && `${H1}${title}`,
-    metaTable(data.difficulty, data.time),
+    !excludeMeta && metaTable(data.difficulty, data.time, servings),
     toString(data.description),
-    ingredients && ingredientsMarkdown(ingredients),
+    !excludeIngredients && ingredients && ingredientsMarkdown(ingredients),
     steps,
     (content || "").trim(),
   ]
@@ -142,9 +262,33 @@ function composeRecipeMarkdown(data, content) {
     .trim();
 }
 
-export function getMarkdown(description) {
+export function getIngredientsTableMarkdown(description, options = {}) {
   if (!isString(description) || isEmpty(description)) return "";
+  const { ingredientMultiplier = 1 } = options;
+  const { data } = parseRecipe(description);
+  const ingredients = normalizeIngredients(
+    data.ingredients,
+    ingredientMultiplier
+  );
+  if (!ingredients) return "";
+
+  const full = ingredientsMarkdown(ingredients);
+  return full.split("\n").slice(1).join("\n").trim();
+}
+
+export function getMarkdown(description, options = {}) {
+  if (!isString(description) || isEmpty(description)) return "";
+  const {
+    ingredientMultiplier = 1,
+    excludeIngredients = false,
+    excludeMeta = false,
+  } = options;
   const { data, content } = parseRecipe(description);
-  const composed = composeRecipeMarkdown(data, content);
+  const composed = composeRecipeMarkdown(data, content, ingredientMultiplier, {
+    excludeIngredients,
+    excludeMeta,
+  });
   return composed || content || "";
 }
+
+export { parseQuantity, scaleQuantity, formatQuantity };

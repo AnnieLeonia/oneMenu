@@ -1,19 +1,12 @@
 import React, { Component } from "react";
-import { micromark } from "micromark";
-import { gfm, gfmHtml } from "micromark-extension-gfm";
-
 import { getMarkdown } from "./recipeMarkdown";
+import markdownToHtml from "./markdownToHtml";
 
-function createMarkup(description) {
+function createMarkup(description, ingredientMultiplier) {
   if (!description) return;
-  const markdown = getMarkdown(description);
+  const markdown = getMarkdown(description, { ingredientMultiplier });
   if (!markdown) return;
-  const html = micromark(markdown, {
-    extensions: [gfm()],
-    htmlExtensions: [gfmHtml()],
-  });
-
-  return { __html: html };
+  return markdownToHtml(markdown);
 }
 
 class MarkdownRenderer extends Component {
@@ -45,12 +38,12 @@ class MarkdownRenderer extends Component {
   };
 
   render() {
-    const { markdown, className } = this.props;
+    const { markdown, className, ingredientMultiplier = 1 } = this.props;
 
     return (
       <div
         ref={this.ref}
-        dangerouslySetInnerHTML={createMarkup(markdown)}
+        dangerouslySetInnerHTML={createMarkup(markdown, ingredientMultiplier)}
         className={className}
       />
     );
