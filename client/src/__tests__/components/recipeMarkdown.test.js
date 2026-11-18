@@ -2,7 +2,6 @@ import {
   getMarkdown,
   getRecipeShowInfo,
   getRecipeViewParts,
-  scaleQuantity,
 } from "../../components/markdown/recipeMarkdown";
 
 const recipe = (body) => `---
@@ -30,13 +29,6 @@ describe("recipeMarkdown", () => {
       ingredientMultiplier: multiplier,
     });
     snippets.forEach((s) => expect(md).toContain(s));
-  });
-
-  it.each([
-    ["1 1/2", 2, "3"],
-    [3, 0.5, "1 1/2"],
-  ])("scaleQuantity(%p, %p)", (quantity, multiplier, expected) => {
-    expect(scaleQuantity(quantity, multiplier)).toBe(expected);
   });
 
   it.each([

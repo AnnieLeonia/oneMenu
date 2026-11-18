@@ -1,20 +1,22 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
 
 import {
-  getRecipeShowInfo,
-  getRecipeViewParts,
+  getRecipeContext,
+  getRecipeViewForContext,
   RECIPE_LABELS,
 } from "./recipeMarkdown";
 
+const micromarkOpts = {
+  extensions: [gfm()],
+  htmlExtensions: [gfmHtml()],
+};
+
 const recipeHtml = (markdown) => {
   if (!markdown) return null;
-  const html = micromark(markdown, {
-    extensions: [gfm()],
-    htmlExtensions: [gfmHtml()],
-  });
+  const html = micromark(markdown, micromarkOpts);
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 };
 
@@ -26,16 +28,32 @@ const crossableParent = (el) => {
   }
 };
 
-function RecipeMarkdownView({
-  markdown,
-  className,
-  selectedServings,
-  onServingsChange,
-}) {
-  const { baseServings, servingOptions, showMetaTable, difficulty, time } =
-    getRecipeShowInfo(markdown);
-  const { preamble, ingredientsMarkdown, cooking, trailing } =
-    getRecipeViewParts(markdown, selectedServings / baseServings);
+function RecipeMarkdownView({ markdown, className }) {
+  const ctx = useMemo(() => getRecipeContext(markdown), [markdown]);
+  const [selectedServings, setSelectedServings] = useState(
+    () => ctx?.baseServings ?? 4
+  );
+
+  useEffect(() => {
+    if (ctx) setSelectedServings(ctx.baseServings);
+  }, [ctx?.baseServings]);
+
+  const multiplier = ctx ? selectedServings / ctx.baseServings : 1;
+  const view = useMemo(
+    () => getRecipeViewForContext(ctx, multiplier),
+    [ctx, multiplier]
+  );
+
+  const {
+    servingOptions,
+    showMetaTable,
+    difficulty,
+    time,
+    preamble,
+    ingredientsMarkdown,
+    cooking,
+    trailing,
+  } = view;
 
   return (
     <div className={className}>
@@ -57,7 +75,7 @@ function RecipeMarkdownView({
                   className="recipe-servings-select"
                   value={String(selectedServings)}
                   aria-label={RECIPE_LABELS.servingsHeader}
-                  onChange={(e) => onServingsChange(Number(e.target.value))}
+                  onChange={(e) => setSelectedServings(Number(e.target.value))}
                 >
                   {servingOptions.map((count) => (
                     <option key={count} value={String(count)}>
@@ -98,12 +116,6 @@ function RecipeMarkdownView({
 RecipeMarkdownView.propTypes = {
   markdown: PropTypes.string.isRequired,
   className: PropTypes.string,
-  selectedServings: PropTypes.number.isRequired,
-  onServingsChange: PropTypes.func,
-};
-
-RecipeMarkdownView.defaultProps = {
-  onServingsChange: () => {},
 };
 
 export default RecipeMarkdownView;

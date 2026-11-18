@@ -7,29 +7,13 @@ import { get, toInteger } from "lodash/fp";
 import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
 import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
-import { getRecipeShowInfo } from "../../components/markdown/recipeMarkdown";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
 
 class ShowDish extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { selectedServings: 4 };
-  }
-
   componentDidMount() {
     this.props.getDish(this.props.id, this.props.history);
-  }
-
-  componentDidUpdate(prevProps) {
-    const descriptionLoaded = !prevProps.description && this.props.description;
-    if (prevProps.id !== this.props.id || descriptionLoaded) {
-      this.setState({
-        selectedServings: getRecipeShowInfo(this.props.description)
-          .baseServings,
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -47,8 +31,6 @@ class ShowDish extends Component {
       location,
       isLoggedIn,
     } = this.props;
-    const { selectedServings } = this.state;
-
     if (!name) {
       return null;
     }
@@ -61,10 +43,6 @@ class ShowDish extends Component {
           <RecipeMarkdownView
             markdown={description}
             className="markdown-body"
-            selectedServings={selectedServings}
-            onServingsChange={(count) =>
-              this.setState({ selectedServings: count })
-            }
           />
         </div>
         <br />

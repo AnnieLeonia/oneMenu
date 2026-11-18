@@ -11,7 +11,6 @@ import {
   resetDish,
 } from "../../actions/dishes";
 import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
-import { getRecipeShowInfo } from "../../components/markdown/recipeMarkdown";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import CategorySelect from "./CategorySelect";
 import DaySelect from "./DaySelect";
@@ -28,18 +27,12 @@ class EditDish extends Component {
       description: "",
       img: "",
       category: "",
-      selectedServings: 4,
     };
   }
 
   componentDidMount() {
     const { dish, history } = this.props;
-    this.props.getDish(dish.id, history).then((res) =>
-      this.setState({
-        ...res.dish,
-        selectedServings: getRecipeShowInfo(res.dish.description).baseServings,
-      })
-    );
+    this.props.getDish(dish.id, history).then((res) => this.setState(res.dish));
   }
 
   componentWillUnmount() {
@@ -49,8 +42,6 @@ class EditDish extends Component {
   render() {
     const { dish, translate, history, location } = this.props;
     const { onRemove, onSubmit } = this.props;
-    const { selectedServings } = this.state;
-
     if (!dish.name) {
       return null;
     }
@@ -127,10 +118,6 @@ class EditDish extends Component {
           <RecipeMarkdownView
             markdown={this.state.description}
             className="flex flex-col markdown-body markdown-preview"
-            selectedServings={selectedServings}
-            onServingsChange={(count) =>
-              this.setState({ selectedServings: count })
-            }
           />
         </div>
       </div>

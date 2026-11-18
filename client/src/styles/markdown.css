@@ -953,24 +953,14 @@
   margin-bottom: 1rem;
 }
 
-/* Override .dish select form layout (float + calc width) inside meta table */
 .markdown-body .recipe-meta-table .recipe-servings-cell {
   white-space: nowrap;
 }
 
 .markdown-body .recipe-meta-table .recipe-servings-select {
-  float: none;
   width: auto;
+  max-width: 100%;
   min-width: 6.5em;
-  margin: 0;
-  border: black solid 1px;
-  box-shadow: 0px 1px 8px 0px #777;
-  background-color: white;
-  color: #24292f;
-  padding: 0.35em 0.5em;
-  font-size: 16px;
-  line-height: 1.25;
+  font: inherit;
   cursor: pointer;
-  -webkit-appearance: menulist;
-  appearance: menulist;
 }

@@ -1,6 +1,15 @@
-import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
+import {
+  isEmpty,
+  isNil,
+  isObject,
+  isString,
+  sortBy,
+  toString,
+  uniq,
+} from "lodash/fp";
 
 import { parseFrontMatter } from "./parseFrontMatter";
+import { scaleQuantity } from "./quantity";
 
 const H1 = "# ";
 const H3 = "### ";
@@ -33,10 +42,6 @@ function preambleMarkdown(data) {
     .trim();
 }
 
-function trailingRecipeMarkdown(content) {
-  return (content || "").trim();
-}
-
 const META_TABLE = [
   `${RECIPE_LABELS.difficultyHeader}   | ${RECIPE_LABELS.timeHeader} | ${RECIPE_LABELS.servingsHeader}`,
   "---------------- | ------------- | --------",
@@ -59,64 +64,6 @@ function parseRecipe(description) {
   } catch {
     return { data: {}, content: description };
   }
-}
-
-function parseQuantity(quantity) {
-  if (isNil(quantity) || quantity === "") return null;
-  if (typeof quantity === "number" && !Number.isNaN(quantity)) return quantity;
-
-  const s = toString(quantity).trim();
-  if (!s) return null;
-  if (/^\d+(\.\d+)?$/.test(s)) return parseFloat(s);
-
-  const fraction = /^(\d+)\s*\/\s*(\d+)$/.exec(s);
-  if (fraction) {
-    return parseInt(fraction[1], 10) / parseInt(fraction[2], 10);
-  }
-
-  const mixed = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/.exec(s);
-  if (mixed) {
-    return (
-      parseInt(mixed[1], 10) + parseInt(mixed[2], 10) / parseInt(mixed[3], 10)
-    );
-  }
-
-  return null;
-}
-
-function formatQuantity(value) {
-  if (!Number.isFinite(value)) return "";
-
-  const tolerance = 0.02;
-  const whole = Math.floor(value + tolerance);
-  const fracPart = value - whole;
-  const fracs = [
-    [1, 2],
-    [1, 3],
-    [2, 3],
-    [1, 4],
-    [3, 4],
-  ];
-
-  if (Math.abs(fracPart) < tolerance) return String(whole);
-
-  for (const [num, den] of fracs) {
-    const f = num / den;
-    if (Math.abs(fracPart - f) < tolerance) {
-      return whole ? `${whole} ${num}/${den}` : `${num}/${den}`;
-    }
-  }
-
-  const rounded = Math.round(value * 100) / 100;
-  if (Number.isInteger(rounded)) return String(rounded);
-  return String(rounded);
-}
-
-function scaleQuantity(quantity, multiplier) {
-  if (multiplier === 1) return quantity;
-  const parsed = parseQuantity(quantity);
-  if (parsed == null) return quantity;
-  return formatQuantity(parsed * multiplier);
 }
 
 function normalizeIngredients(raw, ingredientMultiplier = 1) {
@@ -160,20 +107,41 @@ function parseRecipeServings(data) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
 }
 
-export function getRecipeShowInfo(description) {
-  const { data } = parseRecipe(description);
+const hasRecipeMeta = (data) =>
+  !!(toString(data.difficulty) || toString(data.time) || data.servings != null);
+
+const emptyShowInfo = () => ({
+  baseServings: DEFAULT_SERVINGS,
+  servingOptions: SERVING_PRESETS,
+  showMetaTable: false,
+  difficulty: "",
+  time: "",
+});
+
+function recipeContext(description) {
+  if (!isString(description) || isEmpty(description)) return null;
+  const { data, content } = parseRecipe(description);
   const baseServings = parseRecipeServings(data);
-  const difficulty = toString(data.difficulty);
-  const time = toString(data.time);
   return {
+    data,
+    content,
     baseServings,
-    servingOptions: [...new Set([...SERVING_PRESETS, baseServings])].sort(
-      (a, b) => a - b
-    ),
-    showMetaTable: !!(difficulty || time || data.servings != null),
-    difficulty,
-    time,
+    servingOptions: sortBy((n) => n, uniq([...SERVING_PRESETS, baseServings])),
+    showMetaTable: hasRecipeMeta(data),
+    difficulty: toString(data.difficulty),
+    time: toString(data.time),
   };
+}
+
+export function getRecipeContext(description) {
+  return recipeContext(description);
+}
+
+export function getRecipeShowInfo(description) {
+  const ctx = recipeContext(description);
+  if (!ctx) return emptyShowInfo();
+  const { baseServings, servingOptions, showMetaTable, difficulty, time } = ctx;
+  return { baseServings, servingOptions, showMetaTable, difficulty, time };
 }
 
 function ingredientsMarkdown(
@@ -247,15 +215,24 @@ function stepsMarkdown(data, { includeSectionHeading = true } = {}) {
     : lines.join("\n");
 }
 
-function recipeContentBlocks(data, content, ingredientMultiplier = 1) {
+function recipeContentBlocks(
+  data,
+  content,
+  ingredientMultiplier = 1,
+  { includeSectionHeading = true } = {}
+) {
   const ingredients = normalizeIngredients(
     data.ingredients,
     ingredientMultiplier
   );
   return {
-    ingredientsMarkdown: ingredients ? ingredientsMarkdown(ingredients) : "",
-    cookingMarkdown: stepsMarkdown(data),
-    trailingMarkdown: trailingRecipeMarkdown(content),
+    ingredientsMarkdown: ingredients
+      ? ingredientsMarkdown(ingredients, INGREDIENTS_TABLE, {
+          includeSectionHeading,
+        })
+      : "",
+    cookingMarkdown: stepsMarkdown(data, { includeSectionHeading }),
+    trailingMarkdown: (content || "").trim(),
   };
 }
 
@@ -281,16 +258,14 @@ function metaTable(
 function composeRecipeMarkdown(data, content, ingredientMultiplier = 1) {
   const title = toString(data.title);
   const servings = parseRecipeServings(data);
-  const includeServingsColumn =
-    data.servings != null ||
-    !!toString(data.difficulty) ||
-    !!toString(data.time);
   const { ingredientsMarkdown, cookingMarkdown, trailingMarkdown } =
     recipeContentBlocks(data, content, ingredientMultiplier);
 
   return [
     title && `${H1}${title}`,
-    metaTable(data.difficulty, data.time, servings, { includeServingsColumn }),
+    metaTable(data.difficulty, data.time, servings, {
+      includeServingsColumn: hasRecipeMeta(data),
+    }),
     toString(data.description),
     ingredientsMarkdown,
     cookingMarkdown,
@@ -301,36 +276,57 @@ function composeRecipeMarkdown(data, content, ingredientMultiplier = 1) {
     .trim();
 }
 
-export function getRecipeViewParts(description, ingredientMultiplier = 1) {
-  const empty = {
-    preamble: "",
-    ingredientsMarkdown: "",
-    cooking: "",
-    trailing: "",
-  };
-  if (!isString(description) || isEmpty(description)) return empty;
-  const { data, content } = parseRecipe(description);
-  const ingredients = normalizeIngredients(
-    data.ingredients,
-    ingredientMultiplier
-  );
+const emptyViewParts = () => ({
+  preamble: "",
+  ingredientsMarkdown: "",
+  cooking: "",
+  trailing: "",
+});
+
+function buildRecipeView(ctx, ingredientMultiplier = 1) {
+  if (!ctx) {
+    return { ...emptyShowInfo(), ...emptyViewParts() };
+  }
+  const { ingredientsMarkdown, cookingMarkdown, trailingMarkdown } =
+    recipeContentBlocks(ctx.data, ctx.content, ingredientMultiplier, {
+      includeSectionHeading: false,
+    });
   return {
-    preamble: preambleMarkdown(data),
-    ingredientsMarkdown: ingredients
-      ? ingredientsMarkdown(ingredients, INGREDIENTS_TABLE, {
-          includeSectionHeading: false,
-        })
-      : "",
-    cooking: stepsMarkdown(data, { includeSectionHeading: false }),
-    trailing: trailingRecipeMarkdown(content),
+    baseServings: ctx.baseServings,
+    servingOptions: ctx.servingOptions,
+    showMetaTable: ctx.showMetaTable,
+    difficulty: ctx.difficulty,
+    time: ctx.time,
+    preamble: preambleMarkdown(ctx.data),
+    ingredientsMarkdown,
+    cooking: cookingMarkdown,
+    trailing: trailingMarkdown,
   };
 }
 
+export function getRecipeView(description, ingredientMultiplier = 1) {
+  return buildRecipeView(recipeContext(description), ingredientMultiplier);
+}
+
+export function getRecipeViewForContext(ctx, ingredientMultiplier = 1) {
+  return buildRecipeView(ctx, ingredientMultiplier);
+}
+
+export function getRecipeViewParts(description, ingredientMultiplier = 1) {
+  const { preamble, ingredientsMarkdown, cooking, trailing } = getRecipeView(
+    description,
+    ingredientMultiplier
+  );
+  return { preamble, ingredientsMarkdown, cooking, trailing };
+}
+
 export function getMarkdown(description, { ingredientMultiplier = 1 } = {}) {
-  if (!isString(description) || isEmpty(description)) return "";
-  const { data, content } = parseRecipe(description);
+  const ctx = recipeContext(description);
+  if (!ctx) return "";
   return (
-    composeRecipeMarkdown(data, content, ingredientMultiplier) || content || ""
+    composeRecipeMarkdown(ctx.data, ctx.content, ingredientMultiplier) ||
+    ctx.content ||
+    ""
   );
 }
 
