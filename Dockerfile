@@ -25,7 +25,7 @@ COPY server/ ./server/
 COPY --from=build-client /app/client/build ./client/build
 
 ENV NODE_ENV=production
-EXPOSE 8080
+EXPOSE 3000
 
 WORKDIR /app/server
 CMD ["node", "index"]

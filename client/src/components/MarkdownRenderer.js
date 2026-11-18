@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { micromark } from "micromark";
 import { gfm, gfmHtml } from "micromark-extension-gfm";
-import { getMarkdownBody } from "../utils/recipeIngredients";
+import { getMarkdownBody } from "../utils/recipeMarkdown";
 
 function createMarkup(description, stripFrontmatter, includeTitle) {
   if (!description) return;
