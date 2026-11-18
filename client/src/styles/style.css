@@ -311,7 +311,6 @@ nav a.active {
 .doneBtn,
 .cancelBtn,
 .deleteBtn,
-.saveBtn,
 .loginBtn,
 .logoutBtn {
   cursor: pointer;
@@ -333,7 +332,6 @@ nav a.active {
   width: calc((100% / 3) - 0.75em);
 }
 
-.saveBtn,
 .loginBtn,
 .logoutBtn {
   width: calc(50% - 0.75em);
@@ -355,8 +353,19 @@ nav a.active {
 }
 
 .saveBtn {
+  cursor: pointer;
+  padding: 0.2em 0;
+  font-family: "Quicksand", sans-serif;
+  font-size: 22px;
+  color: black;
+  border-radius: 3px;
+  border: black solid 1px;
+  box-shadow: 3px 3px 5px #888;
+  margin: 0.5em auto;
+  display: block;
+  width: calc(100% - 2em);
+  max-width: 20em;
   background-color: #f1e6de;
-  right: 0.5em;
 }
 
 .loginBtn {
@@ -522,8 +531,9 @@ nav a.active {
 .setting-wrapper {
   background-color: #fff;
   overflow: auto;
-  position: absolute;
-  width: 100%;
+  clear: both;
+  text-align: left;
+  padding: 0.5em 0 1em;
 }
 
 .hidden {
@@ -569,6 +579,7 @@ nav a.active {
 
 .settings {
   text-align: center;
+  padding-bottom: 4em;
 }
 
 .not-found {
