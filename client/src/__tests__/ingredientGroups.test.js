@@ -264,12 +264,12 @@ ingredients:
       },
     ];
     const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:kycklingfilé")).toBe(true);
+    expect(catalog.some((ing) => ing.id === "group:kycklingfile")).toBe(true);
     expect(
       catalog.find((ing) => ing.id === getIngredientId("strimlad kycklingfilé"))
         ?.hiddenFromDefaultList
     ).toBe(true);
-    const filé = catalog.find((ing) => ing.id === "group:kycklingfilé");
+    const filé = catalog.find((ing) => ing.id === "group:kycklingfile");
     expect(expandFindSelection([filé.id], catalog).length).toBe(2);
   });
 
@@ -399,7 +399,7 @@ ingredients:
 
 describe("ingredientGroups", () => {
   it("assigns strimlad kycklingfilé to kycklingfilé group", () => {
-    const filé = getIngredientGroupDef("group:kycklingfilé");
+    const filé = getIngredientGroupDef("group:kycklingfile");
     expect(
       groupMatchesCanonicalId(filé, getIngredientId("strimlad kycklingfilé"))
     ).toBe(true);
@@ -411,7 +411,7 @@ describe("ingredientGroups", () => {
   it("assigns buljong and fond before kycklingfilé", () => {
     const buljong = getIngredientGroupDef("group:buljong");
     const fond = getIngredientGroupDef("group:fond");
-    const filé = getIngredientGroupDef("group:kycklingfilé");
+    const filé = getIngredientGroupDef("group:kycklingfile");
     const cube = getIngredientId("kycklingbuljongtärning");
     expect(groupMatchesCanonicalId(buljong, cube)).toBe(true);
     expect(groupMatchesCanonicalId(filé, cube)).toBe(false);

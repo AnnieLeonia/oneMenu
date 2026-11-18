@@ -1,4 +1,12 @@
-import { filter as filterFp, flow, map, uniq, values } from "lodash/fp";
+import {
+  filter as filterFp,
+  flatMap,
+  flow,
+  map,
+  uniq,
+  uniqBy,
+  values,
+} from "lodash/fp";
 
 import { parseFrontMatter } from "../../components/markdown/parseFrontMatter";
 import { sortFinderCatalogEntries } from "./finderCatalogSort";
@@ -28,16 +36,12 @@ import {
 export const MIN_RECIPES_TO_LIST_INGREDIENT = 4;
 
 function mergeIngredientLists(...lists) {
-  const byId = new Map();
-  lists.forEach((list) => {
-    (list || []).forEach((item) => {
-      if (!item?.name) return;
-      const id = getIngredientId(item.name);
-      if (!id || byId.has(id)) return;
-      byId.set(id, item);
-    });
-  });
-  return byId.size ? Array.from(byId.values()) : null;
+  const merged = flow(
+    flatMap((list) => list || []),
+    filterFp((item) => item?.name && getIngredientId(item.name)),
+    uniqBy((item) => getIngredientId(item.name))
+  )(lists);
+  return merged.length ? merged : null;
 }
 
 /**
@@ -134,8 +138,9 @@ export function buildFindIngredientContext(dishes) {
       const id = item.canonicalId;
       const name = (item.name || "").trim();
       if (!id || !name) return;
+      const groupId = canonicalIdAssignedGroupId(id);
       const collapsedMember = Boolean(
-        getIngredientGroupDef(canonicalIdAssignedGroupId(id))?.collapseToSingle
+        getIngredientGroupDef(groupId)?.collapseToSingle
       );
       if (!nameCounts[id]) nameCounts[id] = {};
       nameCounts[id][name] = (nameCounts[id][name] || 0) + 1;
@@ -192,6 +197,22 @@ export function isFinderChipVisibleByDefault(ing) {
   return ing.recipeCount >= MIN_RECIPES_TO_LIST_INGREDIENT;
 }
 
+function expandOneSelectionId(id, catalog, byId, add) {
+  if (isFinderSearchSelectionId(id)) {
+    filterIngredientsByLooseSearch(
+      catalog,
+      finderSearchSelectionQuery(id)
+    ).forEach((hit) => expandOneSelectionId(hit.id, catalog, byId, add));
+    return;
+  }
+  const entry = byId.get(id);
+  if (entry?.memberIds?.length) {
+    entry.memberIds.forEach(add);
+  } else if (id) {
+    expandIngredientLabelVariantIds(id, catalog).forEach(add);
+  }
+}
+
 export function expandFindSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const seen = new Set();
@@ -201,20 +222,8 @@ export function expandFindSelection(selectedIds, catalog) {
     seen.add(variantId);
     expanded.push(variantId);
   };
-  (selectedIds || []).forEach((id) => {
-    if (isFinderSearchSelectionId(id)) {
-      filterIngredientsByLooseSearch(
-        catalog,
-        finderSearchSelectionQuery(id)
-      ).forEach((hit) => expandFindSelection([hit.id], catalog).forEach(add));
-      return;
-    }
-    const entry = byId.get(id);
-    if (entry?.memberIds?.length) {
-      entry.memberIds.forEach(add);
-    } else if (id) {
-      expandIngredientLabelVariantIds(id, catalog).forEach(add);
-    }
-  });
+  (selectedIds || []).forEach((id) =>
+    expandOneSelectionId(id, catalog, byId, add)
+  );
   return expanded;
 }

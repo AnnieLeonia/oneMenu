@@ -1,15 +1,22 @@
 import { find } from "lodash/fp";
 
-import { cleanIngredientName, getIngredientLabel } from "./normalizeIngredient";
+import {
+  cleanIngredientName,
+  foldIngredientAccents,
+  getIngredientLabel,
+} from "./normalizeIngredient";
 
 function isFarsName(cleaned) {
   if (!cleaned || /\bfärsk/.test(cleaned)) return false;
   return cleaned.includes("färs");
 }
 
-function collapsedGroup(slug, label, match) {
+function collapsedGroup(slug, match = slug) {
+  const label = slug.charAt(0).toUpperCase() + slug.slice(1);
   const matchesCleaned =
-    typeof match === "function" ? match : (t) => t.includes(match);
+    typeof match === "function"
+      ? match
+      : (t) => foldIngredientAccents(t).includes(foldIngredientAccents(match));
   return {
     id: `group:${slug}`,
     label,
@@ -18,17 +25,17 @@ function collapsedGroup(slug, label, match) {
   };
 }
 
-/** First matching entry wins (e.g. buljong before kycklingfilé). */
+/** First matching entry wins (e.g. buljong before kycklingfile). */
 export const INGREDIENT_GROUP_DEFS = [
-  collapsedGroup("färs", "Färs", isFarsName),
-  collapsedGroup("fläskfile", "Fläskfile", "fläskfil"),
-  collapsedGroup("buljong", "Buljong", "buljong"),
-  collapsedGroup("fond", "Fond", "fond"),
-  collapsedGroup("kycklingfilé", "Kycklingfilé", "kycklingfil"),
-  collapsedGroup("bacon", "Bacon", "bacon"),
-  collapsedGroup("vitlök", "Vitlök", "vitlök"),
-  collapsedGroup("parmesan", "Parmesan", "parmesan"),
-  collapsedGroup("sallad", "Sallad", "sallad"),
+  collapsedGroup("färs", isFarsName),
+  collapsedGroup("fläskfile"),
+  collapsedGroup("buljong"),
+  collapsedGroup("fond"),
+  collapsedGroup("kycklingfile"),
+  collapsedGroup("bacon"),
+  collapsedGroup("vitlök"),
+  collapsedGroup("parmesan"),
+  collapsedGroup("sallad"),
 ];
 
 const GROUP_BY_ID = new Map(INGREDIENT_GROUP_DEFS.map((def) => [def.id, def]));
@@ -47,8 +54,9 @@ export function canonicalIdAssignedGroupId(canonicalId) {
 }
 
 export function groupMatchesCanonicalId(groupDef, canonicalId) {
-  if (!groupDef || !canonicalId?.startsWith("raw:")) return false;
-  return canonicalIdAssignedGroupId(canonicalId) === groupDef.id;
+  return (
+    Boolean(groupDef) && canonicalIdAssignedGroupId(canonicalId) === groupDef.id
+  );
 }
 
 export function isIngredientCoveredByGroups(canonicalId) {

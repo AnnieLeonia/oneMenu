@@ -7,7 +7,7 @@ import {
   toLower,
 } from "lodash/fp";
 
-import { formatFinderLabel, getIngredientLabel } from "./normalizeIngredient";
+import { formatFinderLabel } from "./normalizeIngredient";
 import {
   canonicalIdAssignedGroupId,
   collapsedGroupMatchesSearchQuery,
@@ -33,14 +33,6 @@ export function isFinderSearchSelectionId(id) {
 export function finderSearchSelectionQuery(id) {
   if (!isFinderSearchSelectionId(id)) return "";
   return id.slice(FINDER_SEARCH_SELECTION_PREFIX.length);
-}
-
-/** Label text used for search / dish matching for a picker chip id. */
-export function finderChipSearchLabel(chipId, getLabel) {
-  if (isFinderSearchSelectionId(chipId)) {
-    return finderSearchSelectionQuery(chipId);
-  }
-  return (getLabel || getIngredientLabel)(chipId);
 }
 
 /** "färs" must not match the separate staple word "färsk…". */
@@ -90,27 +82,21 @@ function catalogEntryMatchesQuery(ing, query) {
 
 /** Same naming family: exact match or "laxfilé …" detail lines. */
 export function expandIngredientLabelVariantIds(selectedId, catalog) {
-  if (!selectedId || !selectedId.startsWith("raw:")) {
-    return selectedId ? [selectedId] : [];
-  }
-  const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
-  const selected = byId.get(selectedId);
+  if (!selectedId?.startsWith("raw:")) return selectedId ? [selectedId] : [];
+  const selected = (catalog || []).find((ing) => ing.id === selectedId);
   if (!selected) return [selectedId];
 
   const stem = formatFinderLabel(selected.label);
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
-  return (catalog || []).reduce(
-    (ids, ing) => {
-      if (!ing.id.startsWith("raw:") || ing.id === selectedId) return ids;
+  const variantIds = (catalog || [])
+    .filter((ing) => {
+      if (!ing.id.startsWith("raw:") || ing.id === selectedId) return false;
       const text = formatFinderLabel(ing.label);
-      if ((text === stem || text.startsWith(prefix)) && !ids.includes(ing.id)) {
-        ids.push(ing.id);
-      }
-      return ids;
-    },
-    [selectedId]
-  );
+      return text === stem || text.startsWith(prefix);
+    })
+    .map((ing) => ing.id);
+  return [selectedId, ...variantIds];
 }
 
 function omitCollapsedMembersWhenGroupShown(results) {

@@ -14,6 +14,12 @@ export function cleanIngredientName(name) {
     .trim();
 }
 
+/** é→e so filé / file spellings match the same substring. */
+export function foldIngredientAccents(text) {
+  if (!text) return "";
+  return String(text).replace(/é/g, "e");
+}
+
 /**
  * Stable id for matching from recipe text.
  * @param {string} name
