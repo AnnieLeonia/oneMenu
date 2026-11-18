@@ -1,19 +1,11 @@
-import {
-  compact,
-  isArray,
-  map,
-  pipe,
-  size,
-  trim,
-  toString as toStr,
-} from "lodash/fp";
+import { compact, isArray, map, size, trim, toString } from "lodash/fp";
 
 function parseFrontmatterItem(item) {
   const name =
     typeof item === "string"
       ? trim(item)
       : item?.name
-      ? trim(toStr(item.name))
+      ? trim(toString(item.name))
       : "";
   if (!name) return null;
   if (typeof item !== "object" || item == null) return { name };
@@ -22,16 +14,15 @@ function parseFrontmatterItem(item) {
     entry.quantity = item.quantity;
   }
   for (const key of ["unit", "group"]) {
-    const v = trim(toStr(item[key] ?? ""));
+    const v = trim(toString(item[key] ?? ""));
     if (v) entry[key] = v;
   }
   return entry;
 }
 
-/** @param {object} data @returns {Array<{ name: string, quantity?: *, unit?: string, group?: string }>|null} */
 export function parseFromFrontmatter(data) {
   const raw = data?.ingredients;
   if (!isArray(raw) || !size(raw)) return null;
-  const ingredients = pipe(map(parseFrontmatterItem), compact)(raw);
+  const ingredients = compact(map(parseFrontmatterItem)(raw));
   return size(ingredients) ? ingredients : null;
 }

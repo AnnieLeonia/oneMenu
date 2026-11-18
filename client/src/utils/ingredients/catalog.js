@@ -2,7 +2,6 @@ import {
   compact,
   filter as filterFp,
   flow,
-  get,
   map,
   orderBy,
   uniq,
@@ -29,18 +28,21 @@ export const MIN_LIST_RECIPE_COUNT = 4;
 
 export function parseDish(description) {
   const raw = parseFromFrontmatter(parseFrontMatter(description).data);
+  if (!raw?.length) {
+    return { displayIngredients: [], normalizedIngredientIds: null };
+  }
   const displayIngredients = flow(
-    map((item) => ({
-      ...item,
-      normalizedIngredientId: getIngredientId(item.name),
-    })),
-    filterFp((item) => item.normalizedIngredientId)
-  )(raw || []);
+    map((item) => {
+      const normalizedIngredientId = getIngredientId(item.name);
+      return normalizedIngredientId && { ...item, normalizedIngredientId };
+    }),
+    compact
+  )(raw);
+
   const normalizedIngredientIds = flow(
-    map(get("normalizedIngredientId")),
+    map((item) => item.normalizedIngredientId),
     uniq
   )(displayIngredients);
-
   return {
     displayIngredients,
     normalizedIngredientIds: normalizedIngredientIds.length
@@ -136,7 +138,9 @@ export const isDefaultChip = (ing) =>
 export function expandSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const seen = new Set();
-  const add = (id) => id && !seen.has(id) && seen.add(id);
+  const add = (id) => {
+    if (id && !seen.has(id)) seen.add(id);
+  };
   const expandOne = (id) => {
     if (isSearchChipId(id)) {
       filterBySearch(catalog, searchChipQuery(id)).forEach((hit) =>

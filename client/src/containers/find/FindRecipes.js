@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { getTranslate } from "react-localize-redux";
+import onemenuicon from "../../assets/icons/onemenu.svg";
 import IngredientSelector from "../../components/IngredientSelector";
-import RecipeMatchList from "../../components/RecipeMatchList";
 import { buildCatalog, expandSelection } from "../../utils/ingredients/catalog";
 import { matchDishes } from "../../utils/ingredients/match";
 
@@ -27,13 +27,11 @@ class FindRecipes extends Component {
     const { dishes, translate } = this.props;
     const { selectedIds } = this.state;
     const { catalog, getLabel, dishIndex } = buildCatalog(dishes);
-    const matchIds =
-      selectedIds.length > 0 ? expandSelection(selectedIds, catalog) : [];
-    const matches =
-      matchIds.length > 0
-        ? matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds)
-        : [];
     const hasFilter = selectedIds.length > 0;
+    const matchIds = hasFilter ? expandSelection(selectedIds, catalog) : [];
+    const matches = matchIds.length
+      ? matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds)
+      : [];
 
     return (
       <div className="find-page">
@@ -48,11 +46,39 @@ class FindRecipes extends Component {
           <p className="find-empty">{translate("find.noMatches")}</p>
         )}
 
-        <RecipeMatchList
-          matches={matches}
-          translate={translate}
-          onSelect={this.onSelectDish}
-        />
+        {matches.length > 0 && (
+          <div className="recipe-match-list">
+            <h3 className="recipe-match-heading">
+              {translate("find.results")}
+            </h3>
+            <ul className="recipe-match-items">
+              {matches.map(({ dish, matched, total }) => (
+                <li key={dish.id}>
+                  <button
+                    type="button"
+                    className="recipe-match-item"
+                    onClick={() => this.onSelectDish(dish.id)}
+                  >
+                    <img
+                      src={dish.img || onemenuicon}
+                      alt=""
+                      className="recipe-match-img"
+                    />
+                    <div className="recipe-match-info">
+                      <div className="recipe-match-name">{dish.name}</div>
+                      <div className="recipe-match-stats">
+                        {translate("find.matchCount", {
+                          matched: String(matched),
+                          total: String(total),
+                        })}
+                      </div>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     );
   }

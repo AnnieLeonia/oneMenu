@@ -218,7 +218,9 @@ describe("ingredientGroups", () => {
         description: dishWithIngredients(1, "fläskkarré", "salt").description,
       },
     ];
-    const results = matchDishes(dishes, [getIngredientId("fläskkarré")]);
+    const id = getIngredientId("fläskkarré");
+    const { dishIndex, getLabel } = buildCatalog(dishes);
+    const results = matchDishes(dishes, [id], dishIndex, getLabel, [id]);
     expect(results).toHaveLength(1);
     expect(results[0].dish.id).toBe(1);
   });

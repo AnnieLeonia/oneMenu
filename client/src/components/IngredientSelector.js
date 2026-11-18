@@ -72,11 +72,9 @@ class IngredientSelector extends Component {
       <button
         key={ing.id}
         type="button"
-        className={
-          selected
-            ? "ingredient-chip ingredient-chip--selected"
-            : "ingredient-chip"
-        }
+        className={`ingredient-chip${
+          selected ? " ingredient-chip--selected" : ""
+        }`}
         onClick={() => this.onToggleIngredient(ing.id)}
       >
         {ing.label}

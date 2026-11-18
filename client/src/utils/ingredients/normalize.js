@@ -1,8 +1,3 @@
-/**
- * Prepare a raw ingredient name for stable id lookup.
- * @param {string} name
- * @returns {string}
- */
 export function cleanIngredientName(name) {
   if (!name || typeof name !== "string") return "";
   return name
@@ -14,11 +9,6 @@ export function cleanIngredientName(name) {
     .trim();
 }
 
-/**
- * Stable id for matching from recipe text.
- * @param {string} name
- * @returns {string|null}
- */
 export function getIngredientId(name) {
   const cleaned = cleanIngredientName(name);
   if (!cleaned) return null;
@@ -28,10 +18,6 @@ export function getIngredientId(name) {
 export const formatLabel = (text) =>
   text == null || text === "" ? "" : String(text).toLocaleLowerCase("sv");
 
-/**
- * @param {string} ingredientId
- * @returns {string}
- */
 export const getIngredientLabel = (ingredientId) =>
   ingredientId?.startsWith("raw:") ? ingredientId.slice(4) : ingredientId || "";
 

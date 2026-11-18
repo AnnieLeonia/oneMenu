@@ -83,17 +83,17 @@ const omitCollapsedMembersWhenGroupShown = (results) => {
   )(results);
 };
 
-const matchesLooseSearch = (ing, q) =>
-  labelMatchesSearch(ing.label, q) ||
-  (ing.isCollapsedGroup && groupMatchesQuery(ing.id, q));
-
 export function filterBySearch(ingredients, query) {
   const q = normalizeQuery(query);
   if (!q) return ingredients;
   if (!searchWords(q).length) return [];
   return flow(
     filter((ing) => !isExcludedFromPicker(ing.id)),
-    filter((ing) => matchesLooseSearch(ing, q)),
+    filter(
+      (ing) =>
+        labelMatchesSearch(ing.label, q) ||
+        (ing.isCollapsedGroup && groupMatchesQuery(ing.id, q))
+    ),
     omitCollapsedMembersWhenGroupShown
   )(ingredients || []);
 }
