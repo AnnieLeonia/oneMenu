@@ -1,34 +1,25 @@
 import matter from "gray-matter";
+import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
 
-const MD_TITLE_PREFIX = "# ";
-const MD_GROUP_PREFIX = "### ";
-
-const SECTION_INGREDIENTS = "## Ingredienser";
-const SECTION_COOKING = "## Tillagning";
-
-const INGREDIENT_TABLE = ["Mängd | Ingrediens", "----- | ----------"];
-const META_TABLE_HEADER = [
+const H1 = "# ";
+const H3 = "### ";
+const INGREDIENTS = "## Ingredienser";
+const COOKING = "## Tillagning";
+const ING_TABLE = ["Mängd | Ingrediens", "----- | ----------"];
+const META_TABLE = [
   "Svårighetsgrad   | Tid",
   "---------------- | -------------",
 ];
+const EMPTY_AMOUNT = "&nbsp;";
 
-const EMPTY_META_CELL = "—";
-const EMPTY_AMOUNT_CELL = "&nbsp;";
-
-/**
- * Split optional YAML frontmatter from a dish description.
- * @param {string|null|undefined} description
- * @returns {{ data: object, content: string }}
- */
 export function parseDescription(description) {
-  if (!description || typeof description !== "string") {
+  if (!isString(description) || isEmpty(description)) {
     return { data: {}, content: "" };
   }
-
   try {
     const { data, content } = matter(description);
     return {
-      data: data && typeof data === "object" ? data : {},
+      data: isObject(data) ? data : {},
       content: content || "",
     };
   } catch {
@@ -36,189 +27,135 @@ export function parseDescription(description) {
   }
 }
 
-function str(value) {
-  return value == null ? "" : String(value).trim();
-}
-
-function hasStructuredRecipeMeta(data) {
-  if (!data || typeof data !== "object") return false;
+function hasRecipeMeta(data) {
+  if (!isObject(data)) return false;
   return Boolean(
-    str(data.title) ||
-      str(data.description) ||
-      str(data.summary) ||
+    toString(data.title) ||
+      toString(data.description) ||
       data.difficulty ||
       data.time ||
-      (Array.isArray(data.ingredients) && data.ingredients.length > 0) ||
-      (Array.isArray(data.steps) && data.steps.length > 0) ||
+      data.ingredients?.length ||
+      (Array.isArray(data.steps) && data.steps.length) ||
       (typeof data.steps === "string" && data.steps.trim())
   );
 }
 
-function parseIngredientItem(item) {
-  if (!item) return null;
-  if (typeof item === "string") {
-    const name = item.trim();
-    return name ? { name } : null;
-  }
-  if (typeof item !== "object" || !item.name) return null;
+function normalizeIngredients(raw) {
+  if (!Array.isArray(raw) || !raw.length) return null;
 
-  const name = str(item.name);
-  if (!name) return null;
+  const items = raw
+    .map((item) => {
+      if (!item) return null;
+      if (typeof item === "string") {
+        const name = item.trim();
+        return name ? { name } : null;
+      }
+      if (typeof item !== "object" || !item.name) return null;
+      const name = toString(item.name);
+      if (!name) return null;
+      return {
+        name,
+        quantity:
+          !isNil(item.quantity) && item.quantity !== ""
+            ? item.quantity
+            : undefined,
+        unit: toString(item.unit) || undefined,
+        group: toString(item.group) || undefined,
+      };
+    })
+    .filter(Boolean);
 
-  return {
-    name,
-    ...(item.quantity != null && item.quantity !== ""
-      ? { quantity: item.quantity }
-      : {}),
-    ...(item.unit != null && str(item.unit) ? { unit: str(item.unit) } : {}),
-    ...(item.group != null && str(item.group)
-      ? { group: str(item.group) }
-      : {}),
-  };
+  return items.length ? items : null;
 }
 
-function parseIngredientsFromFrontmatter(data) {
-  if (!Array.isArray(data?.ingredients) || data.ingredients.length === 0) {
-    return null;
-  }
-  const ingredients = data.ingredients.map(parseIngredientItem).filter(Boolean);
-  return ingredients.length > 0 ? ingredients : null;
-}
+function ingredientsMarkdown(items) {
+  if (!items?.length) return "";
 
-function parseStepItem(item) {
-  if (item == null) return "";
-  if (typeof item === "string") return item.trim();
-  if (typeof item === "object" && item.text != null) {
-    return String(item.text).trim();
-  }
-  return "";
-}
-
-function parseStepsFromFrontmatter(data) {
-  if (!data || data.steps == null) return null;
-
-  if (typeof data.steps === "string") {
-    const text = data.steps.trim();
-    return text || null;
-  }
-
-  if (!Array.isArray(data.steps) || data.steps.length === 0) return null;
-
-  const steps = data.steps.map(parseStepItem).filter(Boolean);
-  return steps.length > 0 ? steps : null;
-}
-
-function formatAmountCell(item) {
-  const quantity = item.quantity;
-  const unit = item.unit ? str(item.unit) : "";
-
-  if (quantity == null || quantity === "") {
-    return unit || EMPTY_AMOUNT_CELL;
-  }
-
-  return unit ? `${quantity} ${unit}` : String(quantity);
-}
-
-/**
- * @param {Array<{ name: string, quantity?: *, unit?: string, group?: string }>} ingredients
- * @returns {string}
- */
-function formatIngredientsSection(ingredients) {
-  if (!ingredients?.length) return "";
-
-  const allGrouped = ingredients.every((item) => str(item.group));
-  const lines = [SECTION_INGREDIENTS];
-
-  if (!allGrouped) {
-    lines.push(...INGREDIENT_TABLE);
-  }
+  const lines = [INGREDIENTS];
+  const allGrouped = items.every((i) => toString(i.group));
+  if (!allGrouped) lines.push(...ING_TABLE);
 
   let currentGroup = null;
-  for (const item of ingredients) {
-    const group = item.group ? str(item.group) : null;
+  for (const item of items) {
+    const group = item.group ? toString(item.group) : null;
     if (group && group !== currentGroup) {
-      const isFirstGroup = currentGroup == null;
+      const isFirst = currentGroup == null;
       currentGroup = group;
-      if (!isFirstGroup || !allGrouped) lines.push("");
-      lines.push(`${MD_GROUP_PREFIX}${group}`, ...INGREDIENT_TABLE);
+      if (!isFirst || !allGrouped) lines.push("");
+      lines.push(`${H3}${group}`, ...ING_TABLE);
     }
 
-    const name = str(item.name);
+    const name = toString(item.name);
     if (!name) continue;
-    lines.push(`${formatAmountCell(item)} | ${name}`);
+
+    const { quantity, unit } = item;
+    let amount = EMPTY_AMOUNT;
+    if (!isNil(quantity) && quantity !== "") {
+      amount = unit ? `${quantity} ${unit}` : toString(quantity);
+    } else if (unit) {
+      amount = unit;
+    }
+
+    lines.push(`${amount} | ${name}`);
   }
 
-  return `${lines.join("\n")}\n`;
+  return lines.join("\n");
 }
 
-function formatTitleHeading(title) {
-  const t = str(title);
-  return t ? `${MD_TITLE_PREFIX}${t}` : "";
-}
-
-function formatMetaTable(difficulty, time) {
-  const d = str(difficulty);
-  const t = str(time);
-  if (!d && !t) return "";
-
-  return [
-    ...META_TABLE_HEADER,
-    `${d || EMPTY_META_CELL} | ${t || EMPTY_META_CELL}`,
-  ].join("\n");
-}
-
-function formatStepsSection(steps) {
+function stepsMarkdown(data) {
+  const { steps } = data;
   if (steps == null) return "";
-  if (typeof steps === "string") {
-    const body = steps.trim();
-    return body ? `${body}\n` : "";
-  }
-  if (!steps.length) return "";
 
-  const lines = [SECTION_COOKING];
-  steps.forEach((step, index) => {
-    const text = str(step);
-    if (text) lines.push(`${index + 1}. ${text}`);
-  });
-  return lines.length > 1 ? `${lines.join("\n")}\n` : "";
+  if (typeof steps === "string") {
+    return steps.trim();
+  }
+
+  if (!Array.isArray(steps) || !steps.length) return "";
+
+  const lines = steps
+    .map((step) => {
+      if (step == null) return "";
+      if (typeof step === "string") return step.trim();
+      if (typeof step === "object" && step.text != null) {
+        return toString(step.text).trim();
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .map((text, i) => `${i + 1}. ${text}`);
+
+  return lines.length ? [COOKING, ...lines].join("\n") : "";
 }
 
-/**
- * Build markdown for rendering: optional YAML fields, then body markdown unchanged.
- * @param {object} data
- * @param {string} content
- * @returns {string}
- */
-export function composeRecipeMarkdown(data, content) {
-  if (!hasStructuredRecipeMeta(data)) return "";
+function metaTable(difficulty, time) {
+  const d = toString(difficulty);
+  const timeStr = toString(time);
+  if (!d && !timeStr) return "";
+  return [...META_TABLE, `${d || "-"} | ${timeStr || "-"}`].join("\n");
+}
 
-  const titleHeading = formatTitleHeading(data.title);
-  const summary = str(data.description ?? data.summary);
-  const ingredients = parseIngredientsFromFrontmatter(data);
-  const steps = parseStepsFromFrontmatter(data);
-  const metaTable = formatMetaTable(data.difficulty, data.time);
-  const body = (content || "").trim();
+function composeFromFrontmatter(data, content) {
+  if (!hasRecipeMeta(data)) return "";
+
+  const title = toString(data.title);
+  const ingredients = normalizeIngredients(data.ingredients);
+  const steps = stepsMarkdown(data);
 
   return [
-    titleHeading,
-    metaTable,
-    summary,
-    ingredients && formatIngredientsSection(ingredients).trim(),
-    steps && formatStepsSection(steps).trim(),
-    body,
+    title && `${H1}${title}`,
+    metaTable(data.difficulty, data.time),
+    toString(data.description),
+    ingredients && ingredientsMarkdown(ingredients),
+    steps,
+    (content || "").trim(),
   ]
     .filter(Boolean)
     .join("\n\n")
     .trim();
 }
 
-/**
- * Markdown for display: compose structured frontmatter (when present), otherwise body only.
- * @param {string|null|undefined} description
- * @returns {string}
- */
 export function getMarkdownBody(description) {
   const { data, content } = parseDescription(description);
-  const composed = composeRecipeMarkdown(data, content);
+  const composed = composeFromFrontmatter(data, content);
   return composed || content || "";
 }

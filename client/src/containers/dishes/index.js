@@ -1,5 +1,4 @@
 import React from "react";
-
 import DishList from "./DishList";
 import New from "../common/New";
 import Snackbar from "../common/Snackbar";
