@@ -94,7 +94,9 @@ function stepsMarkdown(data) {
   if (steps == null) return "";
 
   if (typeof steps === "string") {
-    return steps.trim();
+    const trimmed = steps.trim();
+    if (!trimmed) return "";
+    return [COOKING, trimmed].join("\n");
   }
 
   if (!Array.isArray(steps) || !steps.length) return "";
@@ -140,6 +142,7 @@ function composeRecipeMarkdown(data, content) {
 }
 
 export function getMarkdownBody(description) {
+  if (!isString(description) || isEmpty(description)) return "";
   const { data, content } = parseDescription(description);
   const composed = composeRecipeMarkdown(data, content);
   return composed || content || "";
