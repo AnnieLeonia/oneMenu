@@ -3,21 +3,16 @@ import { getMarkdown } from "./recipeMarkdown";
 import markdownToHtml from "./markdownToHtml";
 import { toggleCrossOut } from "./toggleCrossOut";
 
-function createMarkup(description, ingredientMultiplier) {
-  if (!description) return;
-  const markdown = getMarkdown(description, { ingredientMultiplier });
-  if (!markdown) return;
-  return markdownToHtml(markdown);
-}
-
 class MarkdownRenderer extends Component {
   render() {
-    const { markdown, className, ingredientMultiplier = 1 } = this.props;
+    const { markdown, className } = this.props;
+    const composed = markdown && getMarkdown(markdown);
+    const html = composed && markdownToHtml(composed);
 
     return (
       <div
         onClick={toggleCrossOut}
-        dangerouslySetInnerHTML={createMarkup(markdown, ingredientMultiplier)}
+        dangerouslySetInnerHTML={html}
         className={className}
       />
     );

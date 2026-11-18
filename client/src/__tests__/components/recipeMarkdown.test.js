@@ -4,9 +4,12 @@ import {
   scaleQuantity,
 } from "../../components/markdown/recipeMarkdown";
 
-const recipe = `---
+const recipe = (body) => `---
 title: Test
-ingredients:
+${body}---
+`;
+
+const SCALING_RECIPE = recipe(`ingredients:
   - name: Flour
     quantity: 500
     unit: g
@@ -14,73 +17,49 @@ ingredients:
     quantity: 1/2
     unit: tsp
   - name: Pepper
----
-`;
+`);
 
-describe("recipeMarkdown ingredient scaling", () => {
-  it("leaves amounts unchanged at 1×", () => {
-    const md = getMarkdown(recipe, { ingredientMultiplier: 1 });
-    expect(md).toContain("500 g");
-    expect(md).toContain("1/2 tsp");
+describe("recipeMarkdown", () => {
+  it.each([
+    [1, ["500 g", "1/2 tsp"]],
+    [2, ["1000 g", "1 tsp"]],
+    [0.5, ["250 g", "1/4 tsp"]],
+  ])("scales ingredients at %sx", (multiplier, snippets) => {
+    const md = getMarkdown(SCALING_RECIPE, {
+      ingredientMultiplier: multiplier,
+    });
+    snippets.forEach((s) => expect(md).toContain(s));
   });
 
-  it("doubles numeric and fractional quantities", () => {
-    const md = getMarkdown(recipe, { ingredientMultiplier: 2 });
-    expect(md).toContain("1000 g");
-    expect(md).toContain("1 tsp");
+  it.each([
+    ["1 1/2", 2, "3"],
+    [3, 0.5, "1 1/2"],
+  ])("scaleQuantity(%p, %p)", (quantity, multiplier, expected) => {
+    expect(scaleQuantity(quantity, multiplier)).toBe(expected);
   });
 
-  it("halves quantities", () => {
-    const md = getMarkdown(recipe, { ingredientMultiplier: 0.5 });
-    expect(md).toContain("250 g");
-    expect(md).toContain("1/4 tsp");
+  it.each([
+    [recipe("difficulty: Enkel\ntime: 20 min\n"), 4],
+    [recipe("servings: 6\n"), 6],
+  ])("getRecipeBaseServings", (yaml, servings) => {
+    expect(getRecipeBaseServings(yaml)).toBe(servings);
   });
 
-  it("scaleQuantity formats mixed numbers", () => {
-    expect(scaleQuantity("1 1/2", 2)).toBe("3");
-    expect(scaleQuantity(3, 0.5)).toBe("1 1/2");
-  });
-
-  it("includes servings in the meta table", () => {
-    const md = getMarkdown(`---
-title: Test
-difficulty: Medel
+  it.each([
+    [
+      recipe(`difficulty: Medel
 time: 30 min
 servings: 4
 ingredients:
   - name: Flour
     quantity: 1
     unit: g
----
-`);
-    expect(md).toContain("🥘 Portioner");
-    expect(md).toContain("4 portioner");
-  });
-
-  it("defaults base servings to 4 when omitted", () => {
-    expect(
-      getRecipeBaseServings(`---
-title: Test
-difficulty: Enkel
-time: 20 min
----
-`)
-    ).toBe(4);
-  });
-
-  it("uses servings from dish front matter", () => {
-    expect(
-      getRecipeBaseServings(`---
-title: Test
-servings: 6
----
-`)
-    ).toBe(6);
-    const md = getMarkdown(`---
-title: Test
-servings: 6
----
-`);
-    expect(md).toContain("6 portioner");
+`),
+      ["🥘 Portioner", "4 portioner"],
+    ],
+    [recipe("servings: 6\n"), ["6 portioner"]],
+  ])("includes servings in composed markdown", (yaml, snippets) => {
+    const md = getMarkdown(yaml);
+    snippets.forEach((s) => expect(md).toContain(s));
   });
 });

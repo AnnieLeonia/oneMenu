@@ -1,4 +1,13 @@
-import { isEmpty, isNil, isObject, isString, toString } from "lodash/fp";
+import {
+  identity,
+  isEmpty,
+  isNil,
+  isObject,
+  isString,
+  sortBy,
+  toString,
+  union,
+} from "lodash/fp";
 
 import { parseFrontMatter } from "./parseFrontMatter";
 
@@ -19,18 +28,10 @@ export const RECIPE_LABELS = {
   ingredientsTableAmount: "Mängd",
   ingredientsTableName: "🥕 Ingrediens",
 };
-const DEFAULT_INGREDIENTS_TABLE = [
-  "Mängd | 🥕 Ingrediens",
+const INGREDIENTS_TABLE = [
+  `${RECIPE_LABELS.ingredientsTableAmount} | ${RECIPE_LABELS.ingredientsTableName}`,
   "----- | ----------",
 ];
-
-function buildIngredientsTable({ amount, name } = {}) {
-  if (!amount && !name) return DEFAULT_INGREDIENTS_TABLE;
-  return [
-    `${amount ?? "Mängd"} | ${name ?? "🥕 Ingrediens"}`,
-    "----- | ----------",
-  ];
-}
 
 export function splitRecipeBodyMarkdown(markdown) {
   if (!isString(markdown) || !markdown.trim()) {
@@ -50,7 +51,7 @@ export function splitRecipeBodyMarkdown(markdown) {
   };
 }
 const META_TABLE = [
-  "💪 Svårighetsgrad   | ⏱️ Tid | 🥘 Portioner",
+  `${RECIPE_LABELS.difficultyHeader}   | ${RECIPE_LABELS.timeHeader} | ${RECIPE_LABELS.servingsHeader}`,
   "---------------- | ------------- | --------",
 ];
 
@@ -176,37 +177,11 @@ function parseRecipeServings(data) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
 }
 
-export function getRecipeBaseServings(description) {
-  const { data } = parseRecipe(description);
-  return parseRecipeServings(data);
-}
-
 export function getServingOptions(baseServings) {
-  const options = [...SERVING_PRESETS];
-  if (!options.includes(baseServings)) {
-    options.push(baseServings);
-  }
-  return options.sort((a, b) => a - b);
+  return sortBy(identity, union(SERVING_PRESETS, [baseServings]));
 }
 
-export function getRecipeMeta(description) {
-  const { data } = parseRecipe(description);
-  return {
-    difficulty: toString(data.difficulty),
-    time: toString(data.time),
-    baseServings: parseRecipeServings(data),
-  };
-}
-
-export function recipeHasIngredientQuantities(description) {
-  const { data } = parseRecipe(description);
-  const items = normalizeIngredients(data.ingredients);
-  if (!items) return false;
-  return items.some((item) => !isNil(item.quantity) && item.quantity !== "");
-}
-
-export function recipeHasRecipeMeta(description) {
-  const { data } = parseRecipe(description);
+function recipeHasMetaFields(data) {
   return !!(
     toString(data.difficulty) ||
     toString(data.time) ||
@@ -214,13 +189,38 @@ export function recipeHasRecipeMeta(description) {
   );
 }
 
+function ingredientsHaveQuantities(items) {
+  return (
+    !!items?.length &&
+    items.some((item) => !isNil(item.quantity) && item.quantity !== "")
+  );
+}
+
+export function getRecipeShowInfo(description) {
+  const { data } = parseRecipe(description);
+  const items = normalizeIngredients(data.ingredients);
+  const canScalePortions = ingredientsHaveQuantities(items);
+  return {
+    baseServings: parseRecipeServings(data),
+    canScalePortions,
+    showRecipeView: canScalePortions || recipeHasMetaFields(data),
+    difficulty: toString(data.difficulty),
+    time: toString(data.time),
+  };
+}
+
+export function getRecipeBaseServings(description) {
+  return getRecipeShowInfo(description).baseServings;
+}
+
 function ingredientsMarkdown(
   items,
-  ingredientsTable = DEFAULT_INGREDIENTS_TABLE
+  ingredientsTable = INGREDIENTS_TABLE,
+  { includeSectionHeading = true } = {}
 ) {
   if (!items?.length) return "";
 
-  const lines = [INGREDIENTS];
+  const lines = includeSectionHeading ? [INGREDIENTS] : [];
   const allGrouped = items.every((i) => toString(i.group));
   if (!allGrouped) lines.push(...ingredientsTable);
 
@@ -279,7 +279,7 @@ function stepsMarkdown(data) {
 }
 
 function formatServingsLabel(count) {
-  return `${count} portioner`;
+  return `${count} ${RECIPE_LABELS.servingsUnit}`;
 }
 
 function metaTable(
@@ -333,19 +333,35 @@ function composeRecipeMarkdown(
     .trim();
 }
 
-export function getIngredientsTableMarkdown(description, options = {}) {
-  if (!isString(description) || isEmpty(description)) return "";
-  const { ingredientMultiplier = 1, ingredientsTableLabels } = options;
-  const ingredientsTable = buildIngredientsTable(ingredientsTableLabels);
-  const { data } = parseRecipe(description);
+export function getRecipeViewParts(description, ingredientMultiplier = 1) {
+  if (!isString(description) || isEmpty(description)) {
+    return {
+      preamble: "",
+      cooking: "",
+      bodyMarkdown: "",
+      ingredientsMarkdown: "",
+    };
+  }
+  const { data, content } = parseRecipe(description);
+  const bodyMarkdown = composeRecipeMarkdown(
+    data,
+    content,
+    ingredientMultiplier,
+    { excludeIngredients: true, excludeMeta: true }
+  );
   const ingredients = normalizeIngredients(
     data.ingredients,
     ingredientMultiplier
   );
-  if (!ingredients) return "";
-
-  const full = ingredientsMarkdown(ingredients, ingredientsTable);
-  return full.split("\n").slice(1).join("\n").trim();
+  return {
+    ...splitRecipeBodyMarkdown(bodyMarkdown),
+    bodyMarkdown,
+    ingredientsMarkdown: ingredients
+      ? ingredientsMarkdown(ingredients, INGREDIENTS_TABLE, {
+          includeSectionHeading: false,
+        })
+      : "",
+  };
 }
 
 export function getMarkdown(description, options = {}) {

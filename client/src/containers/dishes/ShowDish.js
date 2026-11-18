@@ -10,9 +10,8 @@ import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
 import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
 import {
   getRecipeBaseServings,
+  getRecipeShowInfo,
   getServingOptions,
-  recipeHasIngredientQuantities,
-  recipeHasRecipeMeta,
 } from "../../components/markdown/recipeMarkdown";
 
 const redirect = (history, location) =>
@@ -29,11 +28,8 @@ class ShowDish extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
-      this.setState({
-        selectedServings: getRecipeBaseServings(this.props.description),
-      });
-    } else if (!prevProps.description && this.props.description) {
+    const descriptionLoaded = !prevProps.description && this.props.description;
+    if (prevProps.id !== this.props.id || descriptionLoaded) {
       this.setState({
         selectedServings: getRecipeBaseServings(this.props.description),
       });
@@ -56,9 +52,8 @@ class ShowDish extends Component {
       isLoggedIn,
     } = this.props;
     const { selectedServings } = this.state;
-    const canScalePortions = recipeHasIngredientQuantities(description);
-    const showRecipeView = canScalePortions || recipeHasRecipeMeta(description);
-    const baseServings = getRecipeBaseServings(description);
+    const { baseServings, canScalePortions, showRecipeView, difficulty, time } =
+      getRecipeShowInfo(description);
     const servingOptions = getServingOptions(baseServings);
     const ingredientMultiplier = selectedServings / baseServings;
 
@@ -76,6 +71,8 @@ class ShowDish extends Component {
               markdown={description}
               className="markdown-body"
               ingredientMultiplier={ingredientMultiplier}
+              difficulty={difficulty}
+              time={time}
               baseServings={baseServings}
               selectedServings={selectedServings}
               servingOptions={servingOptions}
