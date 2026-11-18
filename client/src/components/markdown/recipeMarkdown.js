@@ -1,12 +1,15 @@
 import {
   compact,
+  gt,
   isEmpty,
   isNil,
+  isNumber,
   isObject,
   isString,
   toString,
 } from "lodash/fp";
 
+import { groupConsecutiveBy } from "../../utils/groupBy";
 import { parseFrontMatter } from "./parseFrontMatter";
 import { scaleQuantity } from "./quantity";
 
@@ -62,11 +65,11 @@ function normalizeIngredients(raw, ingredientMultiplier = 1) {
   const items = compact(
     raw.map((item) => {
       if (!item) return null;
-      if (typeof item === "string") {
+      if (isString(item)) {
         const name = item.trim();
         return name ? { name } : null;
       }
-      if (typeof item !== "object" || !item.name) return null;
+      if (!isObject(item) || !item.name) return null;
       const name = toString(item.name);
       if (!name) return null;
 
@@ -89,13 +92,17 @@ function normalizeIngredients(raw, ingredientMultiplier = 1) {
 
 function parseRecipeServings(data) {
   const raw = data.servings;
-  if (typeof raw === "number" && raw > 0) return raw;
+  if (isNumber(raw) && gt(0)(raw)) return raw;
   const parsed = parseInt(toString(raw), 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_SERVINGS;
 }
 
 const hasRecipeMeta = (data) =>
-  !!(toString(data.difficulty) || toString(data.time) || data.servings != null);
+  !!(
+    toString(data.difficulty) ||
+    toString(data.time) ||
+    toString(data.servings)
+  );
 
 const servingOptionsFor = (baseServings) =>
   [...new Set([...SERVING_PRESETS, baseServings])].sort((a, b) => a - b);
@@ -122,28 +129,32 @@ function ingredientsMarkdown(items, ingredientsTable = INGREDIENTS_TABLE) {
   const allGrouped = items.every((i) => toString(i.group));
   if (!allGrouped) lines.push(...ingredientsTable);
 
-  let currentGroup = null;
-  for (const item of items) {
-    const group = item.group ? toString(item.group) : null;
-    if (group && group !== currentGroup) {
-      const isFirst = currentGroup == null;
-      currentGroup = group;
-      if (!isFirst || !allGrouped) lines.push("");
+  const sections = groupConsecutiveBy(items, (item) =>
+    item.group ? toString(item.group) : null
+  );
+
+  let hasGroupedHeading = false;
+  for (const { key: group, items: sectionItems } of sections) {
+    if (group) {
+      if (hasGroupedHeading || !allGrouped) lines.push("");
+      hasGroupedHeading = true;
       lines.push(`${H3}${group}`, ...ingredientsTable);
     }
 
-    const name = toString(item.name);
-    if (!name) continue;
+    for (const item of sectionItems) {
+      const name = toString(item.name);
+      if (!name) continue;
 
-    const { quantity, unit } = item;
-    const amount =
-      isNil(quantity) || quantity === ""
-        ? unit || EMPTY_AMOUNT
-        : unit
-        ? `${quantity} ${unit}`
-        : toString(quantity);
+      const { quantity, unit } = item;
+      const amount =
+        isNil(quantity) || quantity === ""
+          ? unit || EMPTY_AMOUNT
+          : unit
+          ? `${quantity} ${unit}`
+          : toString(quantity);
 
-    lines.push(`${amount} | ${name}`);
+      lines.push(`${amount} | ${name}`);
+    }
   }
 
   return lines.join("\n");
@@ -151,17 +162,17 @@ function ingredientsMarkdown(items, ingredientsTable = INGREDIENTS_TABLE) {
 
 function stepsMarkdown(data) {
   const { steps } = data;
-  if (steps == null) return "";
+  if (isNil(steps)) return "";
 
-  if (typeof steps === "string") return steps.trim();
+  if (isString(steps)) return steps.trim();
 
   if (!Array.isArray(steps) || !steps.length) return "";
 
   return compact(
     steps.map((step) => {
-      if (step == null) return "";
-      if (typeof step === "string") return step.trim();
-      if (typeof step === "object" && step.text != null) {
+      if (isNil(step)) return "";
+      if (isString(step)) return step.trim();
+      if (isObject(step) && !isNil(step.text)) {
         return toString(step.text).trim();
       }
       return "";

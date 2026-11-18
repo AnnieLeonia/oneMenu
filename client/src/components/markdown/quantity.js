@@ -1,4 +1,4 @@
-import { isNil, toString } from "lodash/fp";
+import { isNaN, isNil, isNumber, toString } from "lodash/fp";
 
 const FRACTION_TOLERANCE = 0.02;
 
@@ -17,7 +17,7 @@ const MIXED_FRACTION_PATTERN = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/;
 
 export function parseQuantity(quantity) {
   if (isNil(quantity) || quantity === "") return null;
-  if (typeof quantity === "number" && !Number.isNaN(quantity)) return quantity;
+  if (isNumber(quantity) && !isNaN(quantity)) return quantity;
 
   const s = toString(quantity).trim();
   if (!s) return null;
