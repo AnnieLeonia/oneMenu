@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { handleCrossOutClick } from "./crossOutClick";
 import markdownToHtml from "./markdownToHtml";
 import RecipeMetaTable from "./RecipeMetaTable";
+import { toggleCrossOut } from "./toggleCrossOut";
 import {
   getIngredientsTableMarkdown,
   getMarkdown,
@@ -13,21 +13,6 @@ import {
 } from "./recipeMarkdown";
 
 class RecipeMarkdownView extends Component {
-  constructor(props) {
-    super(props);
-    this.ref = React.createRef();
-  }
-
-  componentDidMount() {
-    this.ref.current.addEventListener("click", this.handleClick);
-  }
-
-  componentWillUnmount() {
-    this.ref.current.removeEventListener("click", this.handleClick);
-  }
-
-  handleClick = handleCrossOutClick;
-
   render() {
     const {
       markdown,
@@ -61,7 +46,7 @@ class RecipeMarkdownView extends Component {
     const ingredientsHtml = markdownToHtml(ingredientsMarkdown);
 
     return (
-      <div ref={this.ref} className={className}>
+      <div className={className}>
         <RecipeMetaTable
           difficulty={meta.difficulty}
           time={meta.time}
@@ -71,20 +56,24 @@ class RecipeMarkdownView extends Component {
           canScalePortions={canScalePortions}
           onServingsChange={onServingsChange}
         />
-        {preambleHtml && <div dangerouslySetInnerHTML={preambleHtml} />}
-        {cookingHtml && (
-          <section className="recipe-cooking">
-            <h2>{RECIPE_LABELS.cookingHeading}</h2>
-            <div dangerouslySetInnerHTML={cookingHtml} />
-          </section>
-        )}
-        {fallbackBodyHtml && <div dangerouslySetInnerHTML={fallbackBodyHtml} />}
-        {ingredientsHtml && (
-          <section className="recipe-ingredients">
-            <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
-            <div dangerouslySetInnerHTML={ingredientsHtml} />
-          </section>
-        )}
+        <div onClick={toggleCrossOut}>
+          {preambleHtml && <div dangerouslySetInnerHTML={preambleHtml} />}
+          {cookingHtml && (
+            <section className="recipe-cooking">
+              <h2>{RECIPE_LABELS.cookingHeading}</h2>
+              <div dangerouslySetInnerHTML={cookingHtml} />
+            </section>
+          )}
+          {fallbackBodyHtml && (
+            <div dangerouslySetInnerHTML={fallbackBodyHtml} />
+          )}
+          {ingredientsHtml && (
+            <section className="recipe-ingredients">
+              <h2>{RECIPE_LABELS.ingredientsHeading}</h2>
+              <div dangerouslySetInnerHTML={ingredientsHtml} />
+            </section>
+          )}
+        </div>
       </div>
     );
   }

@@ -34,8 +34,6 @@ function RecipeMetaTable({
                 className="recipe-servings-select"
                 value={String(selectedServings)}
                 aria-label={RECIPE_LABELS.servingsHeader}
-                onClick={(event) => event.stopPropagation()}
-                onMouseDown={(event) => event.stopPropagation()}
                 onChange={(event) =>
                   onServingsChange(Number(event.target.value))
                 }

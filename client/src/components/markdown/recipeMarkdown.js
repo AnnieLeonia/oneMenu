@@ -54,7 +54,7 @@ const META_TABLE = [
   "---------------- | ------------- | --------",
 ];
 
-export const SERVING_PRESETS = [2, 4, 8, 12, 14, 16];
+export const SERVING_PRESETS = [2, 4, 6, 8, 12, 14];
 const DEFAULT_SERVINGS = 4;
 const EMPTY_AMOUNT = "&nbsp;";
 
