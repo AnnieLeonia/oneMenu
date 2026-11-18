@@ -26,9 +26,6 @@ export const INGREDIENT_GROUP_DEFS = [
   "sallad",
 ].map(collapsedGroup);
 
-export const getIngredientGroupDef = (groupId) =>
-  find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS) || null;
-
 export function normalizedIngredientIdAssignedGroupId(normalizedIngredientId) {
   if (!normalizedIngredientId?.startsWith("raw:")) return null;
   const cleaned = getIngredientLabel(normalizedIngredientId);
@@ -39,7 +36,7 @@ export function normalizedIngredientIdAssignedGroupId(normalizedIngredientId) {
 }
 
 export function collapsedGroupMatchesSearchQuery(groupId, query) {
-  const def = getIngredientGroupDef(groupId);
+  const def = find((d) => d.id === groupId)(INGREDIENT_GROUP_DEFS);
   const cleaned = cleanIngredientName(query);
   return !!def && !!cleaned && def.matchesCleaned(cleaned);
 }

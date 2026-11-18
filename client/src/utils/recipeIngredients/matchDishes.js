@@ -43,13 +43,14 @@ export function matchDishes(
     chipLabels.some((q) => ingredientLabelMatchesSearch(getLabel(id), q));
 
   return sortMatchResults(
-    compact(
+    flow(
       map((dish) => {
         const dishIds = dishIndex.get(dish.id);
         if (!dishIds?.length) return null;
         const matched = filter(matchesSelection)(dishIds).length;
         return matched ? { dish, matched, total: dishIds.length } : null;
-      })(dishes || [])
-    )
+      }),
+      compact
+    )(dishes || [])
   );
 }

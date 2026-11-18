@@ -9,13 +9,14 @@ import {
 } from "lodash/fp";
 
 function parseFrontmatterItem(item) {
-  if (typeof item === "string") {
-    const name = trim(item);
-    return name ? { name } : null;
-  }
-  if (!item || typeof item !== "object" || !item.name) return null;
-  const name = trim(toStr(item.name));
+  const name =
+    typeof item === "string"
+      ? trim(item)
+      : item?.name
+      ? trim(toStr(item.name))
+      : "";
   if (!name) return null;
+  if (typeof item !== "object" || item == null) return { name };
   const entry = { name };
   if (item.quantity != null && item.quantity !== "") {
     entry.quantity = item.quantity;

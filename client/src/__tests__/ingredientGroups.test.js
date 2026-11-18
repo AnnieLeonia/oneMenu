@@ -1,6 +1,6 @@
 import {
+  INGREDIENT_GROUP_DEFS,
   normalizedIngredientIdAssignedGroupId,
-  getIngredientGroupDef,
 } from "../utils/recipeIngredients/ingredientGroups";
 import {
   getIngredientId,
@@ -11,6 +11,8 @@ import {
   buildFindIngredientContext,
   expandFindSelection,
 } from "../utils/recipeIngredients/parseDishIngredients";
+
+const groupDef = (id) => INGREDIENT_GROUP_DEFS.find((d) => d.id === id);
 
 describe("isFinderExcludedIngredient", () => {
   it("excludes staple ingredients", () => {
@@ -398,7 +400,7 @@ ingredients:
 
 describe("ingredientGroups", () => {
   it("assigns strimlad kycklingfilé to kycklingfilé group", () => {
-    const filé = getIngredientGroupDef("group:kycklingfile");
+    const filé = groupDef("group:kycklingfile");
     expect(
       normalizedIngredientIdAssignedGroupId(
         getIngredientId("strimlad kycklingfilé")
@@ -410,9 +412,9 @@ describe("ingredientGroups", () => {
   });
 
   it("assigns buljong and fond before kycklingfilé", () => {
-    const buljong = getIngredientGroupDef("group:buljong");
-    const fond = getIngredientGroupDef("group:fond");
-    const filé = getIngredientGroupDef("group:kycklingfile");
+    const buljong = groupDef("group:buljong");
+    const fond = groupDef("group:fond");
+    const filé = groupDef("group:kycklingfile");
     const cube = getIngredientId("kycklingbuljongtärning");
     expect(normalizedIngredientIdAssignedGroupId(cube)).toBe(buljong.id);
     expect(normalizedIngredientIdAssignedGroupId(cube)).not.toBe(filé.id);
@@ -425,7 +427,7 @@ describe("ingredientGroups", () => {
   });
 
   it("assigns fläskfilé to fläskfile only", () => {
-    const file = getIngredientGroupDef("group:fläskfile");
+    const file = groupDef("group:fläskfile");
     expect(
       normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfilé"))
     ).toBe(file.id);
@@ -435,7 +437,7 @@ describe("ingredientGroups", () => {
   });
 
   it("assigns fläskfärs to färs", () => {
-    const färs = getIngredientGroupDef("group:färs");
+    const färs = groupDef("group:färs");
     expect(
       normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfärs"))
     ).toBe(färs.id);
@@ -445,7 +447,7 @@ describe("ingredientGroups", () => {
   });
 
   it("matches färs variants", () => {
-    const def = getIngredientGroupDef("group:färs");
+    const def = groupDef("group:färs");
     expect(
       normalizedIngredientIdAssignedGroupId(getIngredientId("nötfärs"))
     ).toBe(def.id);

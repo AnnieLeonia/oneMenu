@@ -41,11 +41,15 @@ export function parseDishIngredients(description) {
     })),
     filterFp((item) => item.normalizedIngredientId)
   )(raw || []);
+  const normalizedIngredientIds = flow(
+    map(get("normalizedIngredientId")),
+    uniq
+  )(displayIngredients);
 
   return {
     displayIngredients,
-    normalizedIngredientIds: displayIngredients.length
-      ? flow(map(get("normalizedIngredientId")), uniq)(displayIngredients)
+    normalizedIngredientIds: normalizedIngredientIds.length
+      ? normalizedIngredientIds
       : null,
   };
 }
@@ -92,9 +96,9 @@ export function buildFindIngredientContext(dishes) {
           id,
           label: name,
           recipeCount: 0,
-          hiddenFromDefaultList:
-            isFinderExcludedIngredient(id) ||
-            Boolean(normalizedIngredientIdAssignedGroupId(id)),
+          hiddenFromDefaultList: Boolean(
+            normalizedIngredientIdAssignedGroupId(id)
+          ),
         };
       }
     }
@@ -106,11 +110,9 @@ export function buildFindIngredientContext(dishes) {
   }
 
   for (const def of INGREDIENT_GROUP_DEFS) {
-    const memberIds = Object.keys(recipeCountById).filter(
-      (id) =>
-        normalizedIngredientIdAssignedGroupId(id) === def.id &&
-        !isFinderExcludedIngredient(id)
-    );
+    const memberIds = filterFp(
+      (id) => normalizedIngredientIdAssignedGroupId(id) === def.id
+    )(Object.keys(recipeCountById));
     const recipeCount = groupRecipeCount[def.id] || 0;
     if (!memberIds.length || recipeCount < MIN_RECIPES_TO_LIST_INGREDIENT) {
       continue;
@@ -144,14 +146,8 @@ export const isFinderChipVisibleByDefault = (ing) =>
 
 export function expandFindSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
-  const out = [];
   const seen = new Set();
-  const add = (id) => {
-    if (id && !seen.has(id)) {
-      seen.add(id);
-      out.push(id);
-    }
-  };
+  const add = (id) => id && !seen.has(id) && seen.add(id);
   const expandOne = (id) => {
     if (isFinderSearchSelectionId(id)) {
       filterIngredientsByLooseSearch(
@@ -161,11 +157,13 @@ export function expandFindSelection(selectedIds, catalog) {
       return;
     }
     const entry = byId.get(id);
-    if (entry?.memberIds?.length) entry.memberIds.forEach(add);
-    else expandIngredientLabelVariantIds(id, catalog).forEach(add);
+    const ids = entry?.memberIds?.length
+      ? entry.memberIds
+      : expandIngredientLabelVariantIds(id, catalog);
+    ids.forEach(add);
   };
   (selectedIds || []).forEach(expandOne);
-  return out;
+  return [...seen];
 }
 
 export const sortFinderCatalogEntries = orderBy(

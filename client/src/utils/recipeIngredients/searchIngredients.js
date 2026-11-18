@@ -49,8 +49,9 @@ const includesMatch = (text, query) => {
 
 export function ingredientLabelMatchesSearch(label, query) {
   const q = normalizeQuery(query);
+  const words = searchWords(q);
   if (!q) return true;
-  if (!searchWords(q).length) return false;
+  if (!words.length) return false;
   const text = formatFinderLabel(label);
   return [text, ...searchWords(text)].some((part) => includesMatch(part, q));
 }
@@ -63,13 +64,11 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
   if (!stem) return [selectedId];
   const prefix = `${stem} `;
   const variants = flow(
-    filter(
-      (ing) =>
-        ing.id.startsWith("raw:") &&
-        ing.id !== selectedId &&
-        (formatFinderLabel(ing.label) === stem ||
-          formatFinderLabel(ing.label).startsWith(prefix))
-    ),
+    filter((ing) => {
+      if (!ing.id.startsWith("raw:") || ing.id === selectedId) return false;
+      const label = formatFinderLabel(ing.label);
+      return label === stem || label.startsWith(prefix);
+    }),
     map(get("id"))
   )(catalog);
   return [selectedId, ...variants];
@@ -77,7 +76,10 @@ export function expandIngredientLabelVariantIds(selectedId, catalog) {
 
 const omitCollapsedMembersWhenGroupShown = (results) => {
   const groupIds = new Set(
-    results.filter((ing) => ing.isCollapsedGroup).map((ing) => ing.id)
+    flow(
+      filter((ing) => ing.isCollapsedGroup),
+      map(get("id"))
+    )(results)
   );
   if (!groupIds.size) return results;
   return filter(

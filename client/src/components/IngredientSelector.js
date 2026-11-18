@@ -18,10 +18,10 @@ class IngredientSelector extends Component {
 
   visibleIngredients() {
     const { catalog } = this.props;
-    const q = this.state.search.trim().toLowerCase();
+    const q = this.state.search.trim();
     const items = q
       ? filterIngredientsByLooseSearch(catalog, q)
-      : catalog.filter((ing) => isFinderChipVisibleByDefault(ing));
+      : catalog.filter(isFinderChipVisibleByDefault);
     return sortFinderCatalogEntries(items);
   }
 
