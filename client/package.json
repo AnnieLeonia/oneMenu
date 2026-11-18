@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "http-proxy-middleware": "2.0.1",
+    "js-yaml": "3.14.1",
     "lodash": "4.17.21",
     "micromark": "^3.0.7",
     "micromark-extension-gfm": "^2.0.0",
@@ -30,7 +31,7 @@
     "react-autosuggest": "10.1.0",
     "react-beautiful-dnd": "11.0.5",
     "react-dom": "16.14.0",
-    "react-localize-redux": "2.17.5",
+    "react-localize-redux": "3.5.3",
     "react-redux": "7.2.4",
     "react-router-dom": "5.2.0",
     "redux": "4.1.1",

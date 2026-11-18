@@ -1,5 +1,4 @@
 import React from "react";
-
 import CategoryList from "./CategoryList";
 import New from "../common/New";
 import Snackbar from "../common/Snackbar";

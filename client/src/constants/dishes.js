@@ -2,26 +2,30 @@ export const FETCH_DISH = "FETCH_DISH";
 export const RESET_DISH = "RESET_DISH";
 export const FETCH_DISHES = "FETCH_DISHES";
 
-export const DEFAULT_DESCRIPTION = (dish) => `# ${dish.name}
-Svårighetsgrad   | Tid
----------------- | -------------
-Svår/Medel/Enkel | 15/30/45 min
-
-En kort beskrivning av rätten.
-
-## Ingredienser
-Mängd | Ingrediens
------ | ----------
-500 g | Kärlek
-500 g | Glädje
-1 st  | Humor
-1/2 st | Tålamod
-&nbsp; | salt
-&nbsp; | peppar
-
-## Tillagning
-1. Dela kärleken.
-2. Blanda glädje och humor.
-3. Tillsätt tålamod.
-4. Salta och peppra efter smak.
+export const DEFAULT_DESCRIPTION = (dish) => `---
+title: ${dish.name}
+difficulty: Enkel/Medel/Svår
+time: 15/30/45 min
+description: En kort beskrivning av rätten.
+ingredients:
+  - name: Kärlek
+    quantity: 500
+    unit: g
+  - name: Glädje
+    quantity: 500
+    unit: g
+  - name: Humor
+    quantity: 1
+    unit: st
+  - name: Tålamod
+    quantity: 1/2
+    unit: st
+  - name: salt
+  - name: peppar
+steps:
+  - Dela **kärleken**.
+  - Blanda *glädje* och humor.
+  - Tillsätt tålamod.
+  - Salta och peppra efter smak.
+---
 `;

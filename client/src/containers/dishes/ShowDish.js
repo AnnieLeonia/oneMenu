@@ -6,7 +6,7 @@ import { get, toInteger } from "lodash/fp";
 
 import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
-import MarkdownRenderer from "../../components/MarkdownRenderer";
+import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
