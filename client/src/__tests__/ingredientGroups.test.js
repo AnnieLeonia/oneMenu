@@ -11,66 +11,59 @@ import {
   buildFindIngredientContext,
   expandFindSelection,
 } from "../utils/recipeIngredients/parseDishIngredients";
+import {
+  dishWithIngredients,
+  repeatIngredientDishes,
+} from "./recipeIngredientsFixtures";
 
 const groupDef = (id) => INGREDIENT_GROUP_DEFS.find((d) => d.id === id);
 
+const expectCollapsedGroup = ({
+  dishes,
+  groupId,
+  hiddenMemberName,
+  expandCount,
+}) => {
+  const { catalog } = buildFindIngredientContext(dishes);
+  expect(catalog.some((ing) => ing.id === groupId)).toBe(true);
+  if (hiddenMemberName) {
+    expect(
+      catalog.find((ing) => ing.id === getIngredientId(hiddenMemberName))
+        ?.hiddenFromDefaultList
+    ).toBe(true);
+  }
+  const group = catalog.find((ing) => ing.id === groupId);
+  expect(expandFindSelection([group.id], catalog).length).toBe(expandCount);
+};
+
 describe("isFinderExcludedIngredient", () => {
-  it("excludes staple ingredients", () => {
-    expect(isFinderExcludedIngredient(getIngredientId("salt"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("olivolja"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("smör"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("vatten"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("vetemjöl"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("mjölk"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("is"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("ris"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("jasminris"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("risvinäger"))).toBe(
-      true
-    );
-    expect(isFinderExcludedIngredient(getIngredientId("vitvinsvinäger"))).toBe(
-      true
-    );
-    expect(isFinderExcludedIngredient(getIngredientId("strösocker"))).toBe(
-      true
-    );
-    expect(isFinderExcludedIngredient(getIngredientId("kinesisk soja"))).toBe(
-      true
-    );
-    expect(isFinderExcludedIngredient(getIngredientId("pasta"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("vodka"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("gin"))).toBe(true);
-    expect(isFinderExcludedIngredient(getIngredientId("kycklingfilé"))).toBe(
-      false
-    );
-    expect(isFinderExcludedIngredient(getIngredientId("fisk"))).toBe(false);
+  test.each([
+    ["salt", true],
+    ["olivolja", true],
+    ["smör", true],
+    ["vatten", true],
+    ["vetemjöl", true],
+    ["mjölk", true],
+    ["is", true],
+    ["ris", true],
+    ["jasminris", true],
+    ["risvinäger", true],
+    ["vitvinsvinäger", true],
+    ["strösocker", true],
+    ["kinesisk soja", true],
+    ["pasta", true],
+    ["vodka", true],
+    ["gin", true],
+    ["kycklingfilé", false],
+    ["fisk", false],
+  ])("%s excluded=%s", (name, excluded) => {
+    expect(isFinderExcludedIngredient(getIngredientId(name))).toBe(excluded);
   });
 
   it("omits staples from the finder catalog", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: salt
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: salt
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: salt
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
+    const { catalog } = buildFindIngredientContext(
+      repeatIngredientDishes("salt", 3)
+    );
     expect(catalog.find((ing) => ing.id === getIngredientId("salt"))).toBe(
       undefined
     );
@@ -78,148 +71,103 @@ ingredients:
 });
 
 describe("collapsed group chips", () => {
-  it("lists vitlök as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: vitlöksklyfta
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: vitlök
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: vitlöksklyftor
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: vitlök
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:vitlök")).toBe(true);
-    const member = catalog.find(
-      (ing) => ing.id === getIngredientId("vitlöksklyfta")
-    );
-    expect(member).toBeDefined();
-    expect(member.hiddenFromDefaultList).toBe(true);
-    const vitlök = catalog.find((ing) => ing.id === "group:vitlök");
-    expect(expandFindSelection([vitlök.id], catalog).length).toBe(3);
-  });
-
-  it("lists färs as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: nötfärs
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: köttfärs
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: fläskfärs
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: köttfärs
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:färs")).toBe(true);
-    expect(
-      catalog.find((ing) => ing.id === getIngredientId("nötfärs"))
-        ?.hiddenFromDefaultList
-    ).toBe(true);
-    const färs = catalog.find((ing) => ing.id === "group:färs");
-    expect(expandFindSelection([färs.id], catalog).length).toBe(3);
-  });
+  test.each([
+    [
+      "vitlök",
+      "group:vitlök",
+      [
+        [1, "vitlöksklyfta"],
+        [2, "vitlök"],
+        [3, "vitlöksklyftor"],
+        [4, "vitlök"],
+      ],
+      "vitlöksklyfta",
+      3,
+    ],
+    [
+      "färs",
+      "group:färs",
+      [
+        [1, "nötfärs"],
+        [2, "köttfärs"],
+        [3, "fläskfärs"],
+        [4, "köttfärs"],
+      ],
+      "nötfärs",
+      3,
+    ],
+    [
+      "kycklingfilé",
+      "group:kycklingfile",
+      [
+        [1, "kycklingfiléer"],
+        [2, "strimlad kycklingfilé"],
+        [3, "strimlad kycklingfilé"],
+        [4, "kycklingfiléer"],
+      ],
+      "strimlad kycklingfilé",
+      2,
+    ],
+    [
+      "sallad",
+      "group:sallad",
+      [
+        [1, "sallad"],
+        [2, "sallad"],
+        [3, "blandad sallad"],
+        [4, "sallad"],
+      ],
+      "blandad sallad",
+      2,
+    ],
+    [
+      "parmesan",
+      "group:parmesan",
+      [
+        [1, "riven parmesan"],
+        [2, "parmesanost"],
+        [3, "riven parmesan"],
+        [4, "parmesanost"],
+      ],
+      "riven parmesan",
+      2,
+    ],
+    [
+      "bacon",
+      "group:bacon",
+      [
+        [1, "tärnat bacon"],
+        [2, "bacon"],
+        [3, "bacon skivat"],
+        [4, "bacon"],
+      ],
+      "tärnat bacon",
+      3,
+    ],
+  ])(
+    "lists %s as one chip and hides variants",
+    (_, groupId, rows, hiddenMember, expandCount) => {
+      const dishes = rows.map(([id, name]) => dishWithIngredients(id, name));
+      expectCollapsedGroup({
+        dishes,
+        groupId,
+        hiddenMemberName: hiddenMember,
+        expandCount,
+      });
+    }
+  );
 
   it("lists buljong and fond as single chips", () => {
     const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: kycklingbuljong
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: köttfond
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: fiskbuljong
----`,
-      },
-      {
-        id: 6,
-        description: `---
-ingredients:
-  - name: kycklingbuljong
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: grönsaksfond
----`,
-      },
-      {
-        id: 5,
-        description: `---
-ingredients:
-  - name: grönsaksfond
----`,
-      },
-      {
-        id: 7,
-        description: `---
-ingredients:
-  - name: oxbuljong
----`,
-      },
-      {
-        id: 8,
-        description: `---
-ingredients:
-  - name: skaldjursfond
----`,
-      },
-    ];
+      [1, "kycklingbuljong"],
+      [2, "köttfond"],
+      [3, "fiskbuljong"],
+      [6, "kycklingbuljong"],
+      [4, "grönsaksfond"],
+      [5, "grönsaksfond"],
+      [7, "oxbuljong"],
+      [8, "skaldjursfond"],
+    ].map(([id, name]) => dishWithIngredients(id, name));
     const { catalog } = buildFindIngredientContext(dishes);
     expect(catalog.some((ing) => ing.id === "group:buljong")).toBe(true);
     expect(catalog.some((ing) => ing.id === "group:fond")).toBe(true);
@@ -231,170 +179,6 @@ ingredients:
     expect(expandFindSelection([buljong.id], catalog).length).toBe(3);
     const fond = catalog.find((ing) => ing.id === "group:fond");
     expect(expandFindSelection([fond.id], catalog).length).toBe(3);
-  });
-
-  it("lists kycklingfilé as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: kycklingfiléer
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: strimlad kycklingfilé
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: strimlad kycklingfilé
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: kycklingfiléer
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:kycklingfile")).toBe(true);
-    expect(
-      catalog.find((ing) => ing.id === getIngredientId("strimlad kycklingfilé"))
-        ?.hiddenFromDefaultList
-    ).toBe(true);
-    const filé = catalog.find((ing) => ing.id === "group:kycklingfile");
-    expect(expandFindSelection([filé.id], catalog).length).toBe(2);
-  });
-
-  it("lists sallad as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: sallad
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: sallad
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: blandad sallad
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: sallad
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:sallad")).toBe(true);
-    expect(
-      catalog.find((ing) => ing.id === getIngredientId("blandad sallad"))
-        ?.hiddenFromDefaultList
-    ).toBe(true);
-    const sallad = catalog.find((ing) => ing.id === "group:sallad");
-    expect(expandFindSelection([sallad.id], catalog).length).toBe(2);
-  });
-
-  it("lists parmesan as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: riven parmesan
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: parmesanost
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: riven parmesan
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: parmesanost
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:parmesan")).toBe(true);
-    expect(
-      catalog.find((ing) => ing.id === getIngredientId("riven parmesan"))
-        ?.hiddenFromDefaultList
-    ).toBe(true);
-    const parmesan = catalog.find((ing) => ing.id === "group:parmesan");
-    expect(expandFindSelection([parmesan.id], catalog).length).toBe(2);
-  });
-
-  it("lists bacon as one chip and hides variants", () => {
-    const dishes = [
-      {
-        id: 1,
-        description: `---
-ingredients:
-  - name: tärnat bacon
----`,
-      },
-      {
-        id: 2,
-        description: `---
-ingredients:
-  - name: bacon
----`,
-      },
-      {
-        id: 3,
-        description: `---
-ingredients:
-  - name: bacon skivat
----`,
-      },
-      {
-        id: 4,
-        description: `---
-ingredients:
-  - name: bacon
----`,
-      },
-    ];
-    const { catalog } = buildFindIngredientContext(dishes);
-    expect(catalog.some((ing) => ing.id === "group:bacon")).toBe(true);
-    expect(
-      catalog.find((ing) => ing.id === getIngredientId("tärnat bacon"))
-        ?.hiddenFromDefaultList
-    ).toBe(true);
-    const bacon = catalog.find((ing) => ing.id === "group:bacon");
-    expect(expandFindSelection([bacon.id], catalog).length).toBe(3);
   });
 });
 
@@ -426,37 +210,26 @@ describe("ingredientGroups", () => {
     ).toBe(filé.id);
   });
 
-  it("assigns fläskfilé to fläskfile only", () => {
-    const file = groupDef("group:fläskfile");
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfilé"))
-    ).toBe(file.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskkarré i bit"))
-    ).toBe(null);
+  test.each([
+    ["fläskfilé", "group:fläskfile"],
+    ["fläskfärs", "group:färs"],
+    ["nötfärs", "group:färs"],
+    ["köttfärs", "group:färs"],
+  ])("assigns %s to %s", (name, groupId) => {
+    expect(normalizedIngredientIdAssignedGroupId(getIngredientId(name))).toBe(
+      groupDef(groupId).id
+    );
   });
 
-  it("assigns fläskfärs to färs", () => {
-    const färs = groupDef("group:färs");
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskfärs"))
-    ).toBe(färs.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("fläskkarré"))
-    ).toBe(null);
-  });
-
-  it("matches färs variants", () => {
-    const def = groupDef("group:färs");
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("nötfärs"))
-    ).toBe(def.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("köttfärs"))
-    ).toBe(def.id);
-    expect(
-      normalizedIngredientIdAssignedGroupId(getIngredientId("strimlat nötkött"))
-    ).toBe(null);
+  test.each([
+    "kycklingvingar",
+    "fläskkarré i bit",
+    "fläskkarré",
+    "strimlat nötkött",
+  ])("%s is not assigned to a collapsed group", (name) => {
+    expect(normalizedIngredientIdAssignedGroupId(getIngredientId(name))).toBe(
+      null
+    );
   });
 
   it("matches dishes when all group member ids are passed", () => {
@@ -464,15 +237,10 @@ describe("ingredientGroups", () => {
       {
         id: 1,
         name: "Fläskrätt",
-        description: `---
-ingredients:
-  - name: fläskkarré
-  - name: salt
----`,
+        description: dishWithIngredients(1, "fläskkarré", "salt").description,
       },
     ];
-    const fläskId = getIngredientId("fläskkarré");
-    const results = matchDishes(dishes, [fläskId]);
+    const results = matchDishes(dishes, [getIngredientId("fläskkarré")]);
     expect(results).toHaveLength(1);
     expect(results[0].dish.id).toBe(1);
   });

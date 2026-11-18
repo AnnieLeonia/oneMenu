@@ -7,6 +7,19 @@ import {
 import { getIngredientId } from "../utils/recipeIngredients/normalizeIngredient";
 import { expandFindSelection } from "../utils/recipeIngredients/parseDishIngredients";
 
+const rawIng = (name, extra = {}) => ({
+  id: getIngredientId(name),
+  label: name,
+  ...extra,
+});
+
+const groupChip = (slug, recipeCount = 10) => ({
+  id: `group:${slug}`,
+  label: slug,
+  isCollapsedGroup: true,
+  recipeCount,
+});
+
 describe("searchIngredients", () => {
   it("includes variant names that share the first word", () => {
     const catalog = [
@@ -18,33 +31,31 @@ describe("searchIngredients", () => {
     expect(hits.map((h) => h.id).sort()).toEqual(["a", "b"]);
   });
 
-  it("matches partial prefix on a word", () => {
-    expect(ingredientLabelMatchesSearch("laxfilé", "lax")).toBe(true);
-    expect(ingredientLabelMatchesSearch("laxfilé", "l")).toBe(true);
-    expect(ingredientLabelMatchesSearch("laxfilé", "la")).toBe(true);
-  });
-
-  it("matches substring in compound words (grädd → vispgrädde)", () => {
-    expect(ingredientLabelMatchesSearch("vispgrädde", "grädd")).toBe(true);
-    expect(ingredientLabelMatchesSearch("vispgrädde", "grädde")).toBe(true);
-  });
-
-  it("does not treat färsk as färs", () => {
-    expect(ingredientLabelMatchesSearch("färsk lax", "färs")).toBe(false);
-    expect(ingredientLabelMatchesSearch("färsk ingefära", "färs")).toBe(false);
-    expect(ingredientLabelMatchesSearch("nötfärs", "färs")).toBe(true);
-  });
+  test.each([
+    ["laxfilé", "lax", true],
+    ["laxfilé", "l", true],
+    ["laxfilé", "la", true],
+    ["vispgrädde", "grädd", true],
+    ["vispgrädde", "grädde", true],
+    ["färsk lax", "färs", false],
+    ["färsk ingefära", "färs", false],
+    ["nötfärs", "färs", true],
+    ["tomat", "tomater", true],
+    ["strimlad kalkon, kyckling eller skinka", "kycklingfilé", false],
+    ["pizzabullar", "kycklingfilé", false],
+  ])(
+    'ingredientLabelMatchesSearch("%s", "%s") → %s',
+    (label, query, expected) => {
+      expect(ingredientLabelMatchesSearch(label, query)).toBe(expected);
+    }
+  );
 
   it("ignores pantry staple words as search terms", () => {
+    const olivolja = rawIng("olivolja");
     for (const q of ["salt", "peppar", "olja", "smör", "vatten"]) {
       expect(ingredientLabelMatchesSearch("olivolja", q)).toBe(false);
       expect(ingredientLabelMatchesSearch("flingsalt", q)).toBe(false);
-      expect(
-        filterIngredientsByLooseSearch(
-          [{ id: getIngredientId("olivolja"), label: "olivolja" }],
-          q
-        )
-      ).toEqual([]);
+      expect(filterIngredientsByLooseSearch([olivolja], q)).toEqual([]);
     }
     expect(ingredientLabelMatchesSearch("olivolja", "oliv")).toBe(true);
   });
@@ -55,14 +66,9 @@ describe("searchIngredients", () => {
     expect(ingredientLabelMatchesSearch("färsk timjan", "timjan")).toBe(true);
     expect(ingredientLabelMatchesSearch("färsk lax", "lax")).toBe(true);
     const catalog = [
-      { id: getIngredientId("färsk timjan"), label: "färsk timjan" },
-      { id: getIngredientId("timjan"), label: "timjan" },
-      {
-        id: "group:färs",
-        label: "färs",
-        isCollapsedGroup: true,
-        recipeCount: 1,
-      },
+      rawIng("färsk timjan"),
+      rawIng("timjan"),
+      groupChip("färs", 1),
     ];
     expect(filterIngredientsByLooseSearch(catalog, "färsk")).toEqual([]);
     expect(
@@ -70,85 +76,33 @@ describe("searchIngredients", () => {
     ).toEqual([getIngredientId("färsk timjan"), getIngredientId("timjan")]);
   });
 
-  it("does not match plain kyckling when searching kycklingfilé", () => {
-    expect(
-      ingredientLabelMatchesSearch(
-        "strimlad kalkon, kyckling eller skinka",
-        "kycklingfilé"
-      )
-    ).toBe(false);
-    expect(ingredientLabelMatchesSearch("pizzabullar", "kycklingfilé")).toBe(
-      false
-    );
-    expect(ingredientLabelMatchesSearch("tomat", "tomater")).toBe(true);
-  });
-
   it("searching färs does not pull in unrelated sallad family", () => {
     const catalog = [
-      {
-        id: "group:färs",
-        label: "färs",
-        isCollapsedGroup: true,
-        recipeCount: 10,
-      },
-      {
-        id: "group:sallad",
-        label: "sallad",
-        isCollapsedGroup: true,
-        recipeCount: 8,
-      },
-      {
-        id: getIngredientId("blandad sallad"),
-        label: "blandad sallad",
-        recipeCount: 4,
-      },
-      {
-        id: getIngredientId("sallad med köttfärs"),
-        label: "sallad med köttfärs",
-        recipeCount: 1,
-      },
-      {
-        id: getIngredientId("nötfärs"),
-        label: "nötfärs",
-        recipeCount: 5,
-      },
+      groupChip("färs"),
+      groupChip("sallad", 8),
+      rawIng("blandad sallad", { recipeCount: 4 }),
+      rawIng("sallad med köttfärs", { recipeCount: 1 }),
+      rawIng("nötfärs", { recipeCount: 5 }),
     ];
-    const hits = filterIngredientsByLooseSearch(catalog, "färs");
-    const hitIds = hits.map((h) => h.id);
+    const hitIds = filterIngredientsByLooseSearch(catalog, "färs").map(
+      (h) => h.id
+    );
     expect(hitIds).toEqual(["group:färs"]);
     expect(hitIds).not.toContain("group:sallad");
     expect(hitIds).not.toContain(getIngredientId("blandad sallad"));
   });
 
-  it("finds collapsed färs chip when searching köttfärs", () => {
-    const catalog = [
-      {
-        id: "group:färs",
-        label: "färs",
-        isCollapsedGroup: true,
-        recipeCount: 10,
-      },
-    ];
-    const hits = filterIngredientsByLooseSearch(catalog, "köttfärs");
-    expect(hits.map((h) => h.id)).toEqual(["group:färs"]);
-  });
-
-  it("finds collapsed member by label", () => {
-    const catalog = [
-      {
-        id: getIngredientId("köttfärs"),
-        label: "köttfärs",
-        recipeCount: 5,
-      },
-      {
-        id: "group:färs",
-        label: "färs",
-        isCollapsedGroup: true,
-        recipeCount: 10,
-      },
-    ];
-    const hits = filterIngredientsByLooseSearch(catalog, "köttfärs");
-    expect(hits.map((h) => h.id)).toEqual(["group:färs"]);
+  test.each([
+    ["group only", [groupChip("färs")], "köttfärs"],
+    [
+      "member hidden behind group",
+      [rawIng("köttfärs", { recipeCount: 5 }), groupChip("färs")],
+      "köttfärs",
+    ],
+  ])("finds collapsed färs chip (%s)", (_, catalog, query) => {
+    expect(
+      filterIngredientsByLooseSearch(catalog, query).map((h) => h.id)
+    ).toEqual(["group:färs"]);
   });
 
   it("expands search: selection with loose search", () => {
@@ -157,11 +111,12 @@ describe("searchIngredients", () => {
     const catalog = [
       { id: shortId, label: "laxfilé" },
       { id: longId, label: "laxfilé i bit med skinn" },
-      { id: getIngredientId("lax"), label: "lax", recipeCount: 1 },
+      rawIng("lax", { recipeCount: 1 }),
     ];
     const searchId = makeFinderSearchSelectionId("laxfi");
-    const expanded = expandFindSelection([searchId], catalog);
-    expect(expanded.sort()).toEqual([shortId, longId].sort());
+    expect(expandFindSelection([searchId], catalog).sort()).toEqual(
+      [shortId, longId].sort()
+    );
   });
 
   it("expands selection to longer labels with the same stem", () => {

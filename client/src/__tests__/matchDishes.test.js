@@ -4,6 +4,14 @@ import {
   expandFindSelection,
   matchDishes,
 } from "../utils/recipeIngredients";
+import { dishWithIngredients } from "./recipeIngredientsFixtures";
+
+const matchRecipes = (dishes, selectedNames) => {
+  const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
+  const selectedIds = selectedNames.map((name) => getIngredientId(name));
+  const matchIds = expandFindSelection(selectedIds, catalog);
+  return matchDishes(dishes, matchIds, dishIndex, getLabel, selectedIds);
+};
 
 describe("matchDishes", () => {
   it("counts stor rödlök when rödlök is selected", () => {
@@ -11,29 +19,16 @@ describe("matchDishes", () => {
       {
         id: 1,
         name: "Tacos",
-        description: `---
-ingredients:
-  - name: köttfärs
-  - name: tomater
-  - name: stor rödlök
-  - name: salt
----`,
+        description: dishWithIngredients(
+          1,
+          "köttfärs",
+          "tomater",
+          "stor rödlök",
+          "salt"
+        ).description,
       },
     ];
-    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
-    const selectedIds = [
-      getIngredientId("köttfärs"),
-      getIngredientId("tomater"),
-      getIngredientId("rödlök"),
-    ];
-    const matchIds = expandFindSelection(selectedIds, catalog);
-    const results = matchDishes(
-      dishes,
-      matchIds,
-      dishIndex,
-      getLabel,
-      selectedIds
-    );
+    const results = matchRecipes(dishes, ["köttfärs", "tomater", "rödlök"]);
     expect(results).toHaveLength(1);
     expect(results[0].matched).toBe(3);
     expect(results[0].total).toBe(4);
@@ -44,23 +39,10 @@ ingredients:
       {
         id: 1,
         name: "Sallad",
-        description: `---
-ingredients:
-  - name: tomat
----`,
+        description: dishWithIngredients(1, "tomat").description,
       },
     ];
-    const { catalog, getLabel, dishIndex } = buildFindIngredientContext(dishes);
-    const tomaterId = getIngredientId("tomater");
-    const selectedIds = [tomaterId];
-    const matchIds = expandFindSelection(selectedIds, catalog);
-    const results = matchDishes(
-      dishes,
-      matchIds,
-      dishIndex,
-      getLabel,
-      selectedIds
-    );
+    const results = matchRecipes(dishes, ["tomater"]);
     expect(results[0].matched).toBe(1);
   });
 });
