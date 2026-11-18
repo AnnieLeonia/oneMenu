@@ -5,6 +5,61 @@ module.exports = {
     dishes: ["Dishes", "Varor", "Platos"],
     menu: ["Menu", "Meny", "Menú"],
     categories: ["Categories", "Kategorier", "Categorías"],
+    find: ["Find", "Hitta", "Buscar"],
+  },
+  find: {
+    title: [
+      "Find something to cook",
+      "Hitta något att laga",
+      "Encuentra algo para cocinar",
+    ],
+    subtitle: [
+      "Select ingredients you have:",
+      "Välj ingredienser du har:",
+      "Selecciona los ingredientes que tienes:",
+    ],
+    search: [
+      "Search ingredients...",
+      "Sök ingredienser...",
+      "Buscar ingredientes...",
+    ],
+    selected: ["Selected", "Valda", "Seleccionados"],
+    clearAll: ["Clear all", "Rensa alla", "Borrar todo"],
+    hint: [
+      "Pick ingredients above to see matching recipes.",
+      "Välj ingredienser ovan för att se matchande recept.",
+      "Elige ingredientes arriba para ver recetas coincidentes.",
+    ],
+    noIngredients: [
+      "No ingredients found in your recipes yet. Add a YAML ingredients list in the recipe description.",
+      "Inga ingredienser hittades i dina recept än. Lägg till en YAML-ingredienslista i receptbeskrivningen.",
+      "Aún no se encontraron ingredientes en tus recetas. Añade ingredientes estructurados o una tabla de Ingredients.",
+    ],
+    noMatches: [
+      "No recipes match those ingredients.",
+      "Inga recept matchar de ingredienserna.",
+      "Ninguna receta coincide con esos ingredientes.",
+    ],
+    results: ["Matching recipes", "Matchande recept", "Recetas coincidentes"],
+    matchCount: [
+      "${ matched }/${ total } ingredients",
+      "${ matched }/${ total } ingredienser",
+      "${ matched }/${ total } ingredientes",
+    ],
+    missing: [
+      "Missing: ${ names }",
+      "Saknas: ${ names }",
+      "Faltan: ${ names }",
+    ],
+    categories: {
+      meat: ["Meat and poultry", "Kött och fågel", "Carne y aves"],
+      fish: ["Fish and seafood", "Fisk och skaldjur", "Pescado y mariscos"],
+      vegetables: ["Vegetables", "Grönsaker", "Verduras"],
+      fruits: ["Fruits", "Frukt", "Frutas"],
+      dairy: ["Dairy", "Mejeri", "Lácteos"],
+      pantry: ["Pantry", "Skafferi", "Despensa"],
+      other: ["Other", "Övrigt", "Otros"],
+    },
   },
   edit: {
     edit: ["Edit", "Redigera", "Editar"],
