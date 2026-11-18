@@ -1,5 +1,20 @@
 import matter from "gray-matter";
 
+const MD_TITLE_PREFIX = "# ";
+const MD_GROUP_PREFIX = "### ";
+
+const SECTION_INGREDIENTS = "## Ingredienser";
+const SECTION_COOKING = "## Tillagning";
+
+const INGREDIENT_TABLE = ["Mängd | Ingrediens", "----- | ----------"];
+const META_TABLE_HEADER = [
+  "Svårighetsgrad   | Tid",
+  "---------------- | -------------",
+];
+
+const EMPTY_META_CELL = "—";
+const EMPTY_AMOUNT_CELL = "&nbsp;";
+
 /**
  * Split optional YAML frontmatter from a dish description.
  * @param {string|null|undefined} description
@@ -16,7 +31,7 @@ export function parseDescription(description) {
       data: data && typeof data === "object" ? data : {},
       content: content || "",
     };
-  } catch (e) {
+  } catch {
     return { data: {}, content: description };
   }
 }
@@ -27,52 +42,56 @@ function str(value) {
 
 function hasStructuredRecipeMeta(data) {
   if (!data || typeof data !== "object") return false;
-  if (str(data.title) || str(data.description) || str(data.summary))
-    return true;
-  if (data.difficulty || data.time) return true;
-  if (Array.isArray(data.ingredients) && data.ingredients.length > 0)
-    return true;
-  if (Array.isArray(data.steps) && data.steps.length > 0) return true;
-  if (typeof data.steps === "string" && data.steps.trim()) return true;
-  return false;
+  return Boolean(
+    str(data.title) ||
+      str(data.description) ||
+      str(data.summary) ||
+      data.difficulty ||
+      data.time ||
+      (Array.isArray(data.ingredients) && data.ingredients.length > 0) ||
+      (Array.isArray(data.steps) && data.steps.length > 0) ||
+      (typeof data.steps === "string" && data.steps.trim())
+  );
+}
+
+function parseIngredientItem(item) {
+  if (!item) return null;
+  if (typeof item === "string") {
+    const name = item.trim();
+    return name ? { name } : null;
+  }
+  if (typeof item !== "object" || !item.name) return null;
+
+  const name = str(item.name);
+  if (!name) return null;
+
+  return {
+    name,
+    ...(item.quantity != null && item.quantity !== ""
+      ? { quantity: item.quantity }
+      : {}),
+    ...(item.unit != null && str(item.unit) ? { unit: str(item.unit) } : {}),
+    ...(item.group != null && str(item.group)
+      ? { group: str(item.group) }
+      : {}),
+  };
 }
 
 function parseIngredientsFromFrontmatter(data) {
-  if (
-    !data ||
-    !Array.isArray(data.ingredients) ||
-    data.ingredients.length === 0
-  ) {
+  if (!Array.isArray(data?.ingredients) || data.ingredients.length === 0) {
     return null;
   }
-
-  const ingredients = data.ingredients
-    .map((item) => {
-      if (!item) return null;
-      if (typeof item === "string") {
-        const name = item.trim();
-        return name ? { name } : null;
-      }
-      if (typeof item === "object" && item.name) {
-        const name = String(item.name).trim();
-        if (!name) return null;
-        const result = { name };
-        if (item.quantity != null && item.quantity !== "") {
-          result.quantity = item.quantity;
-        }
-        if (item.unit != null && str(item.unit)) {
-          result.unit = str(item.unit);
-        }
-        if (item.group != null && str(item.group)) {
-          result.group = str(item.group);
-        }
-        return result;
-      }
-      return null;
-    })
-    .filter(Boolean);
-
+  const ingredients = data.ingredients.map(parseIngredientItem).filter(Boolean);
   return ingredients.length > 0 ? ingredients : null;
+}
+
+function parseStepItem(item) {
+  if (item == null) return "";
+  if (typeof item === "string") return item.trim();
+  if (typeof item === "object" && item.text != null) {
+    return String(item.text).trim();
+  }
+  return "";
 }
 
 function parseStepsFromFrontmatter(data) {
@@ -83,21 +102,9 @@ function parseStepsFromFrontmatter(data) {
     return text || null;
   }
 
-  if (!Array.isArray(data.steps) || data.steps.length === 0) {
-    return null;
-  }
+  if (!Array.isArray(data.steps) || data.steps.length === 0) return null;
 
-  const steps = data.steps
-    .map((item) => {
-      if (item == null) return "";
-      if (typeof item === "string") return item.trim();
-      if (typeof item === "object" && item.text != null) {
-        return String(item.text).trim();
-      }
-      return "";
-    })
-    .filter(Boolean);
-
+  const steps = data.steps.map(parseStepItem).filter(Boolean);
   return steps.length > 0 ? steps : null;
 }
 
@@ -106,13 +113,10 @@ function formatAmountCell(item) {
   const unit = item.unit ? str(item.unit) : "";
 
   if (quantity == null || quantity === "") {
-    return unit || "&nbsp;";
+    return unit || EMPTY_AMOUNT_CELL;
   }
 
-  const qtyText =
-    typeof quantity === "number" && quantity === 0.5 ? "1/2" : String(quantity);
-
-  return unit ? `${qtyText} ${unit}` : qtyText;
+  return unit ? `${quantity} ${unit}` : String(quantity);
 }
 
 /**
@@ -120,35 +124,29 @@ function formatAmountCell(item) {
  * @returns {string}
  */
 function formatIngredientsSection(ingredients) {
-  if (!ingredients || ingredients.length === 0) {
-    return "";
-  }
+  if (!ingredients?.length) return "";
 
-  const allGrouped = ingredients.every((item) => item.group && str(item.group));
+  const allGrouped = ingredients.every((item) => str(item.group));
+  const lines = [SECTION_INGREDIENTS];
 
-  const lines = ["## Ingredienser"];
   if (!allGrouped) {
-    lines.push("Mängd | Ingrediens", "----- | ----------");
+    lines.push(...INGREDIENT_TABLE);
   }
 
   let currentGroup = null;
-  ingredients.forEach((item) => {
+  for (const item of ingredients) {
     const group = item.group ? str(item.group) : null;
     if (group && group !== currentGroup) {
       const isFirstGroup = currentGroup == null;
       currentGroup = group;
-      if (!isFirstGroup || !allGrouped) {
-        lines.push("");
-      }
-      lines.push(`### ${group}`);
-      lines.push("Mängd | Ingrediens", "----- | ----------");
+      if (!isFirstGroup || !allGrouped) lines.push("");
+      lines.push(`${MD_GROUP_PREFIX}${group}`, ...INGREDIENT_TABLE);
     }
 
-    const amount = formatAmountCell(item);
     const name = str(item.name);
-    if (!name) return;
-    lines.push(`${amount} | ${name}`);
-  });
+    if (!name) continue;
+    lines.push(`${formatAmountCell(item)} | ${name}`);
+  }
 
   return `${lines.join("\n")}\n`;
 }
@@ -159,9 +157,8 @@ function formatMetaTable(difficulty, time) {
   if (!d && !t) return "";
 
   return [
-    "Svårighetsgrad   | Tid",
-    "---------------- | -------------",
-    `${d || "—"} | ${t || "—"}`,
+    ...META_TABLE_HEADER,
+    `${d || EMPTY_META_CELL} | ${t || EMPTY_META_CELL}`,
   ].join("\n");
 }
 
@@ -171,9 +168,9 @@ function formatStepsSection(steps) {
     const body = steps.trim();
     return body ? `${body}\n` : "";
   }
-  if (!Array.isArray(steps) || steps.length === 0) return "";
+  if (!steps.length) return "";
 
-  const lines = ["## Tillagning"];
+  const lines = [SECTION_COOKING];
   steps.forEach((step, index) => {
     const text = str(step);
     if (text) lines.push(`${index + 1}. ${text}`);
@@ -189,29 +186,27 @@ function formatStepsSection(steps) {
  * @returns {string}
  */
 export function composeRecipeMarkdown(data, content, options = {}) {
-  if (!hasStructuredRecipeMeta(data)) {
-    return "";
-  }
+  if (!hasStructuredRecipeMeta(data)) return "";
 
   const { includeTitle = true } = options;
   const title = str(data.title);
-  const summary = str(
-    data.description != null ? data.description : data.summary
-  );
+  const summary = str(data.description ?? data.summary);
   const ingredients = parseIngredientsFromFrontmatter(data);
   const steps = parseStepsFromFrontmatter(data);
   const metaTable = formatMetaTable(data.difficulty, data.time);
   const body = (content || "").trim();
 
-  const parts = [];
-  if (includeTitle && title) parts.push(`# ${title}`);
-  if (metaTable) parts.push(metaTable);
-  if (summary) parts.push(summary);
-  if (ingredients) parts.push(formatIngredientsSection(ingredients).trim());
-  if (steps) parts.push(formatStepsSection(steps).trim());
-  if (body) parts.push(body);
-
-  return parts.filter(Boolean).join("\n\n").trim();
+  return [
+    includeTitle && title && `${MD_TITLE_PREFIX}${title}`,
+    metaTable,
+    summary,
+    ingredients && formatIngredientsSection(ingredients).trim(),
+    steps && formatStepsSection(steps).trim(),
+    body,
+  ]
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
 }
 
 /**
