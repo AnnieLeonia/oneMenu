@@ -4,8 +4,8 @@
 
 ## Prerequisite
 
-- Node v12
-- Postgres v11
+- Node v22
+- Postgres v16
 
 ## Environment variables
 

@@ -9,9 +9,12 @@ jobs:
     name: Size Change
     runs-on: ubuntu-latest
 
+    env:
+      NODE_OPTIONS: --openssl-legacy-provider
+
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v2
