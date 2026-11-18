@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "DISABLE_ESLINT_PLUGIN=true PORT=8080 craco start",
-    "build": "DISABLE_ESLINT_PLUGIN=true craco build",
+    "start": "PORT=8080 craco start",
+    "build": "craco build",
+    "lint": "eslint src --ext .js,.jsx --config .eslintrc.airbnb.json",
     "test": "craco test --watchAll=false --coverage",
     "test:watch": "craco test",
     "eject": "react-scripts eject",
