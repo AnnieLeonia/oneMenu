@@ -1,9 +1,5 @@
 import matter from "gray-matter";
 
-const TILLAGNING_HEADING =
-  /^(Tillagning|Instructions|Method|Directions|Tillberedning|Gör så här|Instruktioner)\b/i;
-const INGREDIENSER_HEADING = /^(Ingredienser|Ingredients)\b/i;
-
 /**
  * Split optional YAML frontmatter from a dish description.
  * @param {string|null|undefined} description
@@ -170,23 +166,14 @@ function formatMetaTable(difficulty, time) {
 }
 
 function formatStepsSection(steps) {
-  const heading = "## Tillagning";
   if (steps == null) return "";
   if (typeof steps === "string") {
     const body = steps.trim();
-    if (!body) return "";
-    if (
-      /^##\s+(Tillagning|Instructions|Method|Directions|Tillberedning)\b/im.test(
-        body
-      )
-    ) {
-      return `${body}\n`;
-    }
-    return `${heading}\n\n${body}\n`;
+    return body ? `${body}\n` : "";
   }
   if (!Array.isArray(steps) || steps.length === 0) return "";
 
-  const lines = [heading];
+  const lines = ["## Tillagning"];
   steps.forEach((step, index) => {
     const text = str(step);
     if (text) lines.push(`${index + 1}. ${text}`);
@@ -194,105 +181,8 @@ function formatStepsSection(steps) {
   return lines.length > 1 ? `${lines.join("\n")}\n` : "";
 }
 
-function removeLeadingH1(markdown, title) {
-  let body = (markdown || "").replace(/^#\s+.+$/m, "").trimStart();
-  if (!title) return body;
-
-  const summary = str(title);
-  if (!summary) return body;
-
-  const escaped = summary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  body = body.replace(
-    new RegExp(`(^|\\n\\n)${escaped}(\\n\\n|$)`, "m"),
-    "\n\n"
-  );
-  return body.replace(/\n{3,}/g, "\n\n").trim();
-}
-
-function removeH2Section(markdown, titlePattern) {
-  const lines = (markdown || "").split(/\r?\n/);
-  const out = [];
-  let skipping = false;
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const trimmed = lines[i].trim();
-    const h2 = trimmed.match(/^##\s+(.+)$/);
-    if (h2) {
-      const title = h2[1].trim();
-      if (titlePattern.test(title)) {
-        skipping = true;
-        continue;
-      }
-      skipping = false;
-    }
-    if (!skipping) {
-      out.push(lines[i]);
-    }
-  }
-
-  return out
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-function removeLegacyMetaTable(markdown) {
-  const lines = (markdown || "").split(/\r?\n/);
-  const out = [];
-  let i = 0;
-
-  while (i < lines.length) {
-    const row = lines[i];
-    const lower = row.toLowerCase();
-    const isMetaHeader =
-      row.includes("|") &&
-      /svårighetsgrad|difficulty/.test(lower) &&
-      /\btid\b|time|duration/.test(lower);
-
-    if (isMetaHeader) {
-      i += 1;
-      if (i < lines.length && /^[\s|:-]+$/.test(lines[i].trim())) i += 1;
-      if (i < lines.length && lines[i].includes("|")) i += 1;
-      while (i < lines.length && !lines[i].trim()) i += 1;
-      continue;
-    }
-    out.push(lines[i]);
-    i += 1;
-  }
-
-  return out
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-function displayBody(
-  content,
-  { title, summary, hasMeta, hasIngredients, hasSteps }
-) {
-  let body = removeLeadingH1(content, title);
-  if (summary) {
-    const escaped = summary.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    body = body.replace(
-      new RegExp(`(^|\\n\\n)${escaped}(\\n\\n|$)`, "m"),
-      "\n\n"
-    );
-    body = body.replace(/\n{3,}/g, "\n\n").trim();
-  }
-  if (hasMeta) {
-    body = removeLegacyMetaTable(body);
-  }
-  if (hasIngredients) {
-    body = removeH2Section(body, INGREDIENSER_HEADING);
-  }
-  if (hasSteps) {
-    body = removeH2Section(body, TILLAGNING_HEADING);
-  }
-  return body.trim();
-}
-
 /**
- * Build markdown for rendering from YAML + freetext body.
+ * Build markdown for rendering: optional YAML fields, then body markdown unchanged.
  * @param {object} data
  * @param {string} content
  * @param {{ includeTitle?: boolean }} [options]
@@ -311,28 +201,21 @@ export function composeRecipeMarkdown(data, content, options = {}) {
   const ingredients = parseIngredientsFromFrontmatter(data);
   const steps = parseStepsFromFrontmatter(data);
   const metaTable = formatMetaTable(data.difficulty, data.time);
-
-  const body = displayBody(content, {
-    title,
-    summary,
-    hasMeta: !!(str(data.difficulty) || str(data.time)),
-    hasIngredients: !!ingredients,
-    hasSteps: !!steps,
-  });
+  const body = (content || "").trim();
 
   const parts = [];
   if (includeTitle && title) parts.push(`# ${title}`);
   if (metaTable) parts.push(metaTable);
   if (summary) parts.push(summary);
-  if (body) parts.push(body);
   if (ingredients) parts.push(formatIngredientsSection(ingredients).trim());
   if (steps) parts.push(formatStepsSection(steps).trim());
+  if (body) parts.push(body);
 
   return parts.filter(Boolean).join("\n\n").trim();
 }
 
 /**
- * Markdown for display (frontmatter composed into title, blurb, ingredienser, tillagning).
+ * Markdown for display: compose structured frontmatter (when present), otherwise body only.
  * @param {string|null|undefined} description
  * @param {{ includeTitle?: boolean }} [options]
  * @returns {string}
