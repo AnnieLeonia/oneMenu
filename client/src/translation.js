@@ -5,6 +5,38 @@ module.exports = {
     dishes: ["Dishes", "Varor", "Platos"],
     menu: ["Menu", "Meny", "Menú"],
     categories: ["Categories", "Kategorier", "Categorías"],
+    find: ["Find", "Hitta", "Buscar"],
+  },
+  find: {
+    title: ["Let him cook", "Låt honom laga", "Déjalo cocinar"],
+    subtitle: [
+      "Pick ingredients. He'll find the dish.",
+      "Välj ingredienser. Han hittar rätten.",
+      "Elige ingredientes. Él encuentra el plato.",
+    ],
+    search: [
+      "Search ingredients...",
+      "Sök ingredienser...",
+      "Buscar ingredientes...",
+    ],
+    selected: ["Selected", "Valda", "Seleccionados"],
+    clearAll: ["Clear all", "Rensa alla", "Borrar todo"],
+    noIngredients: [
+      "No ingredients found in your recipes yet. Add a YAML ingredients list in the recipe description.",
+      "Inga ingredienser hittades i dina recept än. Lägg till en YAML-ingredienslista i receptbeskrivningen.",
+      "Aún no se encontraron ingredientes en tus recetas. Añade ingredientes estructurados o una tabla de Ingredients.",
+    ],
+    noMatches: [
+      "No recipes match those ingredients.",
+      "Inga recept matchar de ingredienserna.",
+      "Ninguna receta coincide con esos ingredientes.",
+    ],
+    results: ["Matching recipes", "Matchande recept", "Recetas coincidentes"],
+    matchCount: [
+      "${ matched }/${ total } ingredients",
+      "${ matched }/${ total } ingredienser",
+      "${ matched }/${ total } ingredientes",
+    ],
   },
   edit: {
     edit: ["Edit", "Redigera", "Editar"],

@@ -9,7 +9,7 @@ import {
   toString,
 } from "lodash/fp";
 
-import { groupConsecutiveBy } from "../../utils/groupBy";
+import { parseIngredientItems } from "../../utils/ingredients/frontmatter";
 import { parseFrontMatter } from "./parseFrontMatter";
 import { scaleQuantity } from "./quantity";
 
@@ -44,6 +44,22 @@ export const SERVING_PRESETS = [2, 4, 6, 8, 12, 14];
 export const DEFAULT_SERVINGS = 4;
 const EMPTY_AMOUNT = "&nbsp;";
 
+const ingredientAmount = ({ quantity, unit }) =>
+  isNil(quantity) || quantity === ""
+    ? unit || EMPTY_AMOUNT
+    : unit
+    ? `${quantity} ${unit}`
+    : toString(quantity);
+
+const stepText = (step) =>
+  isNil(step)
+    ? ""
+    : isString(step)
+    ? step.trim()
+    : isObject(step) && !isNil(step.text)
+    ? toString(step.text).trim()
+    : "";
+
 function parseRecipe(description) {
   if (!isString(description) || isEmpty(description)) {
     return { data: {}, content: "" };
@@ -60,34 +76,28 @@ function parseRecipe(description) {
 }
 
 function normalizeIngredients(raw, ingredientMultiplier = 1) {
-  if (!Array.isArray(raw) || !raw.length) return null;
+  const items = parseIngredientItems(raw);
+  if (!items) return null;
+  if (ingredientMultiplier === 1) return items;
 
-  const items = compact(
-    raw.map((item) => {
-      if (!item) return null;
-      if (isString(item)) {
-        const name = item.trim();
-        return name ? { name } : null;
-      }
-      if (!isObject(item) || !item.name) return null;
-      const name = toString(item.name);
-      if (!name) return null;
-
-      const quantity =
-        !isNil(item.quantity) && item.quantity !== ""
-          ? scaleQuantity(item.quantity, ingredientMultiplier)
-          : undefined;
-
-      return {
-        name,
-        quantity,
-        unit: toString(item.unit) || undefined,
-        group: toString(item.group) || undefined,
-      };
-    })
+  return items.map((item) =>
+    !isNil(item.quantity) && item.quantity !== ""
+      ? {
+          ...item,
+          quantity: scaleQuantity(item.quantity, ingredientMultiplier),
+        }
+      : item
   );
+}
 
-  return items.length ? items : null;
+function groupConsecutiveBy(items, getKey) {
+  return items.reduce((groups, item) => {
+    const key = getKey(item);
+    const last = groups[groups.length - 1];
+    if (last?.key === key) last.items.push(item);
+    else groups.push({ key, items: [item] });
+    return groups;
+  }, []);
 }
 
 function parseRecipeServings(data) {
@@ -145,15 +155,7 @@ function ingredientsMarkdown(items, ingredientsTable = INGREDIENTS_TABLE) {
       const name = toString(item.name);
       if (!name) continue;
 
-      const { quantity, unit } = item;
-      const amount =
-        isNil(quantity) || quantity === ""
-          ? unit || EMPTY_AMOUNT
-          : unit
-          ? `${quantity} ${unit}`
-          : toString(quantity);
-
-      lines.push(`${amount} | ${name}`);
+      lines.push(`${ingredientAmount(item)} | ${name}`);
     }
   }
 
@@ -163,21 +165,9 @@ function ingredientsMarkdown(items, ingredientsTable = INGREDIENTS_TABLE) {
 function stepsMarkdown(data) {
   const { steps } = data;
   if (isNil(steps)) return "";
-
   if (isString(steps)) return steps.trim();
-
   if (!Array.isArray(steps) || !steps.length) return "";
-
-  return compact(
-    steps.map((step) => {
-      if (isNil(step)) return "";
-      if (isString(step)) return step.trim();
-      if (isObject(step) && !isNil(step.text)) {
-        return toString(step.text).trim();
-      }
-      return "";
-    })
-  )
+  return compact(steps.map(stepText))
     .map((text, i) => `${i + 1}. ${text}`)
     .join("\n");
 }

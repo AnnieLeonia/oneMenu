@@ -15,7 +15,7 @@ const store = createStore(
 store.dispatch(
   initialize({
     languages: ["en", "sv", "es"],
-    options: { renderToStaticMarkup },
+    options: { renderToStaticMarkup, defaultLanguage: "sv" },
   })
 );
 store.dispatch(addTranslation(translation));

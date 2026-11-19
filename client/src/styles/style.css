@@ -70,12 +70,20 @@ img.responsive {
   z-index: 1;
 }
 
-nav ul {
+nav {
+  display: flex;
+  align-items: center;
   border-bottom: #ff3334 solid 2px;
-  padding: 0em 0 0.3em 0;
-  text-align: center;
+  padding: 0 0.4em 0.3em;
+}
+
+nav ul {
+  flex: 1;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 nav li {
@@ -96,6 +104,16 @@ nav a.active {
   cursor: pointer;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+nav .nav-search-icon {
+  opacity: 0.55;
+  display: block;
+}
+
+nav .nav-find a.active .nav-search-icon {
+  opacity: 1;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.35));
 }
 
 .top a.active img {
@@ -597,6 +615,159 @@ nav a.active {
 @font-face {
   font-family: "Antic Didone";
   src: url("../assets/fonts/AnticDidone-Regular.ttf");
+}
+
+/* Find recipes / ingredient matcher */
+.find-page {
+  padding: 0.5em 0.75em 2em;
+  font-family: "Quicksand", sans-serif;
+}
+
+.find-page .find-title,
+.find-page .recipe-match-heading {
+  font-family: "Comfortaa", sans-serif;
+  color: #ff3334;
+}
+
+.find-page .find-title {
+  margin: 0.5em 0 0.25em;
+  font-size: 1.4em;
+}
+
+.find-page .find-subtitle {
+  margin: 0 0 0.75em;
+  color: #555;
+  font-size: 0.95em;
+}
+
+.find-page .ingredient-finder input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  font-size: 18px;
+  margin: 0.25em 0 0.75em;
+  padding: 0.4em 0.5em;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  background: transparent;
+}
+
+.find-page .ingredient-finder input:focus {
+  border-bottom-color: #ff3334;
+}
+
+.find-page .selected-ingredients {
+  margin-top: 1em;
+}
+
+.find-page .selected-ingredients-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4em;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.find-page .clear-all-btn {
+  background: none;
+  border: none;
+  color: #ff3334;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0.2em 0.4em;
+}
+
+.find-page .ingredient-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+
+/* ~3 rows of chips; scroll when there are more */
+.find-page .ingredient-chip-row--clamped {
+  max-height: 7.1em;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  align-content: flex-start;
+}
+
+.find-page .ingredient-chip {
+  text-transform: lowercase;
+  font-size: 0.9em;
+  padding: 0.35em 0.75em;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.find-page .ingredient-chip--selected {
+  background: #ff3334;
+  border-color: #ff3334;
+  color: #fff;
+}
+
+.find-page .find-empty {
+  color: #777;
+  font-size: 0.95em;
+  margin: 1em 0;
+}
+
+.find-page .recipe-match-list {
+  margin-top: 1.25em;
+}
+
+.find-page .recipe-match-heading {
+  font-size: 1.1em;
+  margin: 0 0 0.5em;
+}
+
+.find-page .recipe-match-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.find-page .recipe-match-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid #e8ddd4;
+  background: transparent;
+  padding: 0.6em 0;
+  cursor: pointer;
+}
+
+.find-page .recipe-match-img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-right: 0.75em;
+}
+
+.find-page .recipe-match-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.find-page .recipe-match-name {
+  font-size: 1.05em;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.find-page .recipe-match-stats {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 0.15em;
 }
 
 /* FONT: AmaticSC */
