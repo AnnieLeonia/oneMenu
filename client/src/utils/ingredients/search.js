@@ -1,4 +1,13 @@
-import { compact, filter, flow, get, map, trim, toLower } from "lodash/fp";
+import {
+  compact,
+  filter,
+  flow,
+  get,
+  map,
+  reject,
+  trim,
+  toLower,
+} from "lodash/fp";
 
 import {
   SEARCH_STOP_WORDS,
@@ -69,17 +78,14 @@ export function expandLabelVariants(selectedId, catalog) {
 
 const omitCollapsedMembersWhenGroupShown = (results) => {
   const groupIds = new Set(
-    flow(
-      filter((ing) => ing.isCollapsedGroup),
-      map(get("id"))
-    )(results)
+    flow(filter(get("isCollapsedGroup")), map(get("id")))(results)
   );
   if (!groupIds.size) return results;
-  return filter(
+  return reject(
     (ing) =>
-      ing.isCollapsedGroup ||
-      !ing.id?.startsWith("raw:") ||
-      !groupIds.has(groupIdFor(ing.id))
+      !ing.isCollapsedGroup &&
+      ing.id?.startsWith("raw:") &&
+      groupIds.has(groupIdFor(ing.id))
   )(results);
 };
 

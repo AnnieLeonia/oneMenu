@@ -1,15 +1,15 @@
 import {
   compact,
-  filter as filterFp,
+  filter,
   flow,
+  get,
   map,
   orderBy,
   uniq,
   values,
 } from "lodash/fp";
 
-import { parseFrontMatter } from "../../components/markdown/parseFrontMatter";
-import { parseFromFrontmatter } from "./frontmatter";
+import { parseDishIngredients } from "./frontmatter";
 import { INGREDIENT_GROUP_DEFS, groupIdFor } from "./groups";
 import {
   expandLabelVariants,
@@ -24,13 +24,13 @@ import {
   isExcludedFromPicker,
 } from "./normalize";
 
-export const MIN_LIST_RECIPE_COUNT = 4;
+const MIN_LIST_RECIPE_COUNT = 4;
 
 export function parseDish(description) {
-  const raw = parseFromFrontmatter(parseFrontMatter(description).data);
-  if (!raw?.length) {
+  const raw = parseDishIngredients(description);
+  if (!raw?.length)
     return { displayIngredients: [], normalizedIngredientIds: null };
-  }
+
   const displayIngredients = flow(
     map((item) => {
       const normalizedIngredientId = getIngredientId(item.name);
@@ -40,9 +40,10 @@ export function parseDish(description) {
   )(raw);
 
   const normalizedIngredientIds = flow(
-    map((item) => item.normalizedIngredientId),
+    map(get("normalizedIngredientId")),
     uniq
   )(displayIngredients);
+
   return {
     displayIngredients,
     normalizedIngredientIds: normalizedIngredientIds.length
@@ -103,7 +104,7 @@ export function buildCatalog(dishes) {
   }
 
   for (const def of INGREDIENT_GROUP_DEFS) {
-    const memberIds = filterFp((id) => groupIdFor(id) === def.id)(
+    const memberIds = filter((id) => groupIdFor(id) === def.id)(
       Object.keys(recipeCountById)
     );
     const recipeCount = groupRecipeCount[def.id] || 0;
@@ -138,13 +139,10 @@ export const isDefaultChip = (ing) =>
 export function expandSelection(selectedIds, catalog) {
   const byId = new Map((catalog || []).map((ing) => [ing.id, ing]));
   const seen = new Set();
-  const add = (id) => {
-    if (id && !seen.has(id)) seen.add(id);
-  };
   const expandOne = (id) => {
     if (isSearchChipId(id)) {
-      filterBySearch(catalog, searchChipQuery(id)).forEach((hit) =>
-        expandOne(hit.id)
+      filterBySearch(catalog, searchChipQuery(id)).forEach(({ id: hitId }) =>
+        expandOne(hitId)
       );
       return;
     }
@@ -152,7 +150,7 @@ export function expandSelection(selectedIds, catalog) {
     const ids = entry?.memberIds?.length
       ? entry.memberIds
       : expandLabelVariants(id, catalog);
-    ids.forEach(add);
+    ids.forEach((memberId) => memberId && seen.add(memberId));
   };
   (selectedIds || []).forEach(expandOne);
   return [...seen];
