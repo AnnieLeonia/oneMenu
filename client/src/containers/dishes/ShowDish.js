@@ -6,7 +6,7 @@ import { get, toInteger } from "lodash/fp";
 
 import { fetchDish, resetDish } from "../../actions/dishes";
 import onemenuicon from "../../assets/icons/onemenu.svg";
-import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
+import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
 
 const redirect = (history, location) =>
   history.push((location.query || {}).backUrl || "/");
@@ -31,7 +31,6 @@ class ShowDish extends Component {
       location,
       isLoggedIn,
     } = this.props;
-
     if (!name) {
       return null;
     }
@@ -41,7 +40,10 @@ class ShowDish extends Component {
         <div className="title">{name}</div>
         <div className="container">
           <img src={img || onemenuicon} alt="Dish" className="responsive"></img>
-          <MarkdownRenderer markdown={description} className="markdown-body" />
+          <RecipeMarkdownView
+            markdown={description}
+            className="markdown-body"
+          />
         </div>
         <br />
         <br />
@@ -81,6 +83,7 @@ ShowDish.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string,
   img: PropTypes.string,
+  description: PropTypes.string,
   translate: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,

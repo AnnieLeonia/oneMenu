@@ -171,9 +171,9 @@ nav a.active {
 }
 
 .search-form input,
-.dish input,
-.dish textarea,
-.dish select,
+.dish form input,
+.dish form textarea,
+.dish form select,
 .category input,
 .settings input,
 .settings select,
@@ -269,9 +269,9 @@ nav a.active {
   padding: 0.6em 0.5em;
 }
 
-.dish input,
-.dish textarea,
-.dish select,
+.dish form input,
+.dish form textarea,
+.dish form select,
 .category input,
 .settings input,
 .settings select,
@@ -283,15 +283,15 @@ nav a.active {
   float: left;
 }
 
-.dish input,
-.dish textarea,
+.dish form input,
+.dish form textarea,
 .category input,
 .settings input,
 #color-btn {
   width: calc(100% - 120px - 2em - 0.6em);
 }
 
-.dish select,
+.dish form select,
 .settings select,
 #color-btn {
   width: calc(100% - 120px - 1.89em);

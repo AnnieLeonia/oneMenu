@@ -947,3 +947,20 @@
   text-decoration: line-through;
   color: gray;
 }
+
+.markdown-body .recipe-meta-table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.markdown-body .recipe-meta-table .recipe-servings-cell {
+  white-space: nowrap;
+}
+
+.markdown-body .recipe-meta-table .recipe-servings-select {
+  width: auto;
+  max-width: 100%;
+  min-width: 6.5em;
+  font: inherit;
+  cursor: pointer;
+}

@@ -10,7 +10,7 @@ import {
   removeDish,
   resetDish,
 } from "../../actions/dishes";
-import MarkdownRenderer from "../../components/markdown/MarkdownRenderer";
+import RecipeMarkdownView from "../../components/markdown/RecipeMarkdownView";
 import { DEFAULT_DESCRIPTION } from "../../constants/dishes";
 import CategorySelect from "./CategorySelect";
 import DaySelect from "./DaySelect";
@@ -42,7 +42,6 @@ class EditDish extends Component {
   render() {
     const { dish, translate, history, location } = this.props;
     const { onRemove, onSubmit } = this.props;
-
     if (!dish.name) {
       return null;
     }
@@ -116,7 +115,7 @@ class EditDish extends Component {
               {translate("edit.save")}
             </button>
           </form>
-          <MarkdownRenderer
+          <RecipeMarkdownView
             markdown={this.state.description}
             className="flex flex-col markdown-body markdown-preview"
           />
